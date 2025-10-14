@@ -13,6 +13,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+
     // Xử lý logic đăng nhập
     public function login(Request $request)
     {
