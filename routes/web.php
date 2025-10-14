@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
+use App\Http\Controllers\PostController; // Giả sử bạn có controller này
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,8 +21,4 @@ Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::get('register', function() { /* ... */ })->name('register');
 Route::get('forgot-password', function() { /* ... */ })->name('password.request');
 
-// Route để hiển thị form đăng ký
-Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
-
-// Route để xử lý dữ liệu từ form đăng ký
-Route::post('register', [AuthController::class, 'register'])->name('register.post');
+Route::resource('posts', PostController::class);
