@@ -61,10 +61,11 @@ class AuthController extends Controller
 
         // 2. Tạo người dùng mới
         $user = User::create([
-            'name' => $request->name,
+            'full_name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            'password_hash' => Hash::make($request->password),
+            'role_id' => 2,
             // Gán role_id mặc định nếu cần
         ]);
 

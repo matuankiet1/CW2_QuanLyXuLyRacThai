@@ -1,14 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-
-
 
 // Route để hiển thị form đăng nhập
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -25,3 +23,5 @@ Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('r
 
 // Route để xử lý dữ liệu từ form đăng ký
 Route::post('register', [AuthController::class, 'register'])->name('register.post');
+
+Route::resource('events', EventController::class);

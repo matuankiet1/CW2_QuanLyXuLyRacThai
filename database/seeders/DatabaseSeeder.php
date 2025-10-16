@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Gọi RoleSeeder trước tiên để tạo các vai trò
+        $this->call([
+            RoleSeeder::class,
         ]);
+
+        // Bây giờ bạn có thể tạo User và Event mẫu
+        \App\Models\User::factory(5)->create(); // Tạo 5 user mẫu
+        \App\Models\Event::factory(10)->create(); // Tạo 10 sự kiện mẫu
     }
 }

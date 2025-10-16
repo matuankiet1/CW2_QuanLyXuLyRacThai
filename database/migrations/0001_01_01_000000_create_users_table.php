@@ -10,33 +10,42 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+{
+    Schema::create('users', function (Blueprint $table) {
+        $table->id('user_id'); // Đặt tên cột ID là user_id
+        $table->string('full_name', 100);
+        $table->string('email', 100)->unique();
+        $table->timestamp('email_verified_at')->nullable();
+        $table->string('password_hash', 255);
+        $table->string('student_id_code', 20)->nullable()->unique();
+        $table->string('class_name', 50)->nullable();
+        $table->unsignedBigInteger('role_id'); // Cột khóa ngoại
+        $table->rememberToken();
+        $table->timestamps();
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+        // Định nghĩa khóa ngoại
+        $table->foreign('role_id')->references('role_id')->on('roles');
+    });
 
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
-    }
+    // Xóa và tạo lại bảng password_reset_tokens nếu cần
+    Schema::dropIfExists('password_reset_tokens');
+    Schema::create('password_reset_tokens', function (Blueprint $table) {
+        $table->string('email')->primary();
+        $table->string('token');
+        $table->timestamp('created_at')->nullable();
+    });
 
+    // Xóa và tạo lại bảng sessions nếu cần
+    Schema::dropIfExists('sessions');
+    Schema::create('sessions', function (Blueprint $table) {
+        $table->string('id')->primary();
+        $table->foreignId('user_id')->nullable()->index();
+        $table->string('ip_address', 45)->nullable();
+        $table->text('user_agent')->nullable();
+        $table->longText('payload');
+        $table->integer('last_activity')->index();
+    });
+}
     /**
      * Reverse the migrations.
      */
