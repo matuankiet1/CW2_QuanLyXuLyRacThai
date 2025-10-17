@@ -1,18 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< Updated upstream
-use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
-<<<<<<< HEAD
-=======
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EventController;
->>>>>>> Stashed changes
-=======
-use App\Http\Controllers\PostController; // Giả sử bạn có controller này
->>>>>>> origin/main
+use App\Http\Controllers\PostController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,60 +24,51 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-<<<<<<< Updated upstream
-
-
-
-// Route để hiển thị form đăng nhập
-Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-=======
-// --- NHÓM ROUTE DÀNH CHO KHÁCH (CHƯA ĐĂNG NHẬP) ---
-// Middleware 'guest' sẽ tự động chuyển hướng người dùng đã đăng nhập về trang chủ.
-Route::middleware('guest')->group(function () {
-    // Hiển thị form đăng nhập
-    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-    // Xử lý đăng nhập
-    Route::post('login', [AuthController::class, 'login'])->name('login.post');
->>>>>>> Stashed changes
-
-    // Hiển thị form đăng ký
-    Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
-    // Xử lý đăng ký
-    Route::post('register', [AuthController::class, 'register'])->name('register.post');
-
-    // (Tùy chọn) Thêm các route cho quên mật khẩu nếu cần
-    // Route::get('forgot-password', ...)->name('password.request');
+Route::get('/test-mail', function () {
+    try {
+        Mail::raw('Đây là mail test gửi từ Laravel qua Gmail SMTP.', function ($message) {
+            $message->to('21211tt4361@mail.tdc.edu.vn')
+                ->subject('✅ Test gửi mail thành công!');
+        });
+        return 'Mail đã gửi thành công ✅';
+    } catch (\Exception $e) {
+        return 'Gửi mail thất bại ❌<br>' . $e->getMessage();
+    }
 });
 
-<<<<<<< HEAD
+//------------------------------------ AUTH -------------------------------------//
 
-<<<<<<< Updated upstream
-// Route để xử lý dữ liệu từ form đăng ký
-Route::post('register', [AuthController::class, 'register'])->name('register.post');
-=======
-// --- NHÓM ROUTE DÀNH CHO NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
-// Middleware 'auth' đảm bảo chỉ người dùng đã xác thực mới có thể truy cập.
-Route::middleware('auth')->group(function () {
-    // Trang Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('login', [AuthController::class, 'login'])->name('login.post');
+Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [AuthController::class, 'register']);
+// Route::get('forgot_password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot_password.show');
 
-    // Quản lý sự kiện (CRUD)
-    Route::resource('events', EventController::class);
+Route::middleware('guest')->group(function () {
+    // Nhập email, gửi mã, và xác thực mã
+    Route::get('/forgot_password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot_password.form');
 
-    // Xử lý đăng xuất
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    
-    Route::get('/forgot-password', function () {
-    return 'Chức năng quên mật khẩu đang được phát triển.';
-})->name('password.request');
+    Route::post('/forgot_password/send_code', [AuthController::class, 'sendCode'])
+        ->middleware('throttle:3,1') // chống spam gửi
+        ->name('forgot_password.send');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/forgot_password/verify', [AuthController::class, 'verifyCode'])
+        ->middleware('throttle:10,1') // chống spam nhập mã
+        ->name('forgot_password.verify');
+
+    // Đặt lại mật khẩu (chỉ vào được sau khi verify mã)
+    Route::get('/reset_password', [AuthController::class, 'showResetPasswordForm'])->name('reset_password.form');
+    Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
+});
+
+//--------------------------------- OTHER FUNCTIONS ---------------------------//
+
+    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard', function () {
     return view('dashboard');
 });
-});
->>>>>>> Stashed changes
-=======
+
+
 Route::resource('posts', PostController::class);
->>>>>>> origin/main
+

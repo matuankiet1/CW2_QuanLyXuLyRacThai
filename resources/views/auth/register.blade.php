@@ -26,7 +26,7 @@
             <p class="text-gray-500">Tham gia vào hệ thống EcoSchool</p>
         </div>
 
-        <form method="POST" action="{{ route('register.post') }}" class="space-y-4">
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
 
             {{-- Full Name --}}
