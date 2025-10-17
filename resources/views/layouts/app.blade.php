@@ -5,11 +5,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}"> {{-- Bảo mật form --}}
 
-    <title>EcoSchool</title>
+    <title>@yield('title', 'EcoSchool')</title>
 
-    {{-- Tích hợp Vite để nạp CSS và JS --}}
-    @vite('resources/css/app.css')
+    {{-- Font hoặc favicon (nếu có) --}}
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+
+    {{-- CSS của ứng dụng (dùng Vite) --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="antialiased">
