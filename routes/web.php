@@ -2,17 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
-<<<<<<< HEAD
-=======
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EventController;
->>>>>>> Stashed changes
-=======
-use App\Http\Controllers\PostController; // Giả sử bạn có controller này
->>>>>>> origin/main
+use App\Http\Controllers\PostController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -71,13 +63,12 @@ Route::middleware('guest')->group(function () {
 
 //--------------------------------- OTHER FUNCTIONS ---------------------------//
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/dashboard', function () {
     return view('dashboard');
 });
-});
->>>>>>> Stashed changes
-=======
+
+
 Route::resource('posts', PostController::class);
->>>>>>> origin/main
+

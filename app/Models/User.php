@@ -43,26 +43,11 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
-<<<<<<< Updated upstream
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-=======
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
-     * Lấy mật khẩu cho người dùng (chỉ cho Laravel biết cột mật khẩu đúng).
-     *
-     * @return string
-     */
-    public function getAuthPassword()
-    {
-        return $this->password_hash;
->>>>>>> Stashed changes
     }
 }
