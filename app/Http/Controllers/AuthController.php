@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use App\Mail\SendCodeMail;
 use Illuminate\Http\Request;
@@ -80,6 +81,89 @@ class AuthController extends Controller
         return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
     }
 
+    public function redirectToProvider($provider)
+    {
+        // Nếu muốn request thêm scope (ví dụ Google openid)
+        if ($provider === 'google') {
+            return Socialite::driver('google')->redirect();
+        }
+
+        if ($provider === 'facebook') {
+            return Socialite::driver('facebook')->redirect();
+        }
+
+        abort(404);
+    }
+
+    public function handleProviderCallback(string $provider)
+    {
+        abort_unless(in_array($provider, ['google', 'facebook']), 404);
+
+        try {
+            $socialUser = Socialite::driver($provider)->user();
+        } catch (\Throwable $e) {
+            dd('Không thể xác thực bằng ' . $provider. '. ' . $e->getMessage());
+            // return redirect()->route('login')->withErrors([
+            //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
+            // ]);
+        }
+
+        $providerId = $socialUser->getId();
+        $email = $socialUser->getEmail();
+        $name = $socialUser->getName() ?? $socialUser->getNickname();
+        
+
+        // 1) Tìm đúng user theo (auth_provider, provider_id)
+        $user = User::where('auth_provider', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        if (!$user && $email) {
+            // 2) Có email trùng?
+            $byEmail = User::where('email', $email)->first();
+
+            if ($byEmail) {
+                // Tài khoản đã được tạo từ provider khác => Chặn (1 user = 1 provider)
+                if ($byEmail->auth_provider !== $provider) {
+                    return redirect()->route('login')->withErrors([
+                        'oauth' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
+                            '. Vui lòng đăng nhập bằng cách đó.',
+                    ]);
+                }
+
+                // Nếu trùng provider mà chưa có provider_id -> cập nhật
+                if (!$byEmail->provider_id) {
+                    $byEmail->update(['provider_id' => $providerId]);
+                }
+
+                $user = $byEmail;
+            }
+        }
+
+        // 3) Nếu chưa có ai => tạo mới
+        if (!$user) {
+            
+            if (!$email) {
+                return redirect()->route('login')->withErrors([
+                    'oauth' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.',
+                ]);
+            }
+
+            $user = User::create([
+                'name' => $name ?: 'User ' . Str::random(6),
+                'email' => $email,
+                'password' => Hash::make(Str::random(16)),
+                'auth_provider' => $provider,                   
+                'provider_id' => $providerId,                 
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        // 4) Login
+        Auth::login($user, true);
+        return redirect()->intended('/dashboard');
+    }
+
     public function showForgotPasswordForm()
     {
         return view('auth.forgot_password');
@@ -103,7 +187,6 @@ class AuthController extends Controller
             DB::table('password_reset_codes')->insert([
                 'email' => $email,
                 'code_hash' => $hash,
-                'attempts' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -139,17 +222,20 @@ class AuthController extends Controller
             return back()->withInput()->withErrors(['code' => 'Mã không hợp lệ']);
         }
 
-        if ($row->attempts = 0) { // Giới hạn 5 lần nhập sai
+        $remaining = 0;
+
+        if ($row->attempts == 1) { // Khi đã nhập sai 5 lần
             DB::table('password_reset_codes')->where('id', $row->id)->delete();
             return back()->withInput()->withErrors(['code' => 'Bạn đã nhập sai quá số lần. Hãy yêu cầu mã mới.']);
         }
 
         if (!Hash::check($code, $row->code_hash)) {
             DB::table('password_reset_codes')->where('id', $row->id)->update([
-                'attempts' => $row->attempts - 1,
+                'attempts' => max(0, $row->attempts - 1),
                 'updated_at' => now(),
             ]);
-            return back()->withInput()->withErrors(['code' => "Mã không hợp lệ, bạn còn {$row->attempts} lần nhập."]);
+            $remaining = DB::table('password_reset_codes')->where('id', $row->id)->value('attempts');
+            return back()->withInput()->withErrors(['code' => "Mã không hợp lệ, bạn còn {$remaining} lần nhập."]);
         }
 
         // Mã đúng -> cấp session cho phép sang trang đặt mật khẩu
