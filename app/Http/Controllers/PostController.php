@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
-    /**
-     * Hiển thị danh sách bài viết
-     */
     public function index(Request $request)
     {
         $query = Post::with('user');
@@ -47,6 +46,13 @@ class PostController extends Controller
         return ['path' => $folder . '/' . $filename];
     }
 
+    private function validateTextField($attribute, $value, $fail)
+    {
+        if (preg_match('/<script|<\/script>|<\?|<iframe|onerror|onload/i', $value)) {
+            $fail('Trường "' . $attribute . '" chứa nội dung không hợp lệ.');
+        }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -69,10 +75,10 @@ class PostController extends Controller
         ]);
 
         $post = new Post();
-        $post->title = $request->title;
-        $post->content = $request->content;
-        $post->user_id = Auth::id();
-        $post->rating = $request->rating ?? 1;
+        $post->title = $request->input('title');
+        $post->content = $request->input('content');
+        $post->user_id = Auth::id(); // cần 'use Illuminate\Support\Facades\Auth;'
+        $post->rating = $request->input('rating', 1); // mặc định là 1 nếu không có
 
         if ($request->hasFile('image')) {
             $upload = $this->handleImageUpload($request);
@@ -83,6 +89,7 @@ class PostController extends Controller
         }
 
         $post->save();
+
         return redirect()->route('posts.index')->with('success', 'Thêm bài viết thành công!');
     }
 
@@ -96,17 +103,15 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($post_id);
 
-        // Kiểm tra xung đột cập nhật
         if ($request->filled('updated_at')) {
-            $clientTime = \Carbon\Carbon::parse($request->updated_at);
+            $clientTime = Carbon::parse($request->updated_at);
             if ($clientTime->ne($post->updated_at)) {
-                return back()
-                    ->withErrors(['error' => 'Dữ liệu đã được chỉnh sửa bởi người khác. Vui lòng tải lại trang.'])
-                    ->withInput();
+                return back()->withErrors([
+                    'error' => 'Dữ liệu đã được chỉnh sửa bởi người khác. Vui lòng tải lại trang.'
+                ])->withInput();
             }
         }
 
-        // Validation
         $validated = $request->validate([
             'title' => [
                 'required',
@@ -127,10 +132,7 @@ class PostController extends Controller
             'rating' => 'nullable|integer|min:1|max:5',
         ]);
 
-        // Cập nhật dữ liệu
-        $post->title = $validated['title'];
-        $post->content = $validated['content'];
-        $post->rating = $validated['rating'] ?? $post->rating;
+        $post->fill($validated);
 
         if ($request->hasFile('image')) {
             if ($post->image && file_exists(public_path($post->image))) {
@@ -146,26 +148,23 @@ class PostController extends Controller
         }
 
         $post->save();
+
         return redirect()->route('posts.index')->with('success', 'Cập nhật bài viết thành công!');
     }
 
     public function destroy(Post $post)
     {
         try {
-            // Xoá ảnh nếu tồn tại và hợp lệ
-            if ($post->image) {
-                $imagePath = public_path($post->image);
-                if (file_exists($imagePath) && is_file($imagePath)) {
-                    unlink($imagePath);
-                }
+            if ($post->image && file_exists(public_path($post->image))) {
+                unlink(public_path($post->image));
             }
 
-            // Xoá bài viết
             $post->delete();
-
             return redirect()->route('posts.index')->with('success', 'Xoá bài viết thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('posts.index')->withErrors(['error' => 'Không thể xoá bài viết: ' . $e->getMessage()]);
+            return redirect()->route('posts.index')->withErrors([
+                'error' => 'Không thể xoá bài viết: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -180,6 +179,4 @@ class PostController extends Controller
         $post = Post::with('user')->findOrFail($id);
         return view('posts.show', compact('post'));
     }
-
-
 }
