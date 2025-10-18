@@ -4,7 +4,7 @@
 <div class="flex h-screen bg-gray-100">
 
     {{-- Sidebar --}}
-    <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200">
+    <aside class="flex-col w-64 bg-white border-r border-gray-200">
         {{-- Logo --}}
         <div class="flex items-center justify-between p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">

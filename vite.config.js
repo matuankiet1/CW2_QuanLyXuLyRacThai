@@ -8,7 +8,6 @@ export default defineConfig({
         laravel({
         input: [
             'resources/css/app.css',
-            'resources/ts/app.tsx',
             'resources/js/app.js',
             'resources/js/dashboard.js', // thêm dòng này
             'resources/js/loader.js',
