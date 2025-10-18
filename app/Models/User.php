@@ -26,6 +26,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'auth_provider',
+        'provider_id',
     ];
 
     /**
@@ -50,4 +52,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isLocal(): bool     { return $this->auth_provider === 'local'; }
+    public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
+    public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
 }

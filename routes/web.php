@@ -2,49 +2,30 @@
 
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Đây là nơi bạn có thể đăng ký các route cho ứng dụng của mình.
-|
-*/
-
 // Route mặc định, chuyển hướng đến trang đăng nhập nếu chưa đăng nhập,
 // hoặc đến dashboard nếu đã đăng nhập.
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('admin');
-    }
-    return redirect()->route('login');
-}); 
-
-Route::get('/test-mail', function () {
-    try {
-        Mail::raw('Đây là mail test gửi từ Laravel qua Gmail SMTP.', function ($message) {
-            $message->to('21211tt4361@mail.tdc.edu.vn')
-                ->subject('✅ Test gửi mail thành công!');
-        });
-        return 'Mail đã gửi thành công ✅';
-    } catch (\Exception $e) {
-        return 'Gửi mail thất bại ❌<br>' . $e->getMessage();
-    }
-});
+// Route::get('/', function () {
+//     if (Auth::check()) {
+//         return redirect()->route('dashboard');
+//     }
+//     return redirect()->route('login');
+// });
 
 //------------------------------------ AUTH -------------------------------------//
-
+// Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
-// Route::get('forgot_password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot_password.show');
 
+// Login, register bằng social (Google, Facebook)
+Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
+Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
+
+// Quên mật khẩu
 Route::middleware('guest')->group(function () {
     // Nhập email, gửi mã, và xác thực mã
     Route::get('/forgot_password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot_password.form');
@@ -64,12 +45,11 @@ Route::middleware('guest')->group(function () {
 
 //--------------------------------- OTHER FUNCTIONS ---------------------------//
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin');
+// Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-//     Route::get('/dashboard', function () {
-//     return view('dashboard.admin');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
 // });
-
 
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
