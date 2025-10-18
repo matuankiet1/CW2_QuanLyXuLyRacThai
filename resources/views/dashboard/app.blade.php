@@ -58,9 +58,9 @@
             </a>
           </li>
           <li>
-            <a href="{{ route('blogs.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-gray-200">
+            <a href="{{ route('posts.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-gray-200">
               <i class="fa-solid fa-user"></i>
-              <span>Blogs</span>
+              <span>Post</span>
             </a>
           </li>
           <li>

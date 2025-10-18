@@ -70,5 +70,16 @@ Route::middleware('guest')->group(function () {
 });
 
 
-Route::resource('posts', PostController::class);
+Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+
+
+
+Route::get('/admin/posts', [PostController::class, 'index'])->name('posts.index'); // Hiển thị danh sách bài viết
+Route::get('/admin/posts/create', [PostController::class, 'create'])->name('posts.create'); // Tạo bài viết mới
+Route::post('/admin/posts', [PostController::class, 'store'])->name('posts.store'); // Lưu bài viết mới
+Route::get('/admin/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+Route::put('/admin/posts/{post}', [PostController::class, 'update'])->name('posts.update'); // Cập nhật bài viết
+Route::delete('/admin/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
 

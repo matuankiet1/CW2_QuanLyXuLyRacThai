@@ -10,7 +10,7 @@
 @endif
 
 <div class="container py-4">
-    <h1 class="text-2xl font-semibold mb-4">Blog Management</h1>
+    <h1 class="text-2xl font-semibold mb-4">Post Management</h1>
 
     @if (session('success'))
         <div class="alert alert-success">
@@ -26,11 +26,11 @@
             </div>
             <div class="col">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <a href="{{ route('blogs.index') }}" class="btn btn-secondary">Xoá lọc</a>
+                <a href="{{ route('posts.index') }}" class="btn btn-secondary">Xoá lọc</a>
             </div>
         </form>
 
-        <a href="{{ route('blogs.create') }}" class="btn btn-success">Add New Blog</a>
+        <a href="{{ route('posts.create') }}" class="btn btn-success">Add New Post</a>
     </div>
 
     <div class="table-responsive shadow-sm">
@@ -46,22 +46,22 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($blogs as $blog)
+                @forelse ($posts as $post)
                     <tr>
-                        <td>{{ $blog->post_id }}</td>
-                        <td>{{ $blog->title }}</td>
+                        <td>{{ $post->post_id }}</td>
+                        <td>{{ $post->title }}</td>
                         <td>
-                            @if ($blog->image)
-                                <img src="{{ asset($blog->image) }}" alt="Blog Image" width="100">
+                            @if ($post->image)
+                                <img src="{{ asset($post->image) }}" alt="Post Image" width="100">
                             @else
                                 <span class="text-muted fst-italic">No image</span>
                             @endif
                         </td>
-                        <td>{{ $blog->user->full_name ?? 'N/A' }}</td>
-                        <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
+                        <td>{{ $post->user->full_name ?? 'N/A' }}</td>
+                        <td>{{ $post->created_at->format('d/m/Y H:i') }}</td>
                         <td class="text-end">
-                            <a href="{{ route('blogs.edit', $blog->post_id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                            <form action="{{ route('blogs.destroy', $blog->post_id) }}" method="POST" class="d-inline delete-form">
+                            <a href="{{ route('posts.edit', $post->post_id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <form action="{{ route('posts.destroy', $post->post_id) }}" method="POST" class="d-inline delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
@@ -78,7 +78,7 @@
     </div>
 
     <div class="mt-3">
-        {{ $blogs->links('pagination::bootstrap-5') }}
+        {{ $posts->links('pagination::bootstrap-5') }}
     </div>
 </div>
 
