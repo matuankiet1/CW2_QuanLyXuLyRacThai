@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\AuthController;
@@ -19,10 +20,10 @@ use App\Http\Controllers\PostController;
 // hoặc đến dashboard nếu đã đăng nhập.
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect()->route('dashboard');
+        return redirect()->route('admin');
     }
     return redirect()->route('login');
-});
+}); 
 
 Route::get('/test-mail', function () {
     try {
@@ -63,11 +64,11 @@ Route::middleware('guest')->group(function () {
 
 //--------------------------------- OTHER FUNCTIONS ---------------------------//
 
-    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin');
 
-    Route::get('/dashboard', function () {
-    return view('dashboard');
-});
+//     Route::get('/dashboard', function () {
+//     return view('dashboard.admin');
+// });
 
 
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
