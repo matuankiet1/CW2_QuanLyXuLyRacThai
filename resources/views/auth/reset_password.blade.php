@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 p-4">
-    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border">
+    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-400">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-green-600 text-white rounded-xl mb-4">
                 {{-- SVG Icon cho chiếc lá (Leaf) thay thế cho lucide-react --}}
