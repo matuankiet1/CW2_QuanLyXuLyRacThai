@@ -36,6 +36,16 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
+        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
+            $user = User::where('email', $credentials['email'])->first();
+            if ($user && $user->auth_provider != 'local') {
+                return redirect()->route('login')->with('status', [
+                    'type' => 'error',
+                    'message' => 'Email này đã đăng ký bằng ' . strtoupper($user->auth_provider) .
+                        '. Vui lòng đăng nhập bằng cách đó.'
+                ]);
+            }
+
         }
 
         // Nếu đăng nhập thất bại
@@ -102,10 +112,14 @@ class AuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Throwable $e) {
-            dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
+            // dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
             // ]);
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Không thể xác thực bằng ' . strtoupper($provider) . '. Vui lòng kiểm tra và thử lại.'
+            ]);
         }
 
         $providerId = $socialUser->getId();
@@ -125,9 +139,10 @@ class AuthController extends Controller
             if ($byEmail) {
                 // Tài khoản đã được tạo từ provider khác => Chặn (1 user = 1 provider)
                 if ($byEmail->auth_provider !== $provider) {
-                    return redirect()->route('login')->withErrors([
-                        'oauth' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
-                            '. Vui lòng đăng nhập bằng cách đó.',
+                    return redirect()->route('login')->with('status', [
+                        'type' => 'error',
+                        'message' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
+                            '. Vui lòng đăng nhập bằng cách đó.'
                     ]);
                 }
 
@@ -142,10 +157,10 @@ class AuthController extends Controller
 
         // 3) Nếu chưa có ai => tạo mới
         if (!$user) {
-
             if (!$email) {
-                return redirect()->route('login')->withErrors([
-                    'oauth' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.',
+                return redirect()->route('login')->with('status', [
+                    'type' => 'error',
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.'
                 ]);
             }
 
@@ -200,7 +215,7 @@ class AuthController extends Controller
             ->with(
                 'valid',
                 'Nếu email hợp lệ, <strong>mã xác thực</strong> đã được gửi. Vui lòng kiểm tra và nhập vào thanh dưới đây.'
-        );
+            );
 
     }
 
@@ -289,5 +304,11 @@ class AuthController extends Controller
             'type' => 'success',
             'message' => 'Đặt lại mật khẩu thành công!'
         ]);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $keyword = $request->get('q', '');
+        return response()->json(User::where('name', 'like', "%{$keyword}%")->pluck('name'));
     }
 }

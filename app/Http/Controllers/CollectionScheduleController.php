@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\CollectionSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,7 +14,8 @@ class CollectionScheduleController extends Controller
      */
     public function index()
     {
-        return view('admin.collection_schedules.index');
+        $collectionSchedules = CollectionSchedule::paginate(10);
+        return view('admin.collection_schedules.index', compact('collectionSchedules'));
     }
 
     /**
@@ -30,12 +32,19 @@ class CollectionScheduleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'staff_id' => 'required|exists:users,user_id',
-            'scheduled_date' => 'required|date',
-            'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
-            'completed_at' => 'nullable|date',
+            'staff_id' => 'required|string|max:255',
+            'scheduled_date' => 'required|date'
         ]);
-        CollectionSchedule::create($validated);
+        $staff_id = User::where('name', $validated['staff_id'])->value('user_id');
+        if (!$staff_id) {
+            return back()->with('status', [
+                'type' => 'error',
+                'message' => 'Staff not found!'
+            ])->withInput();
+        } else {
+            $validated['staff_id'] = $staff_id;
+            CollectionSchedule::create($validated);
+        }
         return back()->with('status', [
             'type' => 'success',
             'message' => 'Added collection schedule successfully!'
@@ -45,15 +54,16 @@ class CollectionScheduleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CollectionSchedule $collectionScheduleManagement)
+    public function show($id)
     {
-        //
+        $collectionSchedule = CollectionSchedule::with('staff')->findOrFail($id);
+        return response()->json($collectionSchedule);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CollectionSchedule $collectionScheduleManagement)
+    public function edit($id)
     {
         //
     }
@@ -71,9 +81,9 @@ class CollectionScheduleController extends Controller
         ]);
         $collectionScheduleManagement->update($validated);
         return back()->with('status', [
-                'type' => 'success',
-                'message' => 'Updated collection schedule successfully!'
-            ]);
+            'type' => 'success',
+            'message' => 'Updated collection schedule successfully!'
+        ]);
     }
 
     /**

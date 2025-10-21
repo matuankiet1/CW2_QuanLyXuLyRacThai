@@ -42,8 +42,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
+Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
+
 //--------------------------------------- DASHBOARD -------------------------------------//
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
 
 //--------------------------------------- POSTS -------------------------------------//
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
@@ -56,7 +58,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 //--------------------------------------- COLLECTION SCHEDULE -------------------------------------//
-Route::resource('collection-schedule', CollectionScheduleController::class);
+Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+    'index' => 'admin.collection-schedules.index',
+    'store' => 'admin.collection-schedules.store',
+    'edit' => 'admin.collection-schedules.edit',
+    'update' => 'admin.collection-schedules.update',
+    'destroy' => 'admin.collection-schedules.destroy',
+]);
 
 //--------------------------------------- BANNERS -------------------------------------//
 Route::resource('banners', BannerController::class);
