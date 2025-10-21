@@ -79,9 +79,9 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            // Gán role_id mặc định nếu cần
+            'role' => 'user',
+            'auth_provider' => 'local',
         ]);
 
         // 3. Tự động đăng nhập cho người dùng mới
@@ -168,6 +168,7 @@ class AuthController extends Controller
                 'name' => $name ?: 'User ' . Str::random(6),
                 'email' => $email,
                 'password' => Hash::make(Str::random(16)),
+                'role' => 'user',
                 'auth_provider' => $provider,
                 'provider_id' => $providerId,
                 'email_verified_at' => now(),
