@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CollectionScheduleController;
+use App\Http\Controllers\BannerController;
+
 
 // Route mặc định, chuyển hướng đến trang đăng nhập nếu chưa đăng nhập,
 // hoặc đến dashboard nếu đã đăng nhập.
@@ -44,14 +46,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset_password', [AuthController::class, 'showResetPasswordForm'])->name('reset_password.form');
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 
-use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
-use App\Http\Controllers\PostController; // Giả sử bạn có controller này
-use App\Http\Controllers\BannerController;
 
-Route::get('dashboard', function () {
-    return view('welcome');
+// use App\Http\Controllers\BannerController;
 
-});
+// Route::get('dashboard', function () {
+//     return view('welcome');
+
+// });
 
 //--------------------------------------- OTHER FUNCTIONS -------------------------------------//
 
@@ -87,3 +88,4 @@ Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banne
 Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
 Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
 
+});
