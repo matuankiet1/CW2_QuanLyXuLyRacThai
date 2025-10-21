@@ -56,11 +56,9 @@ Route::middleware('guest')->group(function () {
 
 //--------------------------------------- OTHER FUNCTIONS -------------------------------------//
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
+Route::get('/dashboard', [DashboardController::class, 'app'])->name('app');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// });
 
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show'); 

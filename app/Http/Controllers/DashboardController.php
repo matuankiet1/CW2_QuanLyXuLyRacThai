@@ -11,4 +11,8 @@ class DashboardController extends Controller
         // Có thể truyền dữ liệu động sau này, tạm thời chỉ hiển thị view
         return view('dashboard.admin');
     }
+
+    public function app(){
+        return view('dashboard.app');
+    }
 }
