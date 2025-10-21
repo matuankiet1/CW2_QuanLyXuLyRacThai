@@ -88,7 +88,7 @@
 
             {{-- Content --}}
             <main class="flex-1 overflow-y-auto bg-gray-100">
-                @yield('dashboard-content')
+                @yield('content')
                 
                 @section('dashboard-content')
                 {{-- Overview Cards --}}
