@@ -1,6 +1,6 @@
 @extends('dashboard.admin')
 
-@section('content')
+@section('dashboard-content')
 <div class="space-y-6">
 
     {{-- Thống kê --}}
@@ -32,7 +32,7 @@
             </div>
             <div class="flex gap-3">
                 <a href="#" class="bg-gray-100 px-3 py-2 rounded">Xuất Excel</a>
-                <a href="{{ route('posts.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">+ Thêm bài viết</a>
+                <a href="{{ route('admin.posts.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">+ Thêm bài viết</a>
             </div>
         </form>
 
