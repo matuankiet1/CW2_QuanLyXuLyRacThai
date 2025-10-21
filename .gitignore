@@ -15,6 +15,7 @@
 /node_modules
 /public/build
 /public/hot
+HEAD
 /public/storage
 /storage/*.key
 /storage/pail
@@ -22,3 +23,12 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
+
+
+node_modules/
+hieu/crud-banner
