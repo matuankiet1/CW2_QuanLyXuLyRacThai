@@ -4,19 +4,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->id('user_id');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // Kiểu đăng nhập: local | google | facebook
+            $table->enum('auth_provider', ['local', 'google', 'facebook'])->default('local');
+            // ID do provider cấp
+            $table->string('provider_id')->nullable();
+            $table->unique(['auth_provider', 'provider_id'], 'users_authprovider_providerid_unique');
             $table->rememberToken();
             $table->timestamps();
         });
