@@ -24,10 +24,10 @@
             {{-- Menu --}}
             @php
                 $menuItems = [
-                    ['id' => 'home', 'label' => 'Trang chủ'],
-                    ['id' => 'dashboard', 'label' => 'Dashboard'],
-                    ['id' => 'users', 'label' => 'Quản lý người dùng'],
-                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom'],
+                    ['id' => 'home', 'label' => 'Trang chủ', 'route' => 'posts.home'],
+                    ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
+                    ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
+                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'collection-schedule.index'],
                     ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
                     ['id' => 'permissions', 'label' => 'Phân quyền'],
                     ['id' => 'events', 'label' => 'Quản lý sự kiện'],
@@ -37,6 +37,7 @@
                     ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                     ['id' => 'finance', 'label' => 'Quản lý tài chính'],
                     ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
+                    ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
                 ];
                 $currentPage = request()->route() ? request()->route()->getName() : '';
             @endphp
@@ -86,7 +87,10 @@
             </header>
 
             {{-- Content --}}
-            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <main class="flex-1 overflow-y-auto bg-gray-100">
+                @yield('dashboard-content')
+                
+                @section('dashboard-content')
                 {{-- Overview Cards --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="p-6 border-l-4 border-green-500 bg-white rounded-lg shadow">
@@ -165,6 +169,7 @@
                         </div>
                     </div>
                 </div>
+                @show
 
             </main>
         </div>
