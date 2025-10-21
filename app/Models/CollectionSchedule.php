@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class CollectionSchedule extends Model
 {
+    use HasFactory;
     protected $primaryKey = 'schedule_id';
 
     protected $fillable = ['staff_id', 'scheduled_date', 'status', 'completed_at'];

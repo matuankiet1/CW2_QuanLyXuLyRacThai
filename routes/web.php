@@ -44,6 +44,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
+Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
+
 //--------------------------------------- OTHER FUNCTIONS -------------------------------------//
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
@@ -53,7 +55,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 // });
 
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show'); 
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
 
 
@@ -65,6 +67,12 @@ Route::put('/admin/posts/{post}', [PostController::class, 'update'])->name('post
 Route::delete('/admin/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
 // Collection Schedule Management
-Route::resource('collection-schedule', CollectionScheduleController::class);  
+Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+    'index' => 'admin.collection-schedules.index',
+    'store' => 'admin.collection-schedules.store',
+    'edit' => 'admin.collection-schedules.edit',
+    'update' => 'admin.collection-schedules.update',
+    'destroy' => 'admin.collection-schedules.destroy',
+]);
 
 

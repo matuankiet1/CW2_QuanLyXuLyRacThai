@@ -4,14 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('collection_schedule', function (Blueprint $table) {
+        Schema::create('collection_schedules', function (Blueprint $table) {
             $table->id('schedule_id');
             $table->foreignId('staff_id')->constrained('users');
             $table->dateTime('scheduled_date');
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('collection_schedule');
+        Schema::dropIfExists('collection_schedules');
     }
 };
