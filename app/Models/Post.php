@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use HasFactory;
+    protected $fillable = [
+        'title',
+        'author',
+        'category',
+        'publish_date',
+        'status',
+        'views',
+        'excerpt',
+        'content',
+        'image_url'
+    ];
 
-    protected $primaryKey = 'post_id'; // nếu khoá chính không phải là "id"
-
-    protected $fillable = ['user_id', 'title', 'content', 'image'];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
+    protected $dates = ['publish_date'];
 }
