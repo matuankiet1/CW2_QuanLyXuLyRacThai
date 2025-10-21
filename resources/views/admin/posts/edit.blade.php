@@ -1,4 +1,4 @@
-@extends('dashboard.app')
+@extends('dashboard.admin')
 
 @section('content')
 <div class="container py-4">
