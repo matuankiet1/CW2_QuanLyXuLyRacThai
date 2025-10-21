@@ -20,7 +20,7 @@
                             ⭐ {{ $post->rating }} |
                             📅 {{ $post->created_at->format('d/m/Y') }}
                         </p>
-                        <a href="{{ route('posts.show', ['id' => $post->post_id]) }}" class="btn btn-outline-primary btn-sm mt-auto">Đọc tiếp</a>
+                        <a href="{{ route('posts.home', ['id' => $post->post_id]) }}" class="btn btn-outline-primary btn-sm mt-auto">Đọc tiếp</a>
                     </div>
                 </div>
             </div>

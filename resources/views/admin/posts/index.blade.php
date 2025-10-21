@@ -19,14 +19,14 @@
     @endif
 
     <div class="mb-3 d-flex justify-content-between align-items-center">
-        <form action="{{ route('posts.index') }}" method="GET" class="row g-2">
+        <form action="{{ route('admin.posts.index') }}" method="GET" class="row g-2">
             <div class="col position-relative">
                 <input type="text" name="search" id="search" class="form-control" placeholder="Tìm tiêu đề bài viết..." value="{{ request('search') }}" autocomplete="off">
                 <ul id="search-suggestions" class="list-group position-absolute" style="z-index: 999; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
             </div>
             <div class="col">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <a href="{{ route('posts.index') }}" class="btn btn-secondary">Xoá lọc</a>
+                <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">Xoá lọc</a>
             </div>
         </form>
 

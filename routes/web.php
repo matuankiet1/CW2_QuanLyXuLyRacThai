@@ -45,18 +45,18 @@ Route::middleware('guest')->group(function () {
 
 //--------------------------------- OTHER FUNCTIONS ---------------------------//
 
-// Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
 // });
 
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show'); 
 
 
 
-Route::get('/admin/posts', [PostController::class, 'index'])->name('posts.index'); // Hiển thị danh sách bài viết
+Route::get('/admin/posts', [PostController::class, 'index'])->name('admin.posts.index'); // Hiển thị danh sách bài viết
 Route::get('/admin/posts/create', [PostController::class, 'create'])->name('posts.create'); // Tạo bài viết mới
 Route::post('/admin/posts', [PostController::class, 'store'])->name('posts.store'); // Lưu bài viết mới
 Route::get('/admin/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
