@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CollectionScheduleController;
 
 // Route mặc định, chuyển hướng đến trang đăng nhập nếu chưa đăng nhập,
 // hoặc đến dashboard nếu đã đăng nhập.
@@ -38,12 +40,20 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:10,1') // chống spam nhập mã
         ->name('forgot_password.verify');
 
-    // Đặt lại mật khẩu (chỉ vào được sau khi verify mã)
+    // Đặt lại mật khẩu
     Route::get('/reset_password', [AuthController::class, 'showResetPasswordForm'])->name('reset_password.form');
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
+
+use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
+use App\Http\Controllers\PostController; // Giả sử bạn có controller này
+use App\Http\Controllers\BannerController;
+
+Route::get('dashboard', function () {
+    return view('welcome');
+
 });
 
-//--------------------------------- OTHER FUNCTIONS ---------------------------//
+//--------------------------------------- OTHER FUNCTIONS -------------------------------------//
 
 Route::get('/dashboard', [DashboardController::class, 'app'])->name('app');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -61,4 +71,19 @@ Route::get('/admin/posts/{post}/edit', [PostController::class, 'edit'])->name('p
 Route::put('/admin/posts/{post}', [PostController::class, 'update'])->name('posts.update'); // Cập nhật bài viết
 Route::delete('/admin/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
+// Collection Schedule Management
+Route::resource('collection-schedule', CollectionScheduleController::class);  
+
+
+
+Route::resource('posts', PostController::class);
+
+// Route cho chức năng crud banner
+Route::resource('banners', BannerController::class);
+Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
+Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
+Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
+Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banners.edit');
+Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
+Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
 
