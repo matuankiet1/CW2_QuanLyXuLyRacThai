@@ -27,6 +27,7 @@
                 ['id'=>'home','label'=>'Trang chủ'],
                 ['id'=>'dashboard','label'=>'Dashboard'],
                 ['id'=>'users','label'=>'Quản lý người dùng'],
+                ['id'=>'schedules','label'=>'Quản lý lịch thu gom'],
                 ['id'=>'permissions','label'=>'Phân quyền'],
                 ['id'=>'events','label'=>'Quản lý sự kiện'],
                 ['id'=>'participants','label'=>'Quản lý sinh viên tham gia'],
