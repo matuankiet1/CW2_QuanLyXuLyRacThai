@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 p-4">
-    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border">
+    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-400">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-green-600 text-white rounded-xl mb-4">
                 {{-- SVG Icon cho chiếc lá (Leaf) thay thế cho lucide-react --}}
@@ -47,7 +47,7 @@
                     <input id="password" name="password" type="password" placeholder="••••••••" required
                         class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
                     <button type="button" id="togglePassword"
-                        class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                        class="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
                             color="#000000" fill="none">
                             <path
@@ -77,7 +77,7 @@
             </div>
 
             <button type="submit"
-                class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                class="cursor-pointer w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                 Đăng nhập
             </button>
         </form>

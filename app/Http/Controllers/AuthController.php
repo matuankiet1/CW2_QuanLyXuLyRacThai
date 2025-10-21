@@ -102,7 +102,7 @@ class AuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Throwable $e) {
-            dd('Không thể xác thực bằng ' . $provider. '. ' . $e->getMessage());
+            dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
             // ]);
@@ -111,7 +111,7 @@ class AuthController extends Controller
         $providerId = $socialUser->getId();
         $email = $socialUser->getEmail();
         $name = $socialUser->getName() ?? $socialUser->getNickname();
-        
+
 
         // 1) Tìm đúng user theo (auth_provider, provider_id)
         $user = User::where('auth_provider', $provider)
@@ -142,7 +142,7 @@ class AuthController extends Controller
 
         // 3) Nếu chưa có ai => tạo mới
         if (!$user) {
-            
+
             if (!$email) {
                 return redirect()->route('login')->withErrors([
                     'oauth' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.',
@@ -153,8 +153,8 @@ class AuthController extends Controller
                 'name' => $name ?: 'User ' . Str::random(6),
                 'email' => $email,
                 'password' => Hash::make(Str::random(16)),
-                'auth_provider' => $provider,                   
-                'provider_id' => $providerId,                 
+                'auth_provider' => $provider,
+                'provider_id' => $providerId,
                 'email_verified_at' => now(),
             ]);
         }
@@ -197,9 +197,9 @@ class AuthController extends Controller
 
         return back()->withInput(['email' => $email])
             ->with(
-                'status',
-                'Nếu email hợp lệ, mã xác thực đã được gửi. Vui lòng nhập mã xác thực vào thanh dưới đây.'
-            );
+                'valid',
+                'Nếu email hợp lệ, <strong>mã xác thực</strong> đã được gửi. Vui lòng kiểm tra và nhập vào thanh dưới đây.'
+        );
 
     }
 
@@ -222,7 +222,7 @@ class AuthController extends Controller
             return back()->withInput()->withErrors(['code' => 'Mã không hợp lệ']);
         }
 
-        $remaining = 0;
+        $left = 0;
 
         if ($row->attempts == 1) { // Khi đã nhập sai 5 lần
             DB::table('password_reset_codes')->where('id', $row->id)->delete();
@@ -234,8 +234,8 @@ class AuthController extends Controller
                 'attempts' => max(0, $row->attempts - 1),
                 'updated_at' => now(),
             ]);
-            $remaining = DB::table('password_reset_codes')->where('id', $row->id)->value('attempts');
-            return back()->withInput()->withErrors(['code' => "Mã không hợp lệ, bạn còn {$remaining} lần nhập."]);
+            $left = DB::table('password_reset_codes')->where('id', $row->id)->value('attempts');
+            return back()->withInput()->withErrors(['code' => "Mã không hợp lệ, bạn còn {$left} lần nhập."]);
         }
 
         // Mã đúng -> cấp session cho phép sang trang đặt mật khẩu
@@ -248,8 +248,7 @@ class AuthController extends Controller
         // Xóa mã ngay sau khi dùng (1 lần)
         DB::table('password_reset_codes')->where('id', $row->id)->delete();
 
-        return redirect()->route('reset_password.form')
-            ->with('status', 'Xác thực thành công. Hãy đặt mật khẩu mới.');
+        return redirect()->route('reset_password.form');
     }
 
     public function showResetPasswordForm()
@@ -285,6 +284,9 @@ class AuthController extends Controller
         // Hủy session reset
         session()->forget(['pw_reset_email', 'pw_reset_ticket']);
 
-        return redirect()->route('login')->with('status', 'Đặt lại mật khẩu thành công.');
+        return redirect()->route('login')->with('status', [
+            'type' => 'success',
+            'message' => 'Đặt lại mật khẩu thành công!'
+        ]);
     }
 }
