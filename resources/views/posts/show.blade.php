@@ -9,6 +9,6 @@
         <img src="{{ asset($post->image) }}" alt="{{ $post->title }}" class="img-fluid mb-4" style="max-height: 400px; object-fit: cover;">
     @endif
     <div>{!! $post->content !!}</div>
-    <a href="{{ route('posts.home') }}" class="btn btn-outline-secondary mt-4">Quay lại danh sách</a>
+    <a href="{{ route('posts.show') }}" class="btn btn-outline-secondary mt-4">Quay lại danh sách</a>
 </div>
 @endsection
