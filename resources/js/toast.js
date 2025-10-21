@@ -1,3 +1,4 @@
+// New
 window.showToast = function (type, message) {
     // Đợi DOM ready trước khi thực thi
     if (document.readyState === "loading") {
@@ -6,16 +7,15 @@ window.showToast = function (type, message) {
         });
         return;
     }
-
     const toastContainer = createToastContainer();
     const newToast = createNewToast(type, message);
-    
+
     toastContainer.appendChild(newToast);
     requestAnimationFrame(() => {
         newToast.classList.remove("hidden", "opacity-0", "translate-y-2");
         newToast.classList.add("opacity-100", "translate-y-0");
     });
-    
+
     setTimeout(() => {
         newToast.classList.add("opacity-0", "translate-y-2");
         setTimeout(() => newToast.remove(), 300);
@@ -30,10 +30,15 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function createToastContainer() {
-    const toastContainer = document.createElement("div");
-    toastContainer.className =
-        "toast-container fixed top-0 left-1/2 -translate-x-1/2 z-50 p-3";
-    document.body.appendChild(toastContainer);
+    let toastContainer = document.querySelector(".toast-container");
+
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.className =
+            "toast-container fixed top-0 right-0 z-50 p-3 flex flex-col gap-3";
+        document.body.appendChild(toastContainer);
+    }
+
     return toastContainer;
 }
 
@@ -43,23 +48,19 @@ function createNewToast(type, message) {
     toast.setAttribute("aria-live", "assertive");
     toast.setAttribute("aria-atomic", "true");
     toast.className =
-        "pointer-events-auto flex items-center gap-3 rounded-lg text-white shadow-lg ring-1 ring-black/10 px-4 py-3 transition transform duration-300 ease-out opacity-0 translate-y-2";
+        "pointer-events-auto flex items-center gap-3 rounded-lg shadow-lg bg-white ring-1 ring-black/10 px-4 py-3 transition transform duration-300 ease-out opacity-0 translate-y-2";
 
-    let bgColor = "#00a63d";
-    let iconSrc = "";
+    let iconSrc = "/images/success-icon.png";
 
     if (type === "error") {
-        bgColor = "#e8000c";
-        iconSrc = "";
+        iconSrc = "/images/error-icon-4.png";
     } else if (type === "info") {
-        bgColor = "#00a7f5";
-        iconSrc = "";
+        iconSrc = "/images/info-icon.png";
     }
 
-    toast.style.backgroundColor = bgColor;
     toast.innerHTML = `
         <img class="toast-icon h-6 w-6" src="${iconSrc}" alt="toast-icon">
-        <span class="message text-sm">${message || "Notification"}</span>
+        <span class="message">${message || "Notification"}</span>
         <button type="button" aria-label="Close"
           class="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-md hover:bg-white/10
                  focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-slate-900">
@@ -69,6 +70,13 @@ function createNewToast(type, message) {
           </svg>
         </button>
     `;
+
+    // Thêm sự kiện đóng toast khi click vào nút close
+    const closeButton = toast.querySelector("button");
+    closeButton.addEventListener("click", () => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+    });
 
     return toast;
 }
