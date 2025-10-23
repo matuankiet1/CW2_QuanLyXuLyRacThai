@@ -58,6 +58,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 //--------------------------------------- COLLECTION SCHEDULE -------------------------------------//
+
+    
 Route::resource('collection-schedules', CollectionScheduleController::class)->names([
     'index' => 'admin.collection-schedules.index',
     'store' => 'admin.collection-schedules.store',

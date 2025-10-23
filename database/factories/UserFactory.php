@@ -23,11 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $provider = fake()->randomElement(['local', 'google', 'facebook']);
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => $provider === 'local' ? Hash::make('password') : '', // chỉ mã hóa nếu là local
+            'auth_provider' => $provider,
+            'provider_id' => $provider !== 'local' ? fake()->uuid() : null,
             'remember_token' => Str::random(10),
         ];
     }
@@ -37,7 +40,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

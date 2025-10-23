@@ -14,7 +14,7 @@ class CollectionScheduleController extends Controller
      */
     public function index()
     {
-        $collectionSchedules = CollectionSchedule::paginate(10);
+        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'desc')->paginate(10);
         return view('admin.collection_schedules.index', compact('collectionSchedules'));
     }
 
@@ -47,7 +47,7 @@ class CollectionScheduleController extends Controller
         }
         return back()->with('status', [
             'type' => 'success',
-            'message' => 'Added collection schedule successfully!'
+            'message' => 'Thêm lịch thu gom thành công!'
         ]);
     }
 
@@ -71,18 +71,35 @@ class CollectionScheduleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CollectionSchedule $collectionScheduleManagement)
+    public function update(Request $request, $id)
     {
+        if ($request['staff_id']) {
+            $staff_id = User::where('name', $request['staff_id'])->value('user_id');
+            if (!$staff_id) {
+                return back()->with('status', [
+                    'type' => 'error',
+                    'message' => 'Không tìm thấy nhân viên. Vui lòng thử lại sau!'
+                ])->withInput();
+            } else {
+                $request['staff_id'] = $staff_id;
+            }
+        }
         $validated = $request->validate([
             'staff_id' => 'required|exists:users,user_id',
             'scheduled_date' => 'required|date',
-            'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
-            'completed_at' => 'nullable|date',
         ]);
-        $collectionScheduleManagement->update($validated);
+        // $collectionScheduleManagement->update($validated);
+        $collectionSchedule = CollectionSchedule::findOrFail($id);
+        if (!$collectionSchedule) {
+            return back()->with('status', [
+                'type' => 'error',
+                'message' => 'Không tìm thấy lịch thu gom. Vui lòng thử lại sau!'
+            ])->withInput();
+        }
+        $collectionSchedule->update($validated);
         return back()->with('status', [
             'type' => 'success',
-            'message' => 'Updated collection schedule successfully!'
+            'message' => 'Cap nhật lịch thu gom thành công!'
         ]);
     }
 
@@ -96,13 +113,15 @@ class CollectionScheduleController extends Controller
             $collectionSchedule->delete();
             return back()->with('status', [
                 'type' => 'success',
-                'message' => 'Deleted collection schedule successfully!'
+                'message' => 'Xóa lịch thu gom thành công!'
             ]);
         } else {
             return back()->with('status', [
                 'type' => 'error',
-                'message' => 'Something went error, please try again later.'
+                'message' => 'Có sự cố xảy ra, vui lòng thử lại sau!'
             ]);
         }
     }
+
+    
 }
