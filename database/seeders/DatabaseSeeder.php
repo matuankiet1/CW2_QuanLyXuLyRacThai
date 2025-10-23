@@ -23,8 +23,10 @@ class DatabaseSeeder extends Seeder
     }
 
     public function post(): void
-{
-    $this->call(PostSeeder::class);
-}
+    {
+        $this->call(UserSeeder::class);
+        $this->call(PostSeeder::class);
+        $this->call(CollectionScheduleSeeder::class);
+    }
 
 }

@@ -13,6 +13,11 @@ class CollectionSchedule extends Model
 
     protected $fillable = ['staff_id', 'scheduled_date', 'status', 'completed_at'];
 
+    public function collectionSchedules()
+    {
+        return $this->hasMany(\App\Models\CollectionSchedule::class, 'staff_id');
+    }
+
     public function staff()
     {
         return $this->belongsTo(User::class, 'staff_id');
