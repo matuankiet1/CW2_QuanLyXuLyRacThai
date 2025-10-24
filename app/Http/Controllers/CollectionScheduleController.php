@@ -14,8 +14,9 @@ class CollectionScheduleController extends Controller
      */
     public function index()
     {
-        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'desc')->paginate(10);
-        return view('admin.collection_schedules.index', compact('collectionSchedules'));
+        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'desc')->paginate(7);
+        $isSearching = false;
+        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearching'));
     }
 
     /**
@@ -130,9 +131,9 @@ class CollectionScheduleController extends Controller
             $query->where('name', 'like', '%' . $q . '%');
         })->orWhere('scheduled_date', 'like', '%' . $q . '%')
             ->orderBy('schedule_id', 'desc')
-            ->paginate(10);
-        // dd($collectionSchedules);    
-        return view('admin.collection_schedules.index', compact('collectionSchedules', 'q'));
+            ->paginate(7);
+        $isSearching = true;
+        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearching', 'q'));
     }
 
 }
