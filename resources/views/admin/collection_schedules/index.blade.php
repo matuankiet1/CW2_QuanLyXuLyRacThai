@@ -5,12 +5,20 @@
         <p>Không có lịch thu gom nào.</p>
     @else --}}
     <div class="max-w-7xl mx-auto">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            @if ($collectionSchedules->isEmpty())
-                <p>Không có lịch thu gom nào. <a type="button" class="openModalBtn underline decoration-solid cursor-pointer text-blue-600 hover:text-blue-800">Thêm mới</a></p>
-            @else
+        @if ($collectionSchedules->isEmpty() && $isSearching == false)
+            <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
+                <p>Không có lịch thu gom nào.
+                    <a type="button"
+                        class="openModalBtn underline decoration-solid cursor-pointer text-blue-600 hover:text-blue-800">Thêm
+                        mới
+                    </a>
+                </p>
+            </div>
+        @else
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full md:w-1/2">
+                    <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
+                        class="relative w-full md:w-1/2">
                         <!-- search icon -->
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" aria-hidden="true">
@@ -41,7 +49,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-gray-100">
-                            @foreach ($collectionSchedules as $collectionSchdule)
+                            @forelse ($collectionSchedules as $collectionSchdule)
                                 <tr class="hover:bg-green-50">
                                     <td class="py-3 px-4">{{ $collectionSchdule->schedule_id }}</td>
                                     <td class="py-3 px-4">{{ $collectionSchdule->staff->name }}</td>
@@ -102,14 +110,22 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 italic">
+                                        @if ($isSearching == true)
+                                            Không có kết quả tìm kiếm cho từ khóa
+                                            "<strong class="text-gray-700">{{ $q }}</strong>".
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
-
                 <!-- Phân trang -->
-                <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
+                {{-- <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
                     <p>Hiển thị 1 - 5 trong tổng số 6 sự kiện</p>
                     <div class="flex items-center gap-2 mt-3 md:mt-0">
                         <button class="p-2 border rounded-lg hover:bg-green-50" aria-label="Trang trước">
@@ -126,86 +142,91 @@
                             </svg>
                         </button>
                     </div>
-                </div>
-            @endif
-
-            <div id="modal"
-                class="hidden fixed inset-0 flex items-center justify-center z-50 bg-white/5 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
-                <div id="modalBox"
-                    class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
-              transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold titleModal">Thêm lịch thu gom mới</h2>
-                        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                </div> --}}
+                @if ($collectionSchedules->hasPages())
+                    <div class="mt-3">
+                        {{ $collectionSchedules->links() }}
                     </div>
+                @endif
+        @endif
 
-                    <form class="space-y-4" action="{{ route('admin.collection-schedules.store') }}" method="POST">
-                        @csrf
-                        <div class="relative">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
+        <div id="modal"
+            class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
+            <div id="modalBox"
+                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
+              transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold titleModal">Thêm lịch thu gom mới</h2>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form class="space-y-4" action="{{ route('admin.collection-schedules.store') }}" method="POST">
+                    @csrf
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
+                                class="text-red-500">*</span></label>
+                        <input id="inputName" name="staff_id" type="text"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-400 focus:outline-none"
+                            placeholder="Nhập tên nhân viên...">
+
+                        <!-- Dropdown suggestions -->
+                        <ul id="suggestions"
+                            class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
+                        </ul>
+                    </div>
+                    <div class="">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
                                     class="text-red-500">*</span></label>
-                            <input id="inputName" name="staff_id" type="text"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-400 focus:outline-none"
-                                placeholder="Nhập tên nhân viên...">
+                            <input type="date" id="inputDate" name="scheduled_date"
+                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-400 focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-3">
+                        <button type="button" id="cancelBtn"
+                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                            <!-- Dropdown suggestions -->
-                            <ul id="suggestions"
-                                class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
-                            </ul>
-                        </div>
-                        <div class="">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
-                                        class="text-red-500">*</span></label>
-                                <input type="date" id="inputDate" name="scheduled_date"
-                                    class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-400 focus:outline-none">
-                            </div>
-                        </div>
-                        <div class="flex justify-end gap-3 pt-3">
-                            <button type="button" id="cancelBtn"
-                                class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
-                        </div>
+        <div id="confirmModal"
+            class="hidden fixed inset-0 flex items-center justify-center z-50 bg-white/5 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
+            <div id="confirmModalBox"
+                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
+              transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
+                    <button id="closeConfirmModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <h2 class="mb-3">Bạn có chắc chắn muốn xóa không?</h2>
+                <div class="flex justify-end gap-3 pt-3">
+                    <button type="button" id="cancelConfirmModalBtn"
+                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
+                    <form action="" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Chắc
+                            chắn!</button>
                     </form>
                 </div>
             </div>
-
-            <div id="confirmModal"
-                class="hidden fixed inset-0 flex items-center justify-center z-50 bg-white/5 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
-                <div id="confirmModalBox"
-                    class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
-              transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
-                        <button id="closeConfirmModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <h2 class="mb-3">Bạn có chắc chắn muốn xóa không?</h2>
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button type="button" id="cancelConfirmModalBtn"
-                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                        <form action="" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Chắc
-                                chắn!</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
+    </div>
     </div>
 
     <script>
