@@ -65,8 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
         form.addEventListener(
             "submit",
             function (e) {
-                console.log("submit form");
-
                 // nếu form invalid -> không bật loader
                 if (!form.checkValidity()) {
                     return;

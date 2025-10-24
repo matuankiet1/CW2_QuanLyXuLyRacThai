@@ -19,7 +19,6 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
                         class="relative w-full md:w-1/2">
-                        <!-- search icon -->
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -29,17 +28,40 @@
                             class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                     </form>
 
-                    <button id=""
-                        class="openModalBtn inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
-                        + Thêm lịch thu gom
-                    </button>
-                </div>
+                    <div class="flex items-center gap-3 ml-auto">
+                        <button id="btnDeleteAll"
+                            class="hidden items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                color="#ffffff" fill="none">
+                                <path
+                                    d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5"
+                                    stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
+                                <path
+                                    d="M3 5.5H21M16.0557 5.5L15.3731 4.09173C14.9196 3.15626 14.6928 2.68852 14.3017 2.39681C14.215 2.3321 14.1231 2.27454 14.027 2.2247C13.5939 2 13.0741 2 12.0345 2C10.9688 2 10.436 2 9.99568 2.23412C9.8981 2.28601 9.80498 2.3459 9.71729 2.41317C9.32164 2.7167 9.10063 3.20155 8.65861 4.17126L8.05292 5.5"
+                                    stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
+                                <path d="M9.5 16.5L9.5 10.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
+                                </path>
+                                <path d="M14.5 16.5L14.5 10.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
+                                </path>
+                            </svg>
+                            Xóa tất cả
+                        </button>
 
+                        <button
+                            class="openModalBtn inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
+                            + Thêm lịch thu gom
+                        </button>
+                    </div>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full border-t border-gray-100">
                         <thead class="bg-green-50 text-gray-600 text-sm font-semibold">
                             <tr>
+                                <th class="py-3 px-4 text-left">
+                                    <input type="checkbox" id="selectAllCheckbox"
+                                        class="w-4 h-4 accent-green-600 cursor-pointer">
+                                </th>
                                 <th class="py-3 px-4 text-left">#</th>
                                 <th class="py-3 px-4 text-left">Nhân viên thực hiện</th>
                                 <th class="py-3 px-4 text-left">Ngày thu gom</th>
@@ -51,6 +73,8 @@
                         <tbody class="text-sm divide-y divide-gray-100">
                             @forelse ($collectionSchedules as $collectionSchdule)
                                 <tr class="hover:bg-green-50">
+                                    <td class="py-3 px-4"><input type="checkbox"
+                                            class="checkbox w-4 h-4 accent-green-600 cursor-pointer"></td>
                                     <td class="py-3 px-4">{{ $collectionSchdule->schedule_id }}</td>
                                     <td class="py-3 px-4">{{ $collectionSchdule->staff->name }}</td>
                                     <td class="py-3 px-4">
@@ -167,11 +191,12 @@
 
                 <form class="space-y-4" action="{{ route('admin.collection-schedules.store') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="status" value="Chưa thực hiện">
                     <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
                                 class="text-red-500">*</span></label>
                         <input id="inputName" name="staff_id" type="text"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-400 focus:outline-none"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
                             placeholder="Nhập tên nhân viên...">
 
                         <!-- Dropdown suggestions -->
@@ -179,13 +204,24 @@
                             class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
                         </ul>
                     </div>
-                    <div class="">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
-                                    class="text-red-500">*</span></label>
-                            <input type="date" id="inputDate" name="scheduled_date"
-                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-400 focus:outline-none">
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
+                                class="text-red-500">*</span></label>
+                        <input type="date" id="inputScheduledDate" name="scheduled_date"
+                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
+                    </div>
+                    <div class="completed-at-field">
+                        <label class="block text-sm font-medium text-gray-700">Ngày hoàn thành:</label>
+                        <input type="date" id="inputCompletedAt" name="completed_at"
+                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
+                    </div>
+                    <div class="status-field">
+                        <label class="block text-sm font-medium text-gray-700">Trạng thái:</label>
+                        <select id="selectStatus" name="status"
+                            class="block w-full mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+                            <option value="Chưa thực hiện">Chưa thực hiện</option>
+                            <option value="Đã hoàn thành">Đã hoàn thành</option>
+                        </select>
                     </div>
                     <div class="flex justify-end gap-3 pt-3">
                         <button type="button" id="cancelBtn"
@@ -245,8 +281,10 @@
         const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
         const cancelConfirmModalBtn = document.getElementById('cancelConfirmModalBtn');
 
+        const form = modalBox.querySelector('form');
+
         const inputName = document.getElementById('inputName');
-        const inputDate = document.getElementById('inputDate');
+        const inputDate = document.getElementById('inputScheduledDate');
 
         const titleModal = document.querySelector('.titleModal');
 
@@ -275,20 +313,18 @@
         openBtn.forEach(btn => {
             btn.addEventListener('click', function() {
                 titleModal.textContent = 'Thêm lịch thu gom mới';
-                inputName.value = '';
-                inputDate.value = '';
-                openModal(modal, modalBox);
-                const form = modalBox.querySelector('form');
+                form.reset(); // Reset toàn bộ form
                 form.action = "/collection-schedules";
+
+                // Xóa input hidden _method nếu có
+                const methodInput = form.querySelector('input[name="_method"]');
+                if (methodInput) methodInput.remove();
+
+                // displayCompletedAtField(false);
+                // displayStatusField(false);
+                openModal(modal, modalBox);
             });
         });
-
-        // openBtn.addEventListener('click', function() {
-        //     titleModal.textContent = 'Thêm lịch thu gom mới';
-        //     inputName.value = '';
-        //     inputDate.value = '';
-        //     openModal(modal, modalBox);
-        // });
 
         closeBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
@@ -300,24 +336,51 @@
         // Edit Modal logic
         editBtn.forEach(button => {
             button.addEventListener('click', async function() {
-                titleModal.textContent = 'Chỉnh sửa lịch thu gom';
                 const id = button.dataset.id;
                 const res = await fetch(`/collection-schedules/${id}`);
                 const data = await res.json();
                 console.log(data);
-
+                const inputCompletedAt = document.getElementById('inputCompletedAt');
+                const selectStatus = document.getElementById('selectStatus');
                 if (data) {
                     inputName.value = data.staff.name;
-                    inputDate.value = data.scheduled_date.split(' ')[0];;
+                    inputDate.value = data.scheduled_date.split(' ')[0];
+                    inputCompletedAt.value = data.completed_at ? data.completed_at.split(' ')[0] : '';
+                    // selectStatus.value = data.status;
                 }
+                titleModal.textContent = 'Chỉnh sửa lịch thu gom';
+                // displayCompletedAtField(true);
+                // displayStatusField(true);
                 openModal(modal, modalBox);
+
                 const form = modalBox.querySelector('form');
                 form.action = `/collection-schedules/${id}`;
+                if (form.querySelector('input[name="_method"]')) {
+                    return; // Nếu đã có input hidden _method thì không thêm nữa
+                }
                 form.insertAdjacentHTML('beforeend', `
                     <input type="hidden" name="_method" value="PUT">
                 `);
             });
         });
+
+        function displayCompletedAtField(show) {
+            const completedAtField = document.querySelector('.completed-at-field');
+            if (show) {
+                completedAtField.classList.remove('hidden');
+            } else {
+                completedAtField.classList.add('hidden');
+            }
+        }
+
+        function displayStatusField(show) {
+            const statusField = document.querySelector('.status-field');
+            if (show) {
+                statusField.classList.remove('hidden');
+            } else {
+                statusField.classList.add('hidden');
+            }
+        }
 
         // Confirm Delete Modal logic
         deleteBtn.forEach(button => {
