@@ -10,7 +10,7 @@
                 <p>Không có lịch thu gom nào. <a type="button" class="openModalBtn underline decoration-solid cursor-pointer text-blue-600 hover:text-blue-800">Thêm mới</a></p>
             @else
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full md:w-1/2">
+                    <form action="" method="GET" class="relative w-full md:w-1/2">
                         <!-- search icon -->
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" aria-hidden="true">
