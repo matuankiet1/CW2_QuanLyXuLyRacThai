@@ -58,7 +58,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 //--------------------------------------- COLLECTION SCHEDULE -------------------------------------//
-
+Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
+    ->name('admin.collection-schedules.search');
     
 Route::resource('collection-schedules', CollectionScheduleController::class)->names([
     'index' => 'admin.collection-schedules.index',

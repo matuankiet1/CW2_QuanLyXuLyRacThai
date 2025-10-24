@@ -123,5 +123,16 @@ class CollectionScheduleController extends Controller
         }
     }
 
-    
+    public function search(Request $request)
+    {
+        $q = $request->input('q');
+        $collectionSchedules = CollectionSchedule::whereHas('staff', function ($query) use ($q) {
+            $query->where('name', 'like', '%' . $q . '%');
+        })->orWhere('scheduled_date', 'like', '%' . $q . '%')
+            ->orderBy('schedule_id', 'desc')
+            ->paginate(10);
+        // dd($collectionSchedules);    
+        return view('admin.collection_schedules.index', compact('collectionSchedules', 'q'));
+    }
+
 }
