@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\CollectionSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class CollectionScheduleController extends Controller
 {
@@ -74,6 +75,7 @@ class CollectionScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dd($request->all());
         if ($request['staff_id']) {
             $staff_id = User::where('name', $request['staff_id'])->value('user_id');
             if (!$staff_id) {
@@ -85,19 +87,29 @@ class CollectionScheduleController extends Controller
                 $request['staff_id'] = $staff_id;
             }
         }
-        $validated = $request->validate([
-            'staff_id' => 'required|exists:users,user_id',
-            'scheduled_date' => 'required|date',
-        ]);
-        // $collectionScheduleManagement->update($validated);
+
+        try {
+            $validated = $request->validate([
+                'staff_id' => 'required|exists:users,user_id',
+                'scheduled_date' => 'required|date',
+                'completed_at' => 'nullable|date',
+                'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
+            ]);
+        } catch (ValidationException $e) {
+            dd('Validate thất bại', $e->errors());
+        }
+
         $collectionSchedule = CollectionSchedule::findOrFail($id);
+
         if (!$collectionSchedule) {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Không tìm thấy lịch thu gom. Vui lòng thử lại sau!'
             ])->withInput();
         }
+
         $collectionSchedule->update($validated);
+
         return back()->with('status', [
             'type' => 'success',
             'message' => 'Cap nhật lịch thu gom thành công!'
