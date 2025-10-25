@@ -27,7 +27,7 @@
                     ['id' => 'home', 'label' => 'Trang chủ', 'route' => 'posts.home'],
                     ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
                     ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
-                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'collection-schedule.index'],
+                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],
                     ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
                     ['id' => 'permissions', 'label' => 'Phân quyền'],
                     ['id' => 'events', 'label' => 'Quản lý sự kiện'],
@@ -175,8 +175,5 @@
         </div>
 
     </div>
-
-    {{-- Include Chart.js --}}
-    @vite(['resources/js/dashboard.js'])
 
 @endsection

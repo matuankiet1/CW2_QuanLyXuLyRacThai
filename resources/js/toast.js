@@ -53,7 +53,7 @@ function createNewToast(type, message) {
     let iconSrc = "/images/success-icon.png";
 
     if (type === "error") {
-        iconSrc = "/images/error-icon-4.png";
+        iconSrc = "/images/error-icon.png";
     } else if (type === "info") {
         iconSrc = "/images/info-icon.png";
     }
