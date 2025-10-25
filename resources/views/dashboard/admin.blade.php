@@ -24,7 +24,7 @@
             {{-- Menu --}}
             @php
                 $menuItems = [
-                    ['id' => 'home', 'label' => 'Trang chủ', 'route' => 'posts.home'],
+                    ['id' => 'home', 'label' => 'Trang chủ'],
                     ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
                     ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
                     ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],

@@ -48,12 +48,17 @@ Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('searc
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
 
 //--------------------------------------- POSTS -------------------------------------//
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+});
 
 // CRUD Admin
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('posts', PostController::class);
     Route::resource('users', UserController::class);
 });
 

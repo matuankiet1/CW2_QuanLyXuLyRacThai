@@ -12,6 +12,7 @@ export default defineConfig({
                 "resources/js/dashboard.js",
                 "resources/js/loader.js",
                 "resources/js/toast.js",
+                "resources/js/checkbox.js",
 
             ],
             refresh: true,
