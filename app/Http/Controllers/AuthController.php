@@ -35,7 +35,21 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
+            // Kiểm tra role và chuyển hướng phù hợp
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended('dashboard');
+            } else {
+                return redirect()->route('posts.home');
+            }
+        } else { // Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu
+            $user = User::where('email', $credentials['email'])->first();
+            if ($user && $user->auth_provider != 'local') {
+                return redirect()->route('login')->with('status', [
+                    'type' => 'error',
+                    'message' => 'Email này đã đăng ký bằng ' . strtoupper($user->auth_provider) .
+                        '. Vui lòng đăng nhập bằng cách đó.'
+                ]);
+            }
         }
 
         // Nếu đăng nhập thất bại
@@ -77,8 +91,8 @@ class AuthController extends Controller
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
 
-        // 4. Chuyển hướng đến trang dashboard
-        return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
+        // 4. Chuyển hướng phù hợp với role
+        return redirect()->route('posts.home');
     }
 
     public function redirectToProvider($provider)

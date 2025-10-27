@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
@@ -17,6 +18,12 @@ Route::get('/', function () {
 // Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
+Route::post('logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout');
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
@@ -42,21 +49,24 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
-//--------------------------------------- DASHBOARD -------------------------------------//
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
-
-//--------------------------------------- POSTS -------------------------------------//
+//--------------------------------------- PUBLIC ROUTES (Mọi người đều truy cập được) -------------------------------------//
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
-// CRUD Admin
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('posts', PostController::class);
-    Route::resource('users', UserController::class);
+//--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
+Route::middleware('admin')->group(function () {
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
+    
+    // CRUD Admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('posts', PostController::class);
+        Route::resource('users', UserController::class);
+    });
+    
+    // Collection Schedule
+    Route::resource('collection-schedule', CollectionScheduleController::class);
+    
+    // Banners
+    Route::resource('banners', BannerController::class);
 });
-
-//--------------------------------------- COLLECTION SCHEDULE -------------------------------------//
-Route::resource('collection-schedule', CollectionScheduleController::class);
-
-//--------------------------------------- BANNERS -------------------------------------//
-Route::resource('banners', BannerController::class);
