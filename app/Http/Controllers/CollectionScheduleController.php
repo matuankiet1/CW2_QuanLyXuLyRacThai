@@ -75,7 +75,7 @@ class CollectionScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dd($request->all());
+        // dd($request->all());
         if ($request['staff_id']) {
             $staff_id = User::where('name', $request['staff_id'])->value('user_id');
             if (!$staff_id) {
@@ -112,7 +112,7 @@ class CollectionScheduleController extends Controller
 
         return back()->with('status', [
             'type' => 'success',
-            'message' => 'Cap nhật lịch thu gom thành công!'
+            'message' => 'Cập nhật lịch thu gom thành công!'
         ]);
     }
 
@@ -134,6 +134,25 @@ class CollectionScheduleController extends Controller
                 'message' => 'Có sự cố xảy ra, vui lòng thử lại sau!'
             ]);
         }
+    }
+
+    public function destroyMultiple(Request $request)
+    {
+        $ids = $request->input('ids'); // Mảng các ID được chọn
+
+        if (!$ids || count($ids) === 0) {
+            return back()->with('status', [
+                'type' => 'error',
+                'message' => 'Vui lòng chọn ít nhất một bản ghi để xóa!'
+            ]);
+        }
+
+        CollectionSchedule::whereIn('schedule_id', $ids)->delete();
+
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Xóa ' . count($ids) . ' lịch thu gom đã chọn thành công!'
+        ]);
     }
 
     public function search(Request $request)

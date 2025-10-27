@@ -89,10 +89,10 @@
                         <p class="text-sm text-gray-900">Admin</p>
                         <p class="text-xs text-gray-500">admin@school.edu</p>
                     </div>
-                    <button
+                    <a href="{{ route('logout') }}"
                         class="h-8 w-8 flex items-center justify-center rounded-xl cursor-pointer hover:text-red-600 hover:bg-red-200">
                         ⏻
-                    </button>
+                    </a>
                 </div>
             </div>
         </aside>

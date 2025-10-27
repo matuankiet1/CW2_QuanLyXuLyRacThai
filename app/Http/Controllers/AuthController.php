@@ -34,9 +34,8 @@ class AuthController extends Controller
         // Thử đăng nhập
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
             return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
-        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
+        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (VD: Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
             $user = User::where('email', $credentials['email'])->first();
             if ($user && $user->auth_provider != 'local') {
                 return redirect()->route('login')->with('status', [
@@ -86,6 +85,8 @@ class AuthController extends Controller
 
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
+
+        $request->session()->regenerate(); // Thêm bởi Lê Tâm 
 
         // 4. Chuyển hướng đến trang dashboard
         return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
@@ -178,6 +179,19 @@ class AuthController extends Controller
         // 4) Login
         Auth::login($user, true);
         return redirect()->intended('/dashboard');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        // Start lại session để đảm bảo token mới được tạo
+        $request->session()->start();
+        return redirect()->route('login')->with('status', [
+            'type' => 'success',
+            'message' => 'Log out successfully!'
+        ]);
     }
 
     public function showForgotPasswordForm()
