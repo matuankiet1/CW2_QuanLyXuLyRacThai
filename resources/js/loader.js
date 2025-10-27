@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (el.type === "hidden") return;
             if (el.tagName === "SELECT") {
 
-                el.classList.add("pointer-events-none", "opacity-70");
+                el.classList.add("opacity-70");
             } else {
                 el.readOnly = true;
             }

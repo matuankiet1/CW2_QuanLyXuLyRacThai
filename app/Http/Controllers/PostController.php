@@ -76,12 +76,9 @@ class PostController extends Controller
                 'content' => 'required|string',
                 'image' => 'nullable|string|max:255',
                 'author' => 'required|string|max:255',
-                'status' => 'nullable|string|in:draft,published',
+                'status' => 'required|in:draft,published',
                 'published_at' => 'nullable|date',
             ]);
-            if (empty($validated['status'])) {
-                $validated['status'] = 'draft';
-            }
 
             // Tạo bài viết
             $post = Post::create($validated);
