@@ -94,13 +94,12 @@ class AuthController extends Controller
         $request->session()->regenerate(); // Thêm bởi Lê Tâm 
 
         // 4. Chuyển hướng đến trang dashboard
-        return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
-        return redirect()->route('auth.login');
+        return redirect('/dashboard');
+        // return redirect()->route('auth.login');
     }
 
     public function redirectToProvider($provider)
     {
-        // Nếu muốn request thêm scope (ví dụ Google openid)
         if ($provider === 'google') {
             return Socialite::driver('google')->redirect();
         }
