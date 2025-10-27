@@ -17,6 +17,12 @@ Route::get('/', function () {
 // Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
+Route::post('logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout');
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
@@ -42,37 +48,36 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
-Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
+//--------------------------------------- PUBLIC ROUTES (Mọi người đều truy cập được) -------------------------------------//
+Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
-//--------------------------------------- DASHBOARD -------------------------------------//
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
-
-//--------------------------------------- POSTS -------------------------------------//
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
-    Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-});
-
-// CRUD Admin
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('users', UserController::class);
-});
-
-//--------------------------------------- COLLECTION SCHEDULE -------------------------------------//
-Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
-    ->name('admin.collection-schedules.search');
+//--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
+Route::middleware('admin')->group(function () {
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
     
-Route::resource('collection-schedules', CollectionScheduleController::class)->names([
-    'index' => 'admin.collection-schedules.index',
-    'store' => 'admin.collection-schedules.store',
-    'edit' => 'admin.collection-schedules.edit',
-    'update' => 'admin.collection-schedules.update',
-    'destroy' => 'admin.collection-schedules.destroy',
-]);
-
-//--------------------------------------- BANNERS -------------------------------------//
-Route::resource('banners', BannerController::class);
+    // Search users
+    Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
+    
+    // CRUD Admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('posts', PostController::class);
+        Route::resource('users', UserController::class);
+    });
+    
+    // Collection Schedule
+    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
+        ->name('admin.collection-schedules.search');
+        
+    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+        'index' => 'admin.collection-schedules.index',
+        'store' => 'admin.collection-schedules.store',
+        'edit' => 'admin.collection-schedules.edit',
+        'update' => 'admin.collection-schedules.update',
+        'destroy' => 'admin.collection-schedules.destroy',
+    ]);
+    
+    // Banners
+    Route::resource('banners', BannerController::class);
+});

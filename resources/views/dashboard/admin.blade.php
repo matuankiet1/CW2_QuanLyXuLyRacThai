@@ -65,15 +65,18 @@
             <div class="p-4 border-t border-gray-200">
                 <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
                     <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                        A
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm text-gray-900">Admin</p>
-                        <p class="text-xs text-gray-500">admin@school.edu</p>
+                        <p class="text-sm text-gray-900">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
                     </div>
-                    <button class="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200">
-                        ⏻
-                    </button>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200" title="Đăng xuất">
+                            ⏻
+                        </button>
+                    </form>
                 </div>
             </div>
         </aside>
@@ -170,7 +173,6 @@
                     </div>
                 </div>
                 @show
-
             </main>
         </div>
 
