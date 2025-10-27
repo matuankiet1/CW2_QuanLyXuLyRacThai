@@ -35,7 +35,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
+            // Kiểm tra role và chuyển hướng phù hợp
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended('dashboard');
+            } else {
+                return redirect()->route('posts.home');
+            }
         }
 
         // Nếu đăng nhập thất bại
@@ -77,8 +82,8 @@ class AuthController extends Controller
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
 
-        // 4. Chuyển hướng đến trang dashboard
-        return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
+        // 4. Chuyển hướng phù hợp với role
+        return redirect()->route('posts.home');
     }
 
     public function redirectToProvider($provider)
