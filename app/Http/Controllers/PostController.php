@@ -9,6 +9,21 @@ use Carbon\Carbon;
 
 class PostController extends Controller
 {
+<<<<<<< Updated upstream
+=======
+    /**
+     * Hiển thị danh sách bài viết cho người dùng thường
+     */
+    public function showAll(Request $request)
+    {
+        $posts = Post::where('status', 'published')->orderBy('publish_date', 'desc')->paginate(9);
+        return view('posts.home', compact('posts'));
+    }
+
+    /**
+     * Danh sách bài viết
+     */
+>>>>>>> Stashed changes
     public function index(Request $request)
     {
         $query = Post::with('user');
