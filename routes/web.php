@@ -49,8 +49,7 @@ Route::middleware('guest')->group(function () {
 });
 
 //--------------------------------------- PUBLIC ROUTES (Mọi người đều truy cập được) -------------------------------------//
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
