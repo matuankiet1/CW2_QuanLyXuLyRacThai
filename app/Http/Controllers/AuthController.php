@@ -34,8 +34,14 @@ class AuthController extends Controller
         // Thử đăng nhập
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
-        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (VD: Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
+
+            // Kiểm tra role và chuyển hướng phù hợp
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended('dashboard');
+            } else {
+                return redirect()->route('auth.login');
+            }
+        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
             $user = User::where('email', $credentials['email'])->first();
             if ($user && $user->auth_provider != 'local') {
                 return redirect()->route('login')->with('status', [
@@ -44,7 +50,6 @@ class AuthController extends Controller
                         '. Vui lòng đăng nhập bằng cách đó.'
                 ]);
             }
-
         }
 
         // Nếu đăng nhập thất bại
@@ -90,6 +95,7 @@ class AuthController extends Controller
 
         // 4. Chuyển hướng đến trang dashboard
         return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
+        return redirect()->route('auth.login');
     }
 
     public function redirectToProvider($provider)

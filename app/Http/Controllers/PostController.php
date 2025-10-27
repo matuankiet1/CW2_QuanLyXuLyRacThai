@@ -1,28 +1,38 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Str;
 use App\Models\Post;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
+    /**
+     * Hiển thị danh sách bài viết cho người dùng thường
+     */
+    public function showAll(Request $request)
+    {
+        $posts = Post::where('status', 'published')->orderBy('publish_date', 'desc')->paginate(9);
+        return view('posts.home', compact('posts'));
+    }
+
+    /**
+     * Danh sách bài viết
+     */
     public function index(Request $request)
     {
-        // Lấy các filter từ request
         $search = $request->input('search');
         $category = $request->input('category');
         $status = $request->input('status');
 
-        // Query cơ bản
         $query = Post::query();
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%$search%")
-                  ->orWhere('author', 'like', "%$search%")
-                  ->orWhere('excerpt', 'like', "%$search%");
+                    ->orWhere('author', 'like', "%$search%")
+                    ->orWhere('excerpt', 'like', "%$search%");
             });
         }
 
@@ -34,10 +44,8 @@ class PostController extends Controller
             $query->where('status', $status);
         }
 
-        // Phân trang
-        $posts = $query->orderBy('publish_date', 'desc')->paginate(8);
+        $posts = $query->orderBy('id', 'asc')->paginate(8);
 
-        // Thống kê
         $totalPosts = Post::count();
         $publishedPosts = Post::where('status', 'published')->count();
         $draftPosts = Post::where('status', 'draft')->count();
@@ -53,35 +61,61 @@ class PostController extends Controller
         ));
     }
 
+    /**
+     * Hiển thị form tạo bài viết mới
+     */
     public function create()
     {
-        return view('posts.form', ['post' => new Post()]);
+        return view('admin.posts.create');
     }
 
+    /**
+     * Lưu bài viết mới
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'publish_date' => 'required|date',
-            'status' => 'required|in:published,draft,archived',
-            'excerpt' => 'required|string|max:500',
-            'content' => 'required|string',
-            'image_url' => 'nullable|url'
-        ]);
+        try {
+            // Ghi log để debug (nếu cần)
+            Log::info("Đang xử lý thêm bài viết", $request->all());
 
-        Post::create($data);
+            // Validate dữ liệu
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'excerpt' => 'required|string',
+                'content' => 'required|string',
+                'image' => 'nullable|string|max:255',
+                'author' => 'required|string|max:255',
+                'status' => 'required|in:draft,published',
+                'published_at' => 'nullable|date',
+            ]);
 
-        return redirect()->route('admin.posts.index')->with('success', 'Đã thêm bài viết mới!');
+            // Tạo bài viết
+            $post = Post::create($validated);
+
+            return redirect()
+                ->route('admin.posts.index')
+                ->with('success', 'Thêm bài viết thành công!');
+        } catch (\Exception $e) {
+            Log::error("Lỗi khi thêm bài viết: " . $e->getMessage());
+            return back()->withErrors(['error' => 'Không thể thêm bài viết.'])->withInput();
+        }
+
     }
 
+
+
+    /**
+     * Hiển thị form chỉnh sửa bài viết
+     */
     public function edit(Post $post)
     {
-        return view('posts.form', compact('post'));
+        return view('admin.posts.edit', compact('post'));
     }
 
-    public function update(Request $request, Post $post)
+    /**
+     * Cập nhật bài viết
+     */
+    public function update(Request $request, $id)
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
@@ -91,11 +125,21 @@ class PostController extends Controller
             'status' => 'required|in:published,draft,archived',
             'excerpt' => 'required|string|max:500',
             'content' => 'required|string',
-            'image_url' => 'nullable|url'
+            'image_url' => 'nullable|url',
         ]);
 
+        $post = Post::findOrFail($id);
         $post->update($data);
 
-        return redirect()->route('admin.posts.index')->with('success', 'Cập nhật bài viết thành công!');
+        return redirect()->route('admin.posts.index')
+            ->with('success', 'Cập nhật bài viết thành công!');
+    }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+
+        return redirect()->route('admin.posts.index')
+            ->with('success', '🗑️ Đã xóa bài viết thành công!');
     }
 }

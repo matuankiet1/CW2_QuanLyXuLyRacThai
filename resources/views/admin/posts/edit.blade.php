@@ -1,68 +1,104 @@
-@extends('dashboard.admin')
+@extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="text-2xl font-semibold mb-4 text-warning">
-        <i class="fas fa-edit me-2"></i>Chỉnh sửa bài viết: {{ $post->title }}
-    </h1>
+<div class="max-w-3xl mx-auto bg-white shadow p-6 rounded-lg">
+    <h2 class="text-xl font-semibold mb-4">Chỉnh sửa bài viết</h2>
 
-    @if ($errors->has('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ $errors->first('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <form action="{{ route('posts.update', $post->post_id) }}" method="POST" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('admin.posts.update', $post->id) }}">
         @csrf
         @method('PUT')
-        <input type="hidden" name="updated_at" value="{{ optional($post->updated_at)->format('Y-m-d H:i:s') }}">
 
-        <div class="mb-3">
-            <label for="title" class="form-label fw-bold text-dark">📝 Tiêu đề</label>
-            <input type="text" class="form-control border-primary" id="title" name="title"
-                value="{{ old('title', $post->title) }}" required>
-            @error('title') <div class="text-danger small">{{ $message }}</div> @enderror
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-medium">Tiêu đề *</label>
+                <input 
+                    name="title" 
+                    value="{{ old('title', $post->title) }}" 
+                    required 
+                    class="w-full border p-2 rounded"
+                />
+            </div>
+            <div>
+                <label class="block mb-1 font-medium">Tác giả *</label>
+                <input 
+                    name="author" 
+                    value="{{ old('author', $post->author) }}" 
+                    required 
+                    class="w-full border p-2 rounded"
+                />
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="content" class="form-label fw-bold text-dark">📄 Nội dung</label>
-            <textarea class="form-control border-success" id="content" name="content" rows="6" required>{{ old('content', $post->content) }}</textarea>
-            @error('content') <div class="text-danger small">{{ $message }}</div> @enderror
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Danh mục *</label>
+            <input 
+                name="category" 
+                value="{{ old('category', $post->category) }}" 
+                required 
+                class="w-full border p-2 rounded"
+            />
         </div>
 
-        <div class="mb-3">
-            <label for="image" class="form-label fw-bold text-dark">🖼️ Hình ảnh</label>
-            <input type="file" class="form-control border-info" id="image" name="image">
-            @if ($post->image && file_exists(public_path('storage/' . $post->image)))
-                <img src="{{ asset('storage/' . $post->image) }}" class="img-thumbnail mt-2" style="max-width: 200px;">
-            @else
-                <img src="{{ asset('assets/images/default-image.png') }}" class="img-thumbnail mt-2" style="max-width: 200px;">
-            @endif
-            <small class="text-muted d-block mt-1">Để trống nếu không muốn thay đổi ảnh.</small>
-            @error('image') <div class="text-danger small">{{ $message }}</div> @enderror
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Mô tả ngắn *</label>
+            <textarea 
+                name="excerpt" 
+                required 
+                rows="3" 
+                class="w-full border p-2 rounded"
+            >{{ old('excerpt', $post->excerpt) }}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label for="rating" class="form-label fw-bold text-dark">⭐ Đánh giá</label>
-            <input type="number" min="1" max="5" step="1" class="form-control border-warning" id="rating" name="rating"
-                value="{{ old('rating', $post->rating) }}" required>
-            @error('rating') <div class="text-danger small">{{ $message }}</div> @enderror
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Nội dung *</label>
+            <textarea 
+                name="content" 
+                required 
+                rows="6" 
+                class="w-full border p-2 rounded"
+            >{{ old('content', $post->content) }}</textarea>
         </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-warning">
-                <i class="fas fa-save me-1"></i> Cập nhật bài viết
-            </button>
-            <a href="{{ route('posts.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Quay lại
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Ảnh đại diện (URL)</label>
+            <input 
+                name="image_url" 
+                value="{{ old('image_url', $post->image_url) }}" 
+                class="w-full border p-2 rounded"
+            />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Trạng thái *</label>
+                <select name="status" required class="w-full border p-2 rounded">
+                    <option value="draft" @selected(old('status', $post->status) == 'draft')>Nháp</option>
+                    <option value="published" @selected(old('status', $post->status) == 'published')>Đã xuất bản</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Ngày xuất bản *</label>
+                <input 
+                    type="date" 
+                    name="publish_date" 
+                    value="{{ old('publish_date', optional($post->publish_date)->format('Y-m-d')) }}" 
+                    required 
+                    class="w-full border p-2 rounded"
+                />
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+            <a href="{{ route('admin.posts.index') }}" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+                Hủy
             </a>
+            <button 
+                type="submit" 
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+                Cập nhật bài viết
+            </button>
         </div>
     </form>
 </div>

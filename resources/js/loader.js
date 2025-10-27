@@ -47,7 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (el.name === "_token") return;
             if (el.type === "hidden") return;
             if (el.tagName === "SELECT") {
-                el.disabled = true;
+
+                el.classList.add("opacity-70");
             } else {
                 el.readOnly = true;
             }
