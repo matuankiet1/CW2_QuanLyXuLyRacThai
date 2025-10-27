@@ -92,7 +92,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // 4. Chuyển hướng phù hợp với role
-        return redirect()->route('posts.home');
+        return redirect()->route('auth.login');
     }
 
     public function redirectToProvider($provider)
