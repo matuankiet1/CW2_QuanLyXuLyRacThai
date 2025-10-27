@@ -91,12 +91,11 @@ class AuthController extends Controller
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
 
-        // 4. Chuyển hướng phù hợp với role
-<<<<<<< HEAD
+        $request->session()->regenerate(); // Thêm bởi Lê Tâm 
+
+        // 4. Chuyển hướng đến trang dashboard
+        return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
         return redirect()->route('auth.login');
-=======
-        return redirect()->route('posts.home');
->>>>>>> phanquyen
     }
 
     public function redirectToProvider($provider)
@@ -186,6 +185,19 @@ class AuthController extends Controller
         // 4) Login
         Auth::login($user, true);
         return redirect()->intended('/dashboard');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        // Start lại session để đảm bảo token mới được tạo
+        $request->session()->start();
+        return redirect()->route('login')->with('status', [
+            'type' => 'success',
+            'message' => 'Log out successfully!'
+        ]);
     }
 
     public function showForgotPasswordForm()

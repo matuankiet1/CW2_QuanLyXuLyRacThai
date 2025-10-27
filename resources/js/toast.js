@@ -51,13 +51,15 @@ function createNewToast(type, message) {
         "pointer-events-auto flex items-center gap-3 rounded-lg shadow-lg bg-white ring-1 ring-black/10 px-4 py-3 transition transform duration-300 ease-out opacity-0 translate-y-2";
 
     let iconSrc = "/images/success-icon.png";
-
+    let bgColor = '#b9f8cf';
     if (type === "error") {
         iconSrc = "/images/error-icon.png";
+        bgColor = '#ffc9c9';
     } else if (type === "info") {
         iconSrc = "/images/info-icon.png";
+        bgColor = '#bedbff';
     }
-
+    toast.style.backgroundColor = bgColor
     toast.innerHTML = `
         <img class="toast-icon h-6 w-6" src="${iconSrc}" alt="toast-icon">
         <span class="message">${message || "Notification"}</span>

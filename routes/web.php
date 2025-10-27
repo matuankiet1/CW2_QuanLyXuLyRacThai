@@ -26,6 +26,8 @@ Route::post('logout', function () {
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
 // Login, register bằng social (Google, Facebook)
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
 Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
@@ -72,6 +74,9 @@ Route::middleware('admin')->group(function () {
     // Collection Schedule
     Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
         ->name('admin.collection-schedules.search');
+  
+  Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
+    ->name('admin.collection-schedules.deleteMultiple');
         
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
