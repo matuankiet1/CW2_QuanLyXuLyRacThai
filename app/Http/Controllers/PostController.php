@@ -44,7 +44,7 @@ class PostController extends Controller
             $query->where('status', $status);
         }
 
-        $posts = $query->orderBy('published_at', 'desc')->paginate(8);
+        $posts = $query->orderBy('id', 'asc')->paginate(8);
 
         $totalPosts = Post::count();
         $publishedPosts = Post::where('status', 'published')->count();

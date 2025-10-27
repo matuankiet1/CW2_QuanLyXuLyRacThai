@@ -43,6 +43,7 @@
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead class="bg-gray-100">
                     <tr>
+                        <th class="p-3 text-left border">ID</th>
                         <th class="p-3 text-left border">Tiêu đề</th>
                         <th class="p-3 border">Tác giả</th>
                         <th class="p-3 border">Danh mục</th>
@@ -55,6 +56,7 @@
                 <tbody>
                     @foreach ($posts as $post)
                         <tr class="hover:bg-gray-50">
+                            <td class="p-3">{{ $post->id }}</td>
                             <td class="p-3">
                                 <div class="font-medium">{{ $post->title }}</div>
                                 <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
