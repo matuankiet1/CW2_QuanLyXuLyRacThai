@@ -37,7 +37,7 @@
                 <div>
                     <label class="block mb-1 font-medium">Trạng thái *</label>
                     <select name="status" required class="w-full border p-2 rounded">
-                        <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Nháp</option>
+                        <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Nháp</option>
                         <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã xuất bản</option>
                     </select>
                 </div>
