@@ -71,14 +71,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
                 <label class="block mb-1 font-medium">Trạng thái *</label>
-                <select 
-                    name="status" 
-                    required 
-                    class="w-full border p-2 rounded"
-                >
+                <select name="status" required class="w-full border p-2 rounded">
                     <option value="draft" @selected(old('status', $post->status) == 'draft')>Nháp</option>
                     <option value="published" @selected(old('status', $post->status) == 'published')>Đã xuất bản</option>
-                    <option value="archived" @selected(old('status', $post->status) == 'archived')>Lưu trữ</option>
                 </select>
             </div>
 
