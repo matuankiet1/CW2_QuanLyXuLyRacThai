@@ -16,27 +16,30 @@ class Post extends Model
         'excerpt',
         'content',
         'image',
-        'image_url',
         'author',
         'status',
-        'category',
         'published_at',
-        'publish_date',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
-        'publish_date' => 'date',
     ];
 
-    // Tự động tạo slug khi tạo mới
-    protected static function boot()
+    public static function boot()
     {
         parent::boot();
 
         static::creating(function ($post) {
             if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
+                $slug = Str::slug($post->title);
+                $originalSlug = $slug;
+                $count = 1;
+
+                while (Post::where('slug', $slug)->exists()) {
+                    $slug = $originalSlug . '-' . $count++;
+                }
+
+                $post->slug = $slug;
             }
         });
     }

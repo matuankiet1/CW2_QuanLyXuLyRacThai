@@ -61,7 +61,7 @@
                             </td>
                             <td class="p-3">{{ $post->author }}</td>
                             <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->category }}</span></td>
-                            <td class="p-3">{{ $post->publish_date->format('d/m/Y') }}</td>
+                            <td class="p-3">{{ $post->published_at->format('d/m/Y') }}</td>
                             <td class="p-3">
                                 @if ($post->status === 'published')
                                     <span class="text-green-600 font-medium">Đã xuất bản</span>

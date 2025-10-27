@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
@@ -49,9 +48,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
-//--------------------------------------- PUBLIC ROUTES (Mọi người đều truy cập được) -------------------------------------//
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+//--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+});
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -43,7 +44,7 @@ class PostController extends Controller
             $query->where('status', $status);
         }
 
-        $posts = $query->orderBy('publish_date', 'desc')->paginate(8);
+        $posts = $query->orderBy('published_at', 'desc')->paginate(8);
 
         $totalPosts = Post::count();
         $publishedPosts = Post::where('status', 'published')->count();
@@ -73,52 +74,35 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // Log request để debug
-        \Log::info('store đang chạy', $request->all());
-
-        // Validate dữ liệu
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string',
-            'content' => 'required|string',
-            'image' => 'nullable|string|max:255',
-            'author' => 'required|string|max:255',
-            'published_at' => 'nullable|date',
-            'status' => 'required|in:draft,published',
-        ]);
-
         try {
-            // Tạo slug cơ bản
-            $baseSlug = \Illuminate\Support\Str::slug($data['title']);
-            $slug = $baseSlug;
-            $counter = 1;
+            // Ghi log để debug (nếu cần)
+            Log::info("Đang xử lý thêm bài viết", $request->all());
 
-            // Kiểm tra slug trùng lặp trong DB
-            while (\App\Models\Post::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
-                $counter++;
+            // Validate dữ liệu
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'excerpt' => 'required|string',
+                'content' => 'required|string',
+                'image' => 'nullable|string|max:255',
+                'author' => 'required|string|max:255',
+                'status' => 'nullable|string|in:draft,published',
+                'published_at' => 'nullable|date',
+            ]);
+            if (empty($validated['status'])) {
+                $validated['status'] = 'draft';
             }
-            $data['slug'] = $slug;
 
-            // Gán giá trị mặc định
-            $data['category'] = $data['category'] ?? 'Tin tức';
-            $data['image_url'] = $data['image_url'] ?? $data['image'] ?? null;
-            $data['publish_date'] = $data['publish_date'] ?? now()->toDateString();
+            // Tạo bài viết
+            $post = Post::create($validated);
 
-            // Thêm bài viết
-            Post::create($data);
-
-            return redirect()->route('admin.posts.index')
-                ->with('success', 'Đã thêm bài viết mới!');
-
+            return redirect()
+                ->route('admin.posts.index')
+                ->with('success', 'Thêm bài viết thành công!');
         } catch (\Exception $e) {
-            // Log lỗi chi tiết
-            \Log::error('Lỗi khi tạo bài viết: ' . $e->getMessage(), $data);
-
-            return back()
-                ->withInput()
-                ->withErrors('Có lỗi xảy ra khi thêm bài viết: ' . $e->getMessage());
+            Log::error("Lỗi khi thêm bài viết: " . $e->getMessage());
+            return back()->withErrors(['error' => 'Không thể thêm bài viết.'])->withInput();
         }
+
     }
 
 

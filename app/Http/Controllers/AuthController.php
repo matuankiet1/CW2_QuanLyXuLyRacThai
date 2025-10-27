@@ -39,7 +39,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended('dashboard');
             } else {
-                return redirect()->route('posts.home');
+                return redirect()->route('auth.login');
             }
         } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
             $user = User::where('email', $credentials['email'])->first();
