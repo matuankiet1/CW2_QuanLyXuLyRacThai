@@ -22,15 +22,17 @@ Route::post('logout', function () {
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return redirect()->route('login');
-})->name('logout');
+})->name('logout'); // Lê Tâm: Đã có hàm Logout trong Controller, nên chỉ cần Route::post('logout', [AuthController::class, 'logout'])->name('logout'); 
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
+
+// Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Login, register bằng social (Google, Facebook)
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
 Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
 
-//------------------------------------ QUÊN MẬT KHẨU -------------------------------------//
+// Quên mật khẩu
 Route::middleware('guest')->group(function () {
     // Nhập email, gửi mã, và xác thực mã
     Route::get('/forgot_password', [AuthController::class, 'showForgotPasswordForm'])->name('forgot_password.form');
@@ -59,20 +61,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::middleware('admin')->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
-    
+
     // Search users
     Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
-    
+
     // CRUD Admin
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('posts', PostController::class);
         Route::resource('users', UserController::class);
     });
-    
+
     // Collection Schedule
     Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
         ->name('admin.collection-schedules.search');
-        
+
+    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
+        ->name('admin.collection-schedules.deleteMultiple');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -80,7 +85,7 @@ Route::middleware('admin')->group(function () {
         'update' => 'admin.collection-schedules.update',
         'destroy' => 'admin.collection-schedules.destroy',
     ]);
-    
+
     // Banners
     Route::resource('banners', BannerController::class);
 });
