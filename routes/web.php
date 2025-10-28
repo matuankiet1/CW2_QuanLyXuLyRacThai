@@ -15,6 +15,13 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
+//------------------------------------ ADMIN HOME -------------------------------------//
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/home', [App\Http\Controllers\AdminHomeController::class, 'index'])->name('home');
+    Route::get('/home/about', [App\Http\Controllers\AdminHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/contact', [App\Http\Controllers\AdminHomeController::class, 'contact'])->name('home.contact');
+});
+
 //------------------------------------ AUTH -------------------------------------//
 // Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
