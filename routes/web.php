@@ -77,6 +77,12 @@ Route::middleware('admin')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('posts', PostController::class);
         Route::resource('users', UserController::class);
+        
+        // Role Management
+        Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
+        Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
+        Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
+        Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
     });
 
     // Collection Schedule
