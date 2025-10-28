@@ -69,10 +69,4 @@ class EventController extends Controller
         return redirect()->back()->with('success', 'Xóa sự kiện thành công!');
     }
 
-    // ✅ (Tuỳ chọn) Xuất Excel danh sách sự kiện
-    public function export()
-    {
-        $fileName = 'danh_sach_su_kien_' . now()->format('Y_m_d_His') . '.xlsx';
-        return Excel::download(new EventsExport, $fileName);
-    }
 }
