@@ -32,7 +32,7 @@
                     ['id' => 'permissions', 'label' => 'Phân quyền'],
                     ['id' => 'events', 'label' => 'Quản lý sự kiện'],
                     ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                    ['id' => 'reports', 'label' => 'Báo cáo người dùng'],
+                    ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'reports.index'],
                     ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                     ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                     ['id' => 'finance', 'label' => 'Quản lý tài chính'],
