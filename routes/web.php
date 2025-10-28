@@ -8,6 +8,7 @@ use App\Http\Controllers\CollectionScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
 
 //------------------------------------ TRANG CHỦ -------------------------------------//
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -76,6 +77,12 @@ Route::middleware('admin')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('posts', PostController::class);
         Route::resource('users', UserController::class);
+        
+        // Role Management
+        Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
+        Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
+        Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
+        Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
     });
 
     // Collection Schedule
@@ -95,4 +102,13 @@ Route::middleware('admin')->group(function () {
 
     // Banners
     Route::resource('banners', BannerController::class);
+
+    //Events
+    Route::prefix('admin')->group(function () {
+        Route::get('/events', [EventController::class, 'index'])->name('admin.events.index');
+        Route::post('/events', [EventController::class, 'store'])->name('admin.events.store');
+        Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update');
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
+        Route::get('/events/export', [EventController::class, 'export'])->name('admin.events.export');
+    });
 });
