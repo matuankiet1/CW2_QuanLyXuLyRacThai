@@ -19,11 +19,20 @@ class Post extends Model
         'author',
         'status',
         'published_at',
+        'user_id',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
     ];
+
+    /**
+     * Relationship với User model
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
 
     public static function boot()
     {
