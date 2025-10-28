@@ -8,6 +8,7 @@ use App\Http\Controllers\CollectionScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
 
 //------------------------------------ TRANG CHỦ -------------------------------------//
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -95,4 +96,13 @@ Route::middleware('admin')->group(function () {
 
     // Banners
     Route::resource('banners', BannerController::class);
+
+    //Events
+    Route::prefix('admin')->group(function () {
+        Route::get('/events', [EventController::class, 'index'])->name('admin.events.index');
+        Route::post('/events', [EventController::class, 'store'])->name('admin.events.store');
+        Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update');
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
+        Route::get('/events/export', [EventController::class, 'export'])->name('admin.events.export');
+    });
 });
