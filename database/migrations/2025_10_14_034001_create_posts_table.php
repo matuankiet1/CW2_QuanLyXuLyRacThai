@@ -17,7 +17,7 @@ return new class extends Migration
             $table->longText('content');
             $table->text('post_categories');
             $table->string('image')->nullable();
-            $table->enum('status', ['draft', 'published'])->default('draft');
+            $table->enum('status', ['draft', 'published','archived'])->default('draft');
             $table->date('published_at')->nullable();
             $table->timestamps();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('posts');  
     }
 };

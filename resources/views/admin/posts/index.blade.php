@@ -12,8 +12,8 @@
                     <select name="post_categories" class="border p-2 rounded">
                         <option>Tất cả danh mục</option>
                         <option>Tin tức</option>
-                        <option>Sự kiện</option>
                         <option>Kiến thức</option>
+                        <option>Tuyên truyền</option>
                     </select>
                     <select name="status" class="border p-2 rounded">
                         <option value="all">Tất cả trạng thái</option>
@@ -45,49 +45,58 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($posts as $post)
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3">{{ $post->id }}</td>
-                            <td class="p-3">
-                                <div class="font-medium">{{ $post->title }}</div>
-                                <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
-                            </td>
-                            <td class="p-3">{{ $post->author }}</td>
-                            <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span></td>
-                            <td class="p-3">{{ $post->published_at->format('d/m/Y') }}</td>
-                            <td class="p-3">
-                                @if ($post->status === 'published')
-                                    <span class="text-green-600 font-medium">Đã xuất bản</span>
-                                @elseif ($post->status === 'draft')
-                                    <span class="text-gray-500">Nháp</span>
-                                @else
-                                    <span class="text-yellow-600">Lưu trữ</span>
-                                @endif
-                            </td>
-                            <td class="p-3 text-right">{{ number_format($post->views) }}</td>
-                            <td class="p-3 text-right flex justify-end gap-2">
-                                {{-- Nút Sửa --}}
-                                <a href="{{ route('admin.posts.edit', $post) }}"
-                                    class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-md transition">
-                                    ✏️ Sửa
-                                </a>
+                    @if ($posts->count() > 0)
+                        @foreach ($posts as $post)
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3">{{ $post->id }}</td>
+                                <td class="p-3">
+                                    <div class="font-medium">{{ $post->title }}</div>
+                                    <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
+                                </td>
+                                <td class="p-3">{{ $post->author }}</td>
+                                <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span></td>
+                                <td class="p-3">
+                                    {{ optional($post->published_at)->format('d/m/Y') }}
+                                </td>
+                                <td class="p-3">
+                                    @if ($post->status === 'published')
+                                        <span class="text-green-600 font-medium">Đã xuất bản</span>
+                                    @elseif ($post->status === 'draft')
+                                        <span class="text-gray-500">Nháp</span>
+                                    @else
+                                        <span class="text-yellow-600">Lưu trữ</span>
+                                    @endif
+                                </td>
+                                <td class="p-3 text-right">{{ number_format($post->views) }}</td>
+                                <td class="p-3 text-right flex justify-end gap-2">
+                                    {{-- Nút Sửa --}}
+                                    <a href="{{ route('admin.posts.edit', $post) }}"
+                                        class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-md transition">
+                                        ✏️ Sửa
+                                    </a>
 
-                                {{-- Nút Xóa --}}
-                                <form action="{{ route('admin.posts.destroy', $post) }}" method="POST"
-                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-md transition">
-                                        🗑️ Xóa
-                                    </button>
-                                </form>
+                                    {{-- Nút Xóa --}}
+                                    <form action="{{ route('admin.posts.destroy', $post) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-md transition">
+                                            🗑️ Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="8" class="text-center py-6 text-gray-500">
+                                Không có bài viết nào.
                             </td>
-
-
                         </tr>
-                    @endforeach
+                    @endif
                 </tbody>
+
             </table>
 
             {{-- Phân trang --}}
