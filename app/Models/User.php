@@ -54,6 +54,14 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Relationship với Post model
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id', 'user_id');
+    }
+
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
