@@ -64,6 +64,15 @@
                 <label for="password" class="text-sm font-medium text-gray-700">Mật khẩu</label>
                 <input id="password" name="password" type="password" placeholder="••••••••" required
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 @error('password') border-red-500 @enderror" />
+                <div class="text-xs text-gray-500">
+                    <p>Mật khẩu phải có ít nhất 8 ký tự, bao gồm:</p>
+                    <ul class="list-disc list-inside ml-2">
+                        <li>Ít nhất 8 ký tự</li>
+                        <li>Chữ hoa và chữ thường</li>
+                        <li>Ít nhất 1 chữ số</li>
+                        <li>Ít nhất 1 ký tự đặc biệt</li>
+                    </ul>
+                </div>
                 @error('password')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -93,4 +102,57 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const passwordRequirements = document.querySelector('.text-xs.text-gray-500');
+    
+    if (passwordInput && passwordRequirements) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const requirements = passwordRequirements.querySelectorAll('li');
+            
+            // Reset all requirements
+            requirements.forEach(li => {
+                li.classList.remove('text-green-600', 'text-red-500');
+                li.classList.add('text-gray-500');
+            });
+            
+            // Check each requirement
+            if (password.length >= 8) {
+                requirements[0].classList.remove('text-gray-500', 'text-red-500');
+                requirements[0].classList.add('text-green-600');
+            } else {
+                requirements[0].classList.remove('text-gray-500', 'text-green-600');
+                requirements[0].classList.add('text-red-500');
+            }
+            
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+                requirements[1].classList.remove('text-gray-500', 'text-red-500');
+                requirements[1].classList.add('text-green-600');
+            } else {
+                requirements[1].classList.remove('text-gray-500', 'text-green-600');
+                requirements[1].classList.add('text-red-500');
+            }
+            
+            if (/\d/.test(password)) {
+                requirements[2].classList.remove('text-gray-500', 'text-red-500');
+                requirements[2].classList.add('text-green-600');
+            } else {
+                requirements[2].classList.remove('text-gray-500', 'text-green-600');
+                requirements[2].classList.add('text-red-500');
+            }
+            
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                requirements[3].classList.remove('text-gray-500', 'text-red-500');
+                requirements[3].classList.add('text-green-600');
+            } else {
+                requirements[3].classList.remove('text-gray-500', 'text-green-600');
+                requirements[3].classList.add('text-red-500');
+            }
+        });
+    }
+});
+</script>
 @endsection
