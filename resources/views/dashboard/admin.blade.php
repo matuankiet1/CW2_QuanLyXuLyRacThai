@@ -30,7 +30,7 @@
                     ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],
                     ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
                     ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
-                    ['id' => 'events', 'label' => 'Quản lý sự kiện'],
+                    ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                     ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
                     ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'reports.index'],
                     ['id' => 'notifications', 'label' => 'Gửi thông báo'],
