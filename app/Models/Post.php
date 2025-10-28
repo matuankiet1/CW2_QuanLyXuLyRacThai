@@ -15,6 +15,7 @@ class Post extends Model
         'slug',
         'excerpt',
         'content',
+        'post_categories',
         'image',
         'author',
         'status',
