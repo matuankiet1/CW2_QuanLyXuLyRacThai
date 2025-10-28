@@ -23,7 +23,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $category = $request->input('category');
+        $post_categories = $request->input('post_categories');
         $status = $request->input('status');
 
         $query = Post::query();
@@ -36,8 +36,8 @@ class PostController extends Controller
             });
         }
 
-        if ($category && $category !== 'Tất cả danh mục') {
-            $query->where('category', $category);
+        if ($post_categories && $post_categories !== 'Tất cả danh mục') {
+            $query->where('post_categories', $post_categories);
         }
 
         if ($status && $status !== 'all') {
@@ -56,7 +56,7 @@ class PostController extends Controller
             'publishedPosts',
             'draftPosts',
             'search',
-            'category',
+            'post_categories',
             'status'
         ));
     }
@@ -83,6 +83,7 @@ class PostController extends Controller
                 'title' => 'required|string|max:255',
                 'excerpt' => 'required|string',
                 'content' => 'required|string',
+                'post_categories' => 'required|string',
                 'image' => 'nullable|string|max:255',
                 'author' => 'required|string|max:255',
                 'status' => 'required|in:draft,published',

@@ -29,6 +29,17 @@
             </div>
 
             <div class="mt-4">
+                <label class="block mb-1 font-medium">Danh mục *</label>
+                <select name="post_categories" required class="w-full border p-2 rounded">
+                    <option value="">-- Chọn danh mục --</option>
+                    <option value="Tin tức" {{ old('post_categories') == 'Tin tức' ? 'selected' : '' }}>Tin tức</option>
+                    <option value="Khuyến mãi" {{ old('post_categories') == 'Kiến thức' ? 'selected' : '' }}>Khuyến mãi
+                    </option>
+                    <option value="Hướng dẫn" {{ old('post_categories') == 'Tuyên truyền' ? 'selected' : '' }}>Hướng dẫn</option>
+                </select>
+            </div>
+
+            <div class="mt-4">
                 <label class="block mb-1 font-medium">Ảnh đại diện (URL)</label>
                 <input name="image" value="{{ old('image') }}" class="w-full border p-2 rounded" />
             </div>
