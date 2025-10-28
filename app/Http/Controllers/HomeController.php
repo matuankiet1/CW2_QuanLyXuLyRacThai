@@ -19,8 +19,8 @@ class HomeController extends Controller
             ->get();
 
         // Lấy lịch thu gom sắp tới
-        $upcomingSchedules = CollectionSchedule::where('date', '>=', now())
-            ->orderBy('date', 'asc')
+        $upcomingSchedules = CollectionSchedule::where('scheduled_date', '>=', now())
+            ->orderBy('scheduled_date', 'asc')
             ->limit(3)
             ->get();
 
@@ -34,7 +34,7 @@ class HomeController extends Controller
         $stats = [
             'total_posts' => Post::where('status', 'published')->count(),
             'total_schedules' => CollectionSchedule::count(),
-            'upcoming_schedules' => CollectionSchedule::where('date', '>=', now())->count(),
+            'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
         ];
 
         return view('home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
