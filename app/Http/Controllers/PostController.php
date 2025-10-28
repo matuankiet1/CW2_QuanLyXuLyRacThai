@@ -28,7 +28,7 @@ class PostController extends Controller
             ->where('post_categories', $post->post_categories)
             ->limit(3)
             ->get();
-        
+
         return view('posts.show', compact('post', 'relatedPosts'));
     }
 
