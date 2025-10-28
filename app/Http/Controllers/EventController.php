@@ -26,6 +26,10 @@ class EventController extends Controller
         return view('admin.events.index', compact('events', 'search'));
     }
 
+    public function create(){
+        return view('admin.events.create');
+    }
+
     // ✅ Tạo sự kiện mới
     public function store(Request $request)
     {
