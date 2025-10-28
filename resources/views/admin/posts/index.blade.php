@@ -33,7 +33,7 @@
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="p-3 text-left border">ID</th>
+                        <th class="p-3 text-left border w-16 text-center">STT</th>
                         <th class="p-3 text-left border">Tiêu đề</th>
                         <th class="p-3 border">Tác giả</th>
                         <th class="p-3 border">Danh mục</th>
@@ -45,15 +45,21 @@
                 </thead>
                 <tbody>
                     @if ($posts->count() > 0)
-                        @foreach ($posts as $post)
+                        @foreach ($posts as $index => $post)
                             <tr class="hover:bg-gray-50">
-                                <td class="p-3">{{ $post->id }}</td>
+                                {{-- STT tự tăng theo trang --}}
+                                <td class="p-3 text-center">
+                                    {{ $posts->firstItem() + $index }}
+                                </td>
+
                                 <td class="p-3">
                                     <div class="font-medium">{{ $post->title }}</div>
                                     <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
                                 </td>
                                 <td class="p-3">{{ $post->author }}</td>
-                                <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span></td>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span>
+                                </td>
                                 <td class="p-3">
                                     {{ optional($post->published_at)->format('d/m/Y') }}
                                 </td>
@@ -95,7 +101,6 @@
                         </tr>
                     @endif
                 </tbody>
-
             </table>
 
             {{-- Phân trang --}}
