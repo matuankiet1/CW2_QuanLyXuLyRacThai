@@ -39,7 +39,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended('dashboard');
             } else {
-                return redirect()->route('auth.login');
+                return redirect()->route('home');
             }
         } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
             $user = User::where('email', $credentials['email'])->first();
@@ -93,8 +93,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate(); // Thêm bởi Lê Tâm 
 
-        // 4. Chuyển hướng đến trang dashboard
-        return redirect('/dashboard');
+        // 4. Chuyển hướng đến trang chủ
+        return redirect()->route('home');
         // return redirect()->route('auth.login');
     }
 
@@ -181,9 +181,13 @@ class AuthController extends Controller
             ]);
         }
 
-        // 4) Login
+        // 4) Login và chuyển hướng theo role
         Auth::login($user, true);
-        return redirect()->intended('/dashboard');
+        if (Auth::user()->role === 'admin') {
+            return redirect()->intended('/dashboard');
+        } else {
+            return redirect()->intended('/');
+        }
     }
 
     public function logout(Request $request)
