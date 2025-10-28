@@ -116,7 +116,7 @@
 </section>
 
 <!-- Call to Action -->
-<section class="py-5" style="background: linear-gradient(135deg, var(--admin-color), #b91c1c); color: white;">
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
