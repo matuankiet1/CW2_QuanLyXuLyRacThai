@@ -18,6 +18,21 @@ class PostController extends Controller
     }
 
     /**
+     * Hiển thị chi tiết bài viết
+     */
+    public function show($id)
+    {
+        $post = Post::where('status', 'published')->findOrFail($id);
+        $relatedPosts = Post::where('status', 'published')
+            ->where('id', '!=', $id)
+            ->where('post_categories', $post->post_categories)
+            ->limit(3)
+            ->get();
+        
+        return view('posts.show', compact('post', 'relatedPosts'));
+    }
+
+    /**
      * Danh sách bài viết
      */
     public function index(Request $request)
