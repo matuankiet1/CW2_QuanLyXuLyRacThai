@@ -55,6 +55,7 @@
                     <select name="status" required class="w-full border p-2 rounded">
                         <option value="draft" @selected(old('status', $post->status) == 'draft')>Nháp</option>
                         <option value="published" @selected(old('status', $post->status) == 'published')>Đã xuất bản</option>
+                        <option value="archived" @selected(old('status', $post->status) == 'archived')>Lưu trữ</option>
                     </select>
                 </div>
 

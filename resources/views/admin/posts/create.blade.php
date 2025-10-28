@@ -33,9 +33,9 @@
                 <select name="post_categories" required class="w-full border p-2 rounded">
                     <option value="">-- Chọn danh mục --</option>
                     <option value="Tin tức" {{ old('post_categories') == 'Tin tức' ? 'selected' : '' }}>Tin tức</option>
-                    <option value="Khuyến mãi" {{ old('post_categories') == 'Kiến thức' ? 'selected' : '' }}>Khuyến mãi
+                    <option value="Kiến thức" {{ old('post_categories') == 'Kiến thức' ? 'selected' : '' }}>Kiến thức
                     </option>
-                    <option value="Hướng dẫn" {{ old('post_categories') == 'Tuyên truyền' ? 'selected' : '' }}>Hướng dẫn</option>
+                    <option value="Tuyên truyền" {{ old('post_categories') == 'Tuyên truyền' ? 'selected' : '' }}>Tuyên truyền</option>
                 </select>
             </div>
 
@@ -50,6 +50,7 @@
                     <select name="status" required class="w-full border p-2 rounded">
                         <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Nháp</option>
                         <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã xuất bản</option>
+                        <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Lưu trữ</option>
                     </select>
                 </div>
 
