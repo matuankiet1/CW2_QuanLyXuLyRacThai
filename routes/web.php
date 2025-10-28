@@ -65,6 +65,15 @@ Route::middleware('admin')->group(function () {
     // Search users
     Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
 
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('index');
+        Route::get('/users', [App\Http\Controllers\ReportController::class, 'users'])->name('users');
+        Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
+        Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
+        Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
+    });
+
     // CRUD Admin
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('posts', PostController::class);
