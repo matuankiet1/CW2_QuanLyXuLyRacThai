@@ -125,7 +125,7 @@
                             <div class="flex space-x-2">
                                 @if($user->id !== auth()->id() && $user->email !== 'admin@ecowaste.com')
                                     <!-- Role Change Form -->
-                                    <form action="{{ route('admin.roles.update', $user->id) }}" method="POST" class="inline">
+                                    <form action="{{ route('admin.roles.update', $user) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
                                         <select name="role" onchange="this.form.submit()" 
@@ -137,7 +137,7 @@
                                     
                                     <!-- Delete Button -->
                                     @if($user->role === 'user')
-                                    <form action="{{ route('admin.roles.destroy', $user->id) }}" method="POST" class="inline" 
+                                    <form action="{{ route('admin.roles.destroy', $user) }}" method="POST" class="inline" 
                                           onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
                                         @csrf
                                         @method('DELETE')
