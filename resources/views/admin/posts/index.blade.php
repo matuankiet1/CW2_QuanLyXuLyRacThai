@@ -9,9 +9,8 @@
                 <div class="flex items-center gap-2">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm theo tiêu đề, tác giả..."
                         class="border p-2 rounded w-64" />
-                    <select name="categories" class="border p-2 rounded">
+                    <select name="post_categories" class="border p-2 rounded">
                         <option>Tất cả danh mục</option>
-                        <option>Hướng dẫn</option>
                         <option>Tin tức</option>
                         <option>Sự kiện</option>
                         <option>Kiến thức</option>
