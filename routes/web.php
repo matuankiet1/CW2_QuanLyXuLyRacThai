@@ -84,7 +84,7 @@ Route::middleware('admin')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('posts', PostController::class);
         Route::resource('users', UserController::class);
-        
+
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
@@ -111,11 +111,15 @@ Route::middleware('admin')->group(function () {
     Route::resource('banners', BannerController::class);
 
     //Events
-    Route::prefix('admin')->group(function () {
-        Route::get('/events', [EventController::class, 'index'])->name('admin.events.index');
-        Route::post('/events', [EventController::class, 'store'])->name('admin.events.store');
-        Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update');
-        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
-        Route::get('/events/export', [EventController::class, 'export'])->name('admin.events.export');
+    // Events
+    Route::prefix('events')->name('admin.events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/', [EventController::class, 'store'])->name('store');
+        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [EventController::class, 'update'])->name('update');
+        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [EventController::class, 'export'])->name('export');
     });
+
 });
