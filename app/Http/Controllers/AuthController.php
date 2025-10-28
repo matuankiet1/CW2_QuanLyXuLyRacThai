@@ -37,7 +37,7 @@ class AuthController extends Controller
 
             // Kiểm tra role và chuyển hướng phù hợp
             if (Auth::user()->role === 'admin') {
-                return redirect()->intended('dashboard');
+                return redirect()->intended('admin/home');
             } else {
                 return redirect()->route('home');
             }
@@ -195,7 +195,7 @@ class AuthController extends Controller
         // 4) Login và chuyển hướng theo role
         Auth::login($user, true);
         if (Auth::user()->role === 'admin') {
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/admin/home');
         } else {
             return redirect()->intended('/');
         }
