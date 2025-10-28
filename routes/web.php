@@ -7,11 +7,12 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CollectionScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HomeController;
 
 //------------------------------------ TRANG CHỦ -------------------------------------//
-Route::get('/', function () {
-    return redirect()->route('login');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [HomeController::class, 'about'])->name('home.about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
 //------------------------------------ AUTH -------------------------------------//
 // Login, register local
@@ -51,11 +52,8 @@ Route::middleware('guest')->group(function () {
 });
 
 //--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-});
+Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
