@@ -86,7 +86,7 @@ class PostController extends Controller
                 'post_categories' => 'required|string',
                 'image' => 'nullable|string|max:255',
                 'author' => 'required|string|max:255',
-                'status' => 'required|in:draft,published',
+                'status' => 'required|in:draft,published,archived',
                 'published_at' => 'nullable|date',
             ]);
 
@@ -125,7 +125,7 @@ class PostController extends Controller
             'post_categories' => 'required|string',
             'image' => 'nullable|string|max:255',
             'author' => 'required|string|max:255',
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:draft,published,archived',
             'published_at' => 'nullable|date',
         ]);
 
