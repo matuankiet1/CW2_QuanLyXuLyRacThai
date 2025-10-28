@@ -71,31 +71,42 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // 1. Validate dữ liệu đầu vào
+        // 1. Validate dữ liệu đầu vào với rules nghiêm ngặt hơn
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:15'], // Tùy chọn, có thể là required
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+\-\s()]+$/'],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+        ], [
+            'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
+            'email.regex' => 'Email không đúng định dạng.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'password.mixed_case' => 'Mật khẩu phải chứa ít nhất 1 chữ hoa và 1 chữ thường.',
+            'password.numbers' => 'Mật khẩu phải chứa ít nhất 1 chữ số.',
+            'password.symbols' => 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.',
         ]);
 
-        // 2. Tạo người dùng mới
+        // 2. Tạo người dùng mới - CHỈ VỚI ROLE USER
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name' => trim($request->name),
+            'email' => strtolower(trim($request->email)),
+            'phone' => $request->phone ? trim($request->phone) : null,
             'password' => Hash::make($request->password),
-            'role' => 'user',
+            'role' => 'user', // CỐ ĐỊNH LÀ USER, KHÔNG CHO PHÉP THAY ĐỔI
             'auth_provider' => 'local',
+            'email_verified_at' => now(), // Tự động xác thực email cho user đăng ký
         ]);
 
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
 
-        $request->session()->regenerate(); // Thêm bởi Lê Tâm 
+        $request->session()->regenerate();
 
-        // 4. Chuyển hướng đến trang chủ
-        return redirect()->route('home');
-        // return redirect()->route('auth.login');
+        // 4. Chuyển hướng đến trang chủ với thông báo thành công
+        return redirect()->route('home')->with('status', [
+            'type' => 'success',
+            'message' => 'Đăng ký tài khoản thành công! Chào mừng bạn đến với EcoWaste.'
+        ]);
     }
 
     public function redirectToProvider($provider)
