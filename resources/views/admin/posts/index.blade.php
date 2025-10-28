@@ -24,7 +24,6 @@
                     <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Lọc</button>
                 </div>
                 <div class="flex gap-3">
-                    <a href="#" class="bg-gray-100 px-3 py-2 rounded">Xuất Excel</a>
                     <a href="{{ route('admin.posts.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">+ Thêm bài
                         viết</a>
                 </div>
