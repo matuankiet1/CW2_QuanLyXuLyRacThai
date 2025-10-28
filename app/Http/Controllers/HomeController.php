@@ -24,9 +24,8 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
 
-        // Lấy banner hoạt động
-        $banners = Banner::where('is_active', true)
-            ->orderBy('created_at', 'desc')
+        // Lấy banner mới nhất
+        $banners = Banner::orderBy('created_at', 'desc')
             ->limit(3)
             ->get();
 
