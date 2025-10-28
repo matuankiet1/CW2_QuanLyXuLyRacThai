@@ -120,13 +120,13 @@ class PostController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'category' => 'required|string|max:100',
-            'publish_date' => 'required|date',
-            'status' => 'required|in:published,draft,archived',
-            'excerpt' => 'required|string|max:500',
+            'excerpt' => 'required|string',
             'content' => 'required|string',
-            'image_url' => 'nullable|url',
+            'post_categories' => 'required|string',
+            'image' => 'nullable|string|max:255',
+            'author' => 'required|string|max:255',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date',
         ]);
 
         $post = Post::findOrFail($id);

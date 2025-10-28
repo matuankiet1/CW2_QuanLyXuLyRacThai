@@ -3,14 +3,6 @@
 @section('main-content')
     <div class="space-y-6">
 
-        {{-- Thống kê --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <x-card title="Tổng bài viết" icon="file-text" color="blue" :value="$totalPosts" sub="+3 trong tháng này" />
-            <x-card title="Đã xuất bản" icon="check-circle" color="green" :value="$publishedPosts"
-                sub="{{ number_format(($publishedPosts / max($totalPosts, 1)) * 100, 0) }}% tổng số bài" />
-            <x-card title="Bài nháp" icon="clock" color="yellow" :value="$draftPosts" sub="Chờ xuất bản" />
-        </div>
-
         {{-- Bộ lọc --}}
         <div class="bg-white rounded-lg shadow p-6">
             <form method="GET" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
