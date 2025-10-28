@@ -17,7 +17,7 @@
                 <div class="flex items-center gap-2">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm theo tiêu đề, tác giả..."
                         class="border p-2 rounded w-64" />
-                    <select name="category" class="border p-2 rounded">
+                    <select name="categories" class="border p-2 rounded">
                         <option>Tất cả danh mục</option>
                         <option>Hướng dẫn</option>
                         <option>Tin tức</option>
@@ -62,7 +62,7 @@
                                 <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
                             </td>
                             <td class="p-3">{{ $post->author }}</td>
-                            <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->category }}</span></td>
+                            <td class="p-3"><span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span></td>
                             <td class="p-3">{{ $post->published_at->format('d/m/Y') }}</td>
                             <td class="p-3">
                                 @if ($post->status === 'published')

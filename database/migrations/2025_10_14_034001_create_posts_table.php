@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('author');
             $table->text('excerpt');
             $table->longText('content');
+            $table->text('post_categories');
             $table->string('image')->nullable();
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->date('published_at')->nullable();
