@@ -32,6 +32,7 @@ class BannerController extends Controller
     // Lưu banner
     public function store(Request $request)
     {
+        // dd('Đã vào được store()', $request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'link' => 'nullable|url',
