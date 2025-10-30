@@ -1,112 +1,120 @@
 @extends('layouts.admin-with-sidebar')
 
 @section('content')
-<div class="space-y-6">
-    {{-- Thống kê --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 bg-white rounded-lg shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 text-xl">📅</div>
-                <div>
-                    <p class="text-sm text-gray-500">Tổng sự kiện</p>
-                    <h3 class="text-2xl">{{ \App\Models\Event::count() }}</h3>
+<div class="container-fluid">
+    <div class="row g-4 mb-1">
+        <div class="col-12 col-md-4">
+            <div class="card shadow-soft h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="rounded bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width:48px;height:48px;">📅</div>
+                    <div>
+                        <div class="text-muted small">Tổng sự kiện</div>
+                        <div class="h4 mb-0">{{ \App\Models\Event::count() }}</div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="p-6 bg-white rounded-lg shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 text-xl">👥</div>
-                <div>
-                    <p class="text-sm text-gray-500">Tổng người tham gia</p>
-                    <h3 class="text-2xl">{{ \App\Models\Event::sum('participants') }}</h3>
+        <div class="col-12 col-md-4">
+            <div class="card shadow-soft h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="rounded bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width:48px;height:48px;">👥</div>
+                    <div>
+                        <div class="text-muted small">Tổng người tham gia</div>
+                        <div class="h4 mb-0">{{ \App\Models\Event::sum('participants') }}</div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="p-6 bg-white rounded-lg shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-teal-600 text-xl">🗑️</div>
+        <div class="col-12 col-md-4">
+            <div class="card shadow-soft h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="rounded bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width:48px;height:48px;">🗑️</div>
+                    <div>
+                        <div class="text-muted small">Sự kiện môi trường</div>
+                        <div class="h6 mb-0">Theo dõi trong tháng</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Bộ lọc & thêm sự kiện --}}
-    <div class="bg-white p-6 rounded-lg shadow">
-        <form method="GET" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-                <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm sự kiện..."
-                    class="border p-2 rounded w-64" />
-                <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Tìm</button>
-                <select name="status" class="border p-2 rounded">
+    <div class="card shadow-soft mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Tìm sự kiện...">
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select name="status" class="form-select">
                         <option value="all">Tất cả trạng thái</option>
                         <option value="completed">Đã kết thúc</option>
                         <option value="upcoming">Sắp diễn ra</option>
                     </select>
-                    <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Lọc</button>
-            </div>
-            
-            {{-- Nút tạo mới --}}
-            <a href="{{ route('admin.events.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">
-                + Tạo sự kiện mới
-            </a>
-        </form>
+                </div>
+                <div class="col-12 col-md-5 d-grid d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-secondary me-md-2 mb-2 mb-md-0">Lọc</button>
+                    <a href="{{ route('admin.events.create') }}" class="btn btn-admin">+ Tạo sự kiện mới</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        {{-- Bảng dữ liệu --}}
-        <table class="min-w-full border-collapse border border-gray-200">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="p-3 border text-left">STT</th>
-                    <th class="p-3 border text-left">Tên sự kiện</th>
-                    <th class="p-3 border text-left">Ngày bắt đầu đăng ký</th>
-                    <th class="p-3 border text-left">Ngày kết thúc đăng ký</th>
-                    <th class="p-3 border text-left">Ngày bắt đầu sự kiện</th>
-                    <th class="p-3 border text-left">Ngày kết thúc sự kiện</th>
-                    <th class="p-3 border text-left">Địa điểm</th>
-                    <th class="p-3 border text-left">Người tham gia</th>
-                    <th class="p-3 border text-left">Trạng thái</th>
-                    <th class="p-3 border text-right">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($events as $index => $event)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 text-center">{{ $events->firstItem() + $index }}</td>
-                        <td class="p-3">{{ $event->title }}</td>
-                        <td class="p-3">{{ \Carbon\Carbon::parse($event->register_date)->format('d/m/Y') }}</td>
-                        <td class="p-3">{{ \Carbon\Carbon::parse($event->register_end_date)->format('d/m/Y') }}</td>
-                        <td class="p-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
-                        <td class="p-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
-                        <td class="p-3">{{ $event->location }}</td>
-                        <td class="p-3">{{ $event->participants }} người</td>
-                        <td class="p-3">
-                            @if ($event->status === 'completed')
-                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã kết thúc</span>
-                            @else
-                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">Sắp diễn ra</span>
-                            @endif
-                        </td>
-                        <td class="p-3 text-right flex justify-end gap-2">
-                            <a href="{{ route('admin.events.edit', $event) }}"
-                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">✏️</a>
-                            <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                onsubmit="return confirm('Xóa sự kiện này?');">
-                                @csrf @method('DELETE')
-                                <button type="submit"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">🗑️</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
+    <div class="card shadow-soft">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
                     <tr>
-                        <td colspan="8" class="text-center py-6 text-gray-500">Không có sự kiện nào</td>
+                        <th style="width:80px">STT</th>
+                        <th>Tên sự kiện</th>
+                        <th>Ngày bắt đầu đăng ký</th>
+                        <th>Ngày kết thúc đăng ký</th>
+                        <th>Ngày bắt đầu sự kiện</th>
+                        <th>Ngày kết thúc sự kiện</th>
+                        <th>Địa điểm</th>
+                        <th>Người tham gia</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        {{-- Phân trang --}}
-        <div class="mt-4">{{ $events->withQueryString()->links() }}</div>
+                </thead>
+                <tbody>
+                    @forelse($events as $index => $event)
+                        <tr>
+                            <td class="text-center">{{ $events->firstItem() + $index }}</td>
+                            <td>{{ $event->title }}</td>
+                            <td>{{ \Carbon\Carbon::parse($event->register_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($event->register_end_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
+                            <td>{{ $event->location }}</td>
+                            <td>{{ $event->participants }} người</td>
+                            <td>
+                                @if ($event->status === 'completed')
+                                    <span class="badge text-bg-success">Đã kết thúc</span>
+                                @else
+                                    <span class="badge text-bg-secondary">Sắp diễn ra</span>
+                                @endif
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-warning">Sửa</a>
+                                    <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Xóa sự kiện này?');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Xóa</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-4">Không có sự kiện nào</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white">{{ $events->withQueryString()->links() }}</div>
     </div>
 </div>
 @endsection
