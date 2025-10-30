@@ -27,10 +27,6 @@
         <div class="p-6 bg-white rounded-lg shadow">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-teal-600 text-xl">🗑️</div>
-                <div>
-                    <p class="text-sm text-gray-500">Rác thu gom</p>
-                    <h3 class="text-2xl">{{ \App\Models\Event::sum('waste') }} kg</h3>
-                </div>
             </div>
         </div>
     </div>
