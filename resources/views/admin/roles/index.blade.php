@@ -1,8 +1,8 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
 @section('title', 'Quản lý phân quyền')
 
-@section('main-content')
+@section('content')
 <div class="space-y-6">
     <!-- Header -->
     <div class="mb-6">
