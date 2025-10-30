@@ -75,7 +75,7 @@
                         <td class="p-3">{{ $event->participants }} người</td>
                         <td class="p-3">
                             @if ($event->status === 'completed')
-                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã hoàn thành</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã kết thúc</span>
                             @else
                                 <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">Sắp diễn ra</span>
                             @endif

@@ -30,6 +30,10 @@ class EventController extends Controller
         return view('admin.events.create');
     }
 
+    public function edit(Event $event){
+        return view('admin.events.edit', compact('event'));
+    }
+
     // ✅ Tạo sự kiện mới
     public function store(Request $request)
     {
@@ -70,7 +74,9 @@ class EventController extends Controller
 
         $event->update($data);
 
-        return redirect()->back()->with('success', 'Cập nhật sự kiện thành công!');
+        return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Sửa sự kiện thành công!');
     }
 
     // ✅ Xóa sự kiện

@@ -275,6 +275,13 @@
                             <i class="fas fa-envelope me-1"></i>Liên hệ
                         </a>
                     </li>
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.reports.create') }}">
+                            <i class="fas fa-flag me-1"></i>Báo cáo
+                        </a>
+                    </li>
+                    @endauth
                 </ul>
                 
                 <ul class="navbar-nav">

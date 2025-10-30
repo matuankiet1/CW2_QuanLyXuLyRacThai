@@ -10,6 +10,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 
+// Route để đánh dấu báo cáo đã đọc
+Route::post('/reports/user-reports/{id}/mark-read', function($id) {
+    $report = App\Models\UserReport::findOrFail($id);
+    $report->markAsRead();
+    
+    return response()->json(['success' => true]);
+});
+
 //------------------------------------ TRANG CHỦ -------------------------------------//
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
@@ -63,6 +71,12 @@ Route::middleware('guest')->group(function () {
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
+//--------------------------------------- USER REPORTS -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
+    Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
+});
+
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
     // Dashboard
@@ -78,6 +92,14 @@ Route::middleware('admin')->group(function () {
         Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
         Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
         Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
+        
+        // User Reports
+        Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
+        Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
+        Route::post('/user-reports/{id}/status', [App\Http\Controllers\UserReportController::class, 'updateStatus'])->name('user-reports.update-status');
+        Route::post('/user-reports/{id}/mark-read', [App\Http\Controllers\UserReportController::class, 'markAsRead'])->name('user-reports.mark-read');
+        Route::post('/user-reports/{id}/mark-unread', [App\Http\Controllers\UserReportController::class, 'markAsUnread'])->name('user-reports.mark-unread');
+        Route::post('/user-reports/{id}/status-ajax', [App\Http\Controllers\UserReportController::class, 'updateStatusAjax'])->name('user-reports.update-status-ajax');
     });
 
     // CRUD Admin
