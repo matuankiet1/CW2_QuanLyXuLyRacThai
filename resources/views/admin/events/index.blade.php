@@ -38,8 +38,14 @@
                 <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm sự kiện..."
                     class="border p-2 rounded w-64" />
                 <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Tìm</button>
+                <select name="status" class="border p-2 rounded">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="completed">Đã kết thúc</option>
+                        <option value="upcoming">Sắp diễn ra</option>
+                    </select>
+                    <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Lọc</button>
             </div>
-
+            
             {{-- Nút tạo mới --}}
             <a href="{{ route('admin.events.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">
                 + Tạo sự kiện mới
@@ -75,7 +81,7 @@
                         <td class="p-3">{{ $event->participants }} người</td>
                         <td class="p-3">
                             @if ($event->status === 'completed')
-                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã hoàn thành</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã kết thúc</span>
                             @else
                                 <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">Sắp diễn ra</span>
                             @endif

@@ -59,7 +59,7 @@
             <label class="block font-medium mb-1">Trạng thái</label>
             <select name="status" class="w-full border p-2 rounded">
                 <option value="upcoming" {{ old('status') == 'upcoming' ? 'selected' : '' }}>Sắp diễn ra</option>
-                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Đã hoàn thành</option>
+                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Đã kết thúc</option>
             </select>
         </div>
 
