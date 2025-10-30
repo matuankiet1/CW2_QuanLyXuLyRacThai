@@ -35,11 +35,13 @@ class EventController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'date' => 'required|date',
+            'register_date' => 'required|date',
+            'register_end_date' => 'required|date',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
-            'waste' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
 
@@ -53,11 +55,13 @@ class EventController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'date' => 'required|date',
+            'register_date' => 'required|date',
+            'register_end_date' => 'required|date',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
-            'waste' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
 
