@@ -13,12 +13,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'admin@school.edu',
-            'password' => Hash::make('password'),
-        ]);
+        // Tạo tài khoản admin mặc định
+        $this->call(DefaultAdminSeeder::class);
+        
+        // Tạo tài khoản test nếu cần
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'admin@school.edu',
+        //     'password' => Hash::make('password'),
+        // ]);
     }
+
+    public function post(): void
+    {
+        $this->call(UserSeeder::class);
+        $this->call(PostSeeder::class);
+        $this->call(CollectionScheduleSeeder::class);
+    }
+
 }

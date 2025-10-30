@@ -24,19 +24,20 @@
             {{-- Menu --}}
             @php
                 $menuItems = [
-                    ['id' => 'home', 'label' => 'Trang chủ'],
-                    ['id' => 'dashboard', 'label' => 'Dashboard'],
-                    ['id' => 'users', 'label' => 'Quản lý người dùng'],
-                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom'],
+                    ['id' => 'home', 'label' => 'Trang chủ', 'route' => 'admin.home'],
+                    ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
+                    ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
+                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],
                     ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
-                    ['id' => 'permissions', 'label' => 'Phân quyền'],
-                    ['id' => 'events', 'label' => 'Quản lý sự kiện'],
+                    ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
+                    ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                     ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                    ['id' => 'reports', 'label' => 'Báo cáo người dùng'],
+                    ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'reports.index'],
                     ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                     ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                     ['id' => 'finance', 'label' => 'Quản lý tài chính'],
                     ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
+                    ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
                 ];
                 $currentPage = request()->route() ? request()->route()->getName() : '';
             @endphp
@@ -64,15 +65,18 @@
             <div class="p-4 border-t border-gray-200">
                 <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
                     <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                        A
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm text-gray-900">Admin</p>
-                        <p class="text-xs text-gray-500">admin@school.edu</p>
+                        <p class="text-sm text-gray-900">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
                     </div>
-                    <button class="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200">
-                        ⏻
-                    </button>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200" title="Đăng xuất">
+                            ⏻
+                        </button>
+                    </form>
                 </div>
             </div>
         </aside>
@@ -86,7 +90,10 @@
             </header>
 
             {{-- Content --}}
-            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+            <main class="flex-1 overflow-y-auto bg-gray-100">
+                @yield('content')
+                
+                @section('dashboard-content')
                 {{-- Overview Cards --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="p-6 border-l-4 border-green-500 bg-white rounded-lg shadow">
@@ -165,13 +172,10 @@
                         </div>
                     </div>
                 </div>
-
+                @show
             </main>
         </div>
 
     </div>
-
-    {{-- Include Chart.js --}}
-    @vite(['resources/js/dashboard.js'])
 
 @endsection

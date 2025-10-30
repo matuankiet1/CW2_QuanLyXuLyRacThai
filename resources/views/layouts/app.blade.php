@@ -1,5 +1,4 @@
 
-
 {{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -21,6 +20,7 @@
 <body class="antialiased">
     @yield('content') {{-- Nội dung của các trang con sẽ được chèn vào đây --}}
 
+    @vite('resources/js/checkbox.js')
     @vite('resources/js/loader.js')
     @vite('resources/js/toast.js')
     {{-- Hiển thị toast (nếu có) --}}

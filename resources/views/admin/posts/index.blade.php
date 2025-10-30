@@ -1,98 +1,113 @@
-@extends('dashboard.app')
+@extends('layouts.dashboard')
 
-@section('content')
+@section('main-content')
+    <div class="space-y-6">
 
-@if ($errors->has('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ $errors->first('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+        {{-- Bộ lọc --}}
+        <div class="bg-white rounded-lg shadow p-6">
+            <form method="GET" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2">
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm theo tiêu đề, tác giả..."
+                        class="border p-2 rounded w-64" />
+                    <select name="post_categories" class="border p-2 rounded">
+                        <option>Tất cả danh mục</option>
+                        <option>Tin tức</option>
+                        <option>Kiến thức</option>
+                        <option>Tuyên truyền</option>
+                    </select>
+                    <select name="status" class="border p-2 rounded">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="published">Đã xuất bản</option>
+                        <option value="draft">Nháp</option>
+                        <option value="archived">Lưu trữ</option>
+                    </select>
+                    <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Lọc</button>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ route('admin.posts.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">+ Thêm bài
+                        viết</a>
+                </div>
+            </form>
 
-<div class="container py-4">
-    <h1 class="text-2xl font-semibold mb-4">Post Management</h1>
+            {{-- Bảng --}}
+            <table class="min-w-full border-collapse border border-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 text-left border w-16 text-center">STT</th>
+                        <th class="p-3 text-left border">Tiêu đề</th>
+                        <th class="p-3 border">Tác giả</th>
+                        <th class="p-3 border">Danh mục</th>
+                        <th class="p-3 border">Ngày xuất bản</th>
+                        <th class="p-3 border">Trạng thái</th>
+                        <th class="p-3 border">Lượt xem</th>
+                        <th class="p-3 border">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if ($posts->count() > 0)
+                        @foreach ($posts as $index => $post)
+                            <tr class="hover:bg-gray-50">
+                                {{-- STT tự tăng theo trang --}}
+                                <td class="p-3 text-center">
+                                    {{ $posts->firstItem() + $index }}
+                                </td>
 
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+                                <td class="p-3">
+                                    <div class="font-medium">{{ $post->title }}</div>
+                                    <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
+                                </td>
+                                <td class="p-3">{{ $post->author }}</td>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 border rounded">{{ $post->post_categories }}</span>
+                                </td>
+                                <td class="p-3">
+                                    {{ optional($post->published_at)->format('d/m/Y') }}
+                                </td>
+                                <td class="p-3">
+                                    @if ($post->status === 'published')
+                                        <span class="text-green-600 font-medium">Đã xuất bản</span>
+                                    @elseif ($post->status === 'draft')
+                                        <span class="text-gray-500">Nháp</span>
+                                    @else
+                                        <span class="text-yellow-600">Lưu trữ</span>
+                                    @endif
+                                </td>
+                                <td class="p-3 text-right">{{ number_format($post->views) }}</td>
+                                <td class="p-3 text-right flex justify-end gap-2">
+                                    {{-- Nút Sửa --}}
+                                    <a href="{{ route('admin.posts.edit', $post) }}"
+                                        class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-md transition">
+                                        ✏️ Sửa
+                                    </a>
+
+                                    {{-- Nút Xóa --}}
+                                    <form action="{{ route('admin.posts.destroy', $post) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-md transition">
+                                            🗑️ Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="8" class="text-center py-6 text-gray-500">
+                                Không có bài viết nào.
+                            </td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+
+            {{-- Phân trang --}}
+            <div class="mt-4">
+                {{ $posts->withQueryString()->links() }}
+            </div>
         </div>
-    @endif
-
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-        <form action="{{ route('admin.posts.index') }}" method="GET" class="row g-2">
-            <div class="col position-relative">
-                <input type="text" name="search" id="search" class="form-control" placeholder="Tìm tiêu đề bài viết..." value="{{ request('search') }}" autocomplete="off">
-                <ul id="search-suggestions" class="list-group position-absolute" style="z-index: 999; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
-            </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">Xoá lọc</a>
-            </div>
-        </form>
-
-        <a href="{{ route('posts.create') }}" class="btn btn-success">Add New Post</a>
     </div>
-
-    <div class="table-responsive shadow-sm">
-        <table class="table table-bordered align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Image</th>
-                    <th>Author</th>
-                    <th>Created At</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($posts as $post)
-                    <tr>
-                        <td>{{ $post->post_id }}</td>
-                        <td>{{ $post->title }}</td>
-                        <td>
-                            @if ($post->image)
-                                <img src="{{ asset($post->image) }}" alt="Post Image" width="100">
-                            @else
-                                <span class="text-muted fst-italic">No image</span>
-                            @endif
-                        </td>
-                        <td>{{ $post->user->full_name ?? 'N/A' }}</td>
-                        <td>{{ $post->created_at->format('d/m/Y H:i') }}</td>
-                        <td class="text-end">
-                            <a href="{{ route('posts.edit', $post->post_id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                            <form action="{{ route('posts.destroy', $post->post_id) }}" method="POST" class="d-inline delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">Không có bài viết nào.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-3">
-        {{ $posts->links('pagination::bootstrap-5') }}
-    </div>
-</div>
-
 @endsection
-
-@push('scripts')
-<script>
-    document.querySelectorAll('.delete-form').forEach(form => {
-        form.addEventListener('submit', function (e) {
-            if (!confirm('Bạn có chắc muốn xoá bài viết này không?')) {
-                e.preventDefault();
-            }
-        });
-    });
-
-</script>
-@endpush
+3
