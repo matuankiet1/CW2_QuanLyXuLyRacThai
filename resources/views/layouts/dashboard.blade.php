@@ -173,4 +173,5 @@
 
         {{-- Include Chart.js --}}
         @vite(['resources/js/dashboard.js'])
+        @vite(['resources/js/offcanvas.js'])
     @endsection
