@@ -24,7 +24,7 @@
             {{-- Menu --}}
             @php
                 $menuItems = [
-                    ['id' => 'home', 'label' => 'Trang chủ'],
+                    ['id' => 'home', 'label' => 'Trang chủ', 'route' => 'admin.home'],
                     ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
                     ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
                     ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],
@@ -32,7 +32,7 @@
                     ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
                     ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                     ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                    ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'reports.index'],
+                    ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.index'],
                     ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                     ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                     ['id' => 'finance', 'label' => 'Quản lý tài chính'],

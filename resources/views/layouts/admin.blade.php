@@ -39,7 +39,7 @@
         }
 
         .navbar {
-            background: linear-gradient(135deg, var(--admin-color), #b91c1c);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 1rem 0;
         }
@@ -66,8 +66,8 @@
         }
 
         .admin-badge {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #92400e;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            color: white;
             font-size: 0.75rem;
             font-weight: 600;
             padding: 0.25rem 0.5rem;
@@ -90,7 +90,7 @@
         }
 
         .btn-admin {
-            background: linear-gradient(135deg, var(--admin-color), #b91c1c);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border: none;
             border-radius: 0.75rem;
             padding: 0.75rem 1.5rem;
@@ -101,7 +101,7 @@
 
         .btn-admin:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
             color: white;
         }
 
@@ -119,7 +119,7 @@
         }
 
         .hero-section {
-            background: linear-gradient(135deg, var(--admin-color), #b91c1c);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             padding: 4rem 0;
             position: relative;
@@ -158,7 +158,7 @@
         .feature-icon {
             width: 4rem;
             height: 4rem;
-            background: linear-gradient(135deg, var(--admin-color), #b91c1c);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border-radius: 1rem;
             display: flex;
             align-items: center;
@@ -185,7 +185,7 @@
         .stats-number {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--admin-color);
+            color: var(--primary-color);
             margin-bottom: 0.5rem;
         }
 
@@ -227,8 +227,8 @@
         }
 
         .schedule-card {
-            background: linear-gradient(135deg, #fef2f2, #fee2e2);
-            border-left: 4px solid var(--admin-color);
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left: 4px solid var(--primary-color);
         }
 
         .banner-slide {
@@ -388,7 +388,7 @@
                         <li class="mb-2"><a href="{{ route('dashboard.admin') }}">Dashboard</a></li>
                         <li class="mb-2"><a href="{{ route('admin.users.index') }}">Người dùng</a></li>
                         <li class="mb-2"><a href="{{ route('admin.roles.index') }}">Phân quyền</a></li>
-                        <li class="mb-2"><a href="{{ route('reports.index') }}">Báo cáo</a></li>
+                        <li class="mb-2"><a href="{{ route('admin.reports.index') }}">Báo cáo</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 mb-4">

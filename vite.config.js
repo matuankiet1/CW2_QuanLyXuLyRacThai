@@ -13,7 +13,7 @@ export default defineConfig({
                 "resources/js/loader.js",
                 "resources/js/toast.js",
                 "resources/js/checkbox.js",
-
+                "resources/js/offcanvas.js",
             ],
             refresh: true,
         }),

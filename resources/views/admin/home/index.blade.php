@@ -130,7 +130,7 @@
                         </div>
                         <h5 class="card-title">Báo cáo</h5>
                         <p class="card-text">Xem báo cáo chi tiết về hoạt động của người dùng và hệ thống.</p>
-                        <a href="{{ route('reports.index') }}" class="btn btn-primary">Xem báo cáo</a>
+                        <a href="{{ route('admin.reports.index') }}" class="btn btn-primary">Xem báo cáo</a>
                     </div>
                 </div>
             </div>
@@ -253,7 +253,7 @@
 @endif
 
 <!-- Call to Action Section -->
-<section class="py-5" style="background: linear-gradient(135deg, var(--admin-color), #b91c1c); color: white;">
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">

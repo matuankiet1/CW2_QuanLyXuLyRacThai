@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // Tạo tài khoản admin mặc định
         $this->call(DefaultAdminSeeder::class);
+        $this->call(PostSeeder::class);
         
         // Tạo tài khoản test nếu cần
         // User::factory()->create([
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
     public function post(): void
     {
         $this->call(UserSeeder::class);
-        $this->call(PostSeeder::class);
+        
         $this->call(CollectionScheduleSeeder::class);
     }
 
