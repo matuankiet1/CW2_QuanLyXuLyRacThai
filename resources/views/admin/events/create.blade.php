@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow">
     <h2 class="text-2xl font-semibold mb-4">🆕 Tạo sự kiện mới</h2>
 

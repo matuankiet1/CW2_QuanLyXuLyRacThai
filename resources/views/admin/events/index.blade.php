@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <div class="space-y-6">
     {{-- Thống kê --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
