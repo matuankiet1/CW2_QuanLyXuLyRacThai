@@ -130,7 +130,7 @@
                         </div>
                         <h5 class="card-title">Báo cáo</h5>
                         <p class="card-text">Xem báo cáo chi tiết về hoạt động của người dùng và hệ thống.</p>
-                        <a href="{{ route('reports.index') }}" class="btn btn-primary">Xem báo cáo</a>
+                        <a href="{{ route('admin.reports.index') }}" class="btn btn-primary">Xem báo cáo</a>
                     </div>
                 </div>
             </div>

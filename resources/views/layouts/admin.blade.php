@@ -388,7 +388,7 @@
                         <li class="mb-2"><a href="{{ route('dashboard.admin') }}">Dashboard</a></li>
                         <li class="mb-2"><a href="{{ route('admin.users.index') }}">Người dùng</a></li>
                         <li class="mb-2"><a href="{{ route('admin.roles.index') }}">Phân quyền</a></li>
-                        <li class="mb-2"><a href="{{ route('reports.index') }}">Báo cáo</a></li>
+                        <li class="mb-2"><a href="{{ route('admin.reports.index') }}">Báo cáo</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 mb-4">

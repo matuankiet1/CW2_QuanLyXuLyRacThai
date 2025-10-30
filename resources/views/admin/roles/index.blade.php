@@ -2,8 +2,8 @@
 
 @section('title', 'Quản lý phân quyền')
 
-@section('content')
-<div class="p-6">
+@section('main-content')
+<div class="space-y-6">
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Quản lý phân quyền</h1>
