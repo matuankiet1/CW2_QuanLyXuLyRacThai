@@ -27,10 +27,6 @@
         <div class="p-6 bg-white rounded-lg shadow">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-teal-600 text-xl">🗑️</div>
-                <div>
-                    <p class="text-sm text-gray-500">Rác thu gom</p>
-                    <h3 class="text-2xl">{{ \App\Models\Event::sum('waste') }} kg</h3>
-                </div>
             </div>
         </div>
     </div>
@@ -56,10 +52,12 @@
                 <tr>
                     <th class="p-3 border text-left">STT</th>
                     <th class="p-3 border text-left">Tên sự kiện</th>
-                    <th class="p-3 border text-left">Ngày</th>
+                    <th class="p-3 border text-left">Ngày bắt đầu đăng ký</th>
+                    <th class="p-3 border text-left">Ngày kết thúc đăng ký</th>
+                    <th class="p-3 border text-left">Ngày bắt đầu sự kiện</th>
+                    <th class="p-3 border text-left">Ngày kết thúc sự kiện</th>
                     <th class="p-3 border text-left">Địa điểm</th>
                     <th class="p-3 border text-left">Người tham gia</th>
-                    <th class="p-3 border text-left">Rác thu gom</th>
                     <th class="p-3 border text-left">Trạng thái</th>
                     <th class="p-3 border text-right">Thao tác</th>
                 </tr>
@@ -69,10 +67,12 @@
                     <tr class="hover:bg-gray-50">
                         <td class="p-3 text-center">{{ $events->firstItem() + $index }}</td>
                         <td class="p-3">{{ $event->title }}</td>
-                        <td class="p-3">{{ \Carbon\Carbon::parse($event->date)->format('d/m/Y') }}</td>
+                        <td class="p-3">{{ \Carbon\Carbon::parse($event->register_date)->format('d/m/Y') }}</td>
+                        <td class="p-3">{{ \Carbon\Carbon::parse($event->register_end_date)->format('d/m/Y') }}</td>
+                        <td class="p-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
+                        <td class="p-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
                         <td class="p-3">{{ $event->location }}</td>
                         <td class="p-3">{{ $event->participants }} người</td>
-                        <td class="p-3">{{ $event->waste > 0 ? $event->waste . ' kg' : '-' }}</td>
                         <td class="p-3">
                             @if ($event->status === 'completed')
                                 <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Đã hoàn thành</span>

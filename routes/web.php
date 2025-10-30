@@ -63,6 +63,12 @@ Route::middleware('guest')->group(function () {
 Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
+//--------------------------------------- USER REPORTS -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
+    Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
+});
+
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
     // Dashboard
@@ -72,12 +78,17 @@ Route::middleware('admin')->group(function () {
     Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
 
     // Reports
-    Route::prefix('reports')->name('reports.')->group(function () {
+    Route::prefix('reports')->name('admin.reports.')->group(function () {
         Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('index');
         Route::get('/users', [App\Http\Controllers\ReportController::class, 'users'])->name('users');
         Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
         Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
         Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
+        
+        // User Reports
+        Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
+        Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
+        Route::post('/user-reports/{id}/status', [App\Http\Controllers\UserReportController::class, 'updateStatus'])->name('user-reports.update-status');
     });
 
     // CRUD Admin
