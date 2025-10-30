@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // Tên sự kiện
-            $table->date('date'); // Ngày tổ chức
+            $table->date('register_date'); // Ngày bắt đầu đăng ký tham gia sự kiện
+            $table->date('register_end_date'); // Ngày kết thúc đăng ký tham gia sự kiện
+            $table->date('event_start_date'); // Ngày bắt đầu sự kiện
+            $table->date('event_end_date'); // Ngày kết thúc đăng ký tham gia sự kiện
             $table->string('location'); // Địa điểm
             $table->integer('participants')->default(0); // Số người tham gia
-            $table->integer('waste')->default(0); // Lượng rác thu gom (kg)
             $table->enum('status', ['upcoming', 'completed'])->default('upcoming'); // Trạng thái
             $table->text('description')->nullable(); // Mô tả chi tiết
             $table->timestamps();
