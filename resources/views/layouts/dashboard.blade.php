@@ -36,7 +36,7 @@
                         ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
                         ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                         ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.index'],
+                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
                         ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                         ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                         ['id' => 'finance', 'label' => 'Quản lý tài chính'],
