@@ -2,7 +2,6 @@
 
 @section('main-content')
     <div class="space-y-6">
-
         {{-- Bộ lọc --}}
         <div class="bg-white rounded-lg shadow p-6">
             <form method="GET" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -53,8 +52,8 @@
                                 </td>
 
                                 <td class="p-3">
-                                    <div class="font-medium">{{ $post->title }}</div>
-                                    <div class="text-sm text-gray-500 truncate">{{ $post->excerpt }}</div>
+                                    <div class="font-medium">{{ Str::limit($post->title, 40) }}</div>
+                                    <div class="text-sm text-gray-500">{{ Str::limit($post->excerpt, 60) }}</div>
                                 </td>
                                 <td class="p-3">{{ $post->author }}</td>
                                 <td class="p-3">
@@ -110,4 +109,3 @@
         </div>
     </div>
 @endsection
-3

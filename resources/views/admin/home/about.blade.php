@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin-with-sidebar')
 
 @section('title', 'Giới thiệu - EcoWaste Admin')
 
