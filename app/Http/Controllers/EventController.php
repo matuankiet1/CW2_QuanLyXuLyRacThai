@@ -21,7 +21,7 @@ class EventController extends Controller
                   ->orWhere('location', 'like', "%$search%");
         }
 
-        $events = $query->orderBy('date', 'desc')->paginate(10);
+        $events = $query->orderBy('id', 'asc')->paginate(10);
 
         return view('admin.events.index', compact('events', 'search'));
     }
@@ -33,6 +33,7 @@ class EventController extends Controller
     // ✅ Tạo sự kiện mới
     public function store(Request $request)
     {
+        \Log::info('Dữ liệu gửi lên:', $request->all());
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'register_date' => 'required|date',
@@ -47,7 +48,9 @@ class EventController extends Controller
 
         Event::create($data);
 
-        return redirect()->back()->with('success', 'Thêm sự kiện thành công!');
+       return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Thêm sự kiện thành công!');
     }
 
     // ✅ Cập nhật sự kiện

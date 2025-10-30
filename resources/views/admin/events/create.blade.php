@@ -43,6 +43,12 @@
             @error('location') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
         </div>
 
+          <div class="mb-4">
+            <label class="block font-medium mb-1">Người tham gia</label>
+            <input type="text" name="participants" value="{{ old('participants') }}" required class="w-full border p-2 rounded">
+            @error('participants') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
+        </div>
+
         <div class="mb-4">
             <label class="block font-medium mb-1">Mô tả sự kiện</label>
             <input type="text" name="description" value="{{ old('description') }}" required class="w-full border p-2 rounded">
