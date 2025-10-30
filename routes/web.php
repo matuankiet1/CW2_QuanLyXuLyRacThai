@@ -107,8 +107,13 @@ Route::middleware('admin')->group(function () {
         'destroy' => 'admin.collection-schedules.destroy',
     ]);
 
-    // Banners
-    Route::resource('banners', BannerController::class);
+    // 🟢 Banners
+Route::prefix('banners')->name('admin.banners.')->group(function () {
+    Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
+        ->name('confirm-delete');
+    Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
+});
+
 
     //Events
     // Events

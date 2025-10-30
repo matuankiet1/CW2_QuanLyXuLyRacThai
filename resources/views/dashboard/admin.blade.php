@@ -37,7 +37,7 @@
                     ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                     ['id' => 'finance', 'label' => 'Quản lý tài chính'],
                     ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
-                    ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
+                    ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'admin.banners.index'],
                 ];
                 $currentPage = request()->route() ? request()->route()->getName() : '';
             @endphp

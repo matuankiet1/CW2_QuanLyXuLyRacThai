@@ -1,8 +1,6 @@
 /* Tailwind CSS v4 */
 @import 'tailwindcss';
-
-/* Nếu cần Bootstrap, uncomment dòng dưới (không khuyến nghị dùng chung với Tailwind) */
-/* @import "bootstrap/dist/css/bootstrap.min.css"; */
+/*@import "bootstrap/dist/css/bootstrap.min.css";
 
 
 
