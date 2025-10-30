@@ -13,7 +13,7 @@ class PostController extends Controller
      */
     public function showAll(Request $request)
     {
-        $posts = Post::where('status', 'published')->orderBy('publish_date', 'desc')->paginate(9);
+        $posts = Post::where('status', 'published')->orderBy('publish_date', 'desc')->paginate(10);
         return view('posts.home', compact('posts'));
     }
 
@@ -59,7 +59,7 @@ class PostController extends Controller
             $query->where('status', $status);
         }
 
-        $posts = $query->orderBy('id', 'asc')->paginate(8);
+        $posts = $query->orderBy('id', 'asc')->paginate(10);
 
         $totalPosts = Post::count();
         $publishedPosts = Post::where('status', 'published')->count();
