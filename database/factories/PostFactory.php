@@ -28,7 +28,7 @@ class PostFactory extends Factory
             'author' => $author,
             'excerpt' => $this->faker->sentence(2),
             'content' => $this->faker->paragraphs(4, true),
-            'post_categories' => $this->faker->randomElement(['Tin tức', 'Sự kiện', 'Môi trường', 'Kiến thức']),
+            'post_categories' => $this->faker->randomElement(['Tin tức', 'Tuyên truyền', 'Kiến thức']),
             'image' => $this->faker->imageUrl(800, 600, 'nature', true, 'Post'),
             'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
             'published_at' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
