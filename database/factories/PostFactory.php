@@ -12,19 +12,26 @@ class PostFactory extends Factory
 
     public function definition()
     {
-        // Tạo tiêu đề ngắn 2–4 từ
-        $title = ucfirst($this->faker->words(rand(2, 3), true));
+        // Tiêu đề ngắn gọn 2 từ
+        $title = ucfirst($this->faker->words(2, true));
+
+        // Lấy họ và tên
+        $first = ucfirst($this->faker->firstName());
+        $last = ucfirst($this->faker->lastName());
+
+        // Rút họ chỉ còn ký tự đầu, ví dụ: "N. An"
+        $author = strtoupper(substr($last, 0, 1)) . '. ' . $first;
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title) . '-' . Str::random(5),
-            'author' => $this->faker->name(),
-            'excerpt' => $this->faker->sentence(10),
-            'content' => $this->faker->paragraphs(5, true),
-            'post_categories' => $this->faker->randomElement(['Tin tức', 'Sự kiện', 'Bài viết môi trường', 'Thông báo']),
-            'image' => $this->faker->imageUrl(800, 600, 'nature', true, 'Post Image'),
+            'slug' => Str::slug($title) . '-' . Str::random(4),
+            'author' => $author,
+            'excerpt' => $this->faker->sentence(2),
+            'content' => $this->faker->paragraphs(4, true),
+            'post_categories' => $this->faker->randomElement(['Tin tức', 'Sự kiện', 'Môi trường', 'Kiến thức']),
+            'image' => $this->faker->imageUrl(800, 600, 'nature', true, 'Post'),
             'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
-            'published_at' => $this->faker->optional()->dateTimeBetween('-1 month', '+1 month'),
+            'published_at' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
         ];
     }
 }
