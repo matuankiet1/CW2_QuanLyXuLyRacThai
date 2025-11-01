@@ -380,7 +380,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="{{ route('banners.index') }}" class="menu-link {{ request()->routeIs('banners.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.banners.index') }}" class="menu-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                         <i class="fas fa-image"></i>
                         <span>Banner</span>
                     </a>

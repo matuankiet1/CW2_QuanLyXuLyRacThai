@@ -26,8 +26,19 @@ class AdminHomeController extends Controller
             ->get();
 
         // Lấy banner mới nhất
-        $banners = Banner::orderBy('created_at', 'desc')
-            ->limit(3)
+        $topBanners = Banner::where('position', 'top')
+            ->where('status', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $sidebarBanners = Banner::where('position', 'sidebar')
+            ->where('status', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $footerBanners = Banner::where('position', 'footer')
+            ->where('status', true)
+            ->orderBy('created_at', 'desc')
             ->get();
 
         // Thống kê nhanh cho admin
@@ -41,7 +52,7 @@ class AdminHomeController extends Controller
             'new_users_today' => User::whereDate('created_at', today())->count(),
         ];
 
-        return view('admin.home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
+        return view('admin.home.index', compact('latestPosts', 'upcomingSchedules', 'topBanners', 'sidebarBanners', 'footerBanners', 'stats'));
     }
 
     public function about()
