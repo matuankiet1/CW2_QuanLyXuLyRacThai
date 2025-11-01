@@ -35,7 +35,21 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended('dashboard'); // Chuyển hướng đến trang dashboard sau khi thành công
+            // Kiểm tra role và chuyển hướng phù hợp
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended('admin/home');
+            } else {
+                return redirect()->route('home');
+            }
+        } else { // Thêm bởi Lê Tâm: Kiểm tra nếu user tồn tại nhưng đăng nhập sai kiểu (Đăng ký tài khoản bằng Google nhưng lại đăng nhập loại thường - local )
+            $user = User::where('email', $credentials['email'])->first();
+            if ($user && $user->auth_provider != 'local') {
+                return redirect()->route('login')->with('status', [
+                    'type' => 'error',
+                    'message' => 'Email này đã đăng ký bằng ' . strtoupper($user->auth_provider) .
+                        '. Vui lòng đăng nhập bằng cách đó.'
+                ]);
+            }
         }
 
         // Nếu đăng nhập thất bại
@@ -57,33 +71,46 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // 1. Validate dữ liệu đầu vào
+        // 1. Validate dữ liệu đầu vào với rules nghiêm ngặt hơn
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:15'], // Tùy chọn, có thể là required
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+\-\s()]+$/'],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+        ], [
+            'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
+            'email.regex' => 'Email không đúng định dạng.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'password.mixed_case' => 'Mật khẩu phải chứa ít nhất 1 chữ hoa và 1 chữ thường.',
+            'password.numbers' => 'Mật khẩu phải chứa ít nhất 1 chữ số.',
+            'password.symbols' => 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.',
         ]);
 
-        // 2. Tạo người dùng mới
+        // 2. Tạo người dùng mới - CHỈ VỚI ROLE USER
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
+            'name' => trim($request->name),
+            'email' => strtolower(trim($request->email)),
+            'phone' => $request->phone ? trim($request->phone) : null,
             'password' => Hash::make($request->password),
-            // Gán role_id mặc định nếu cần
+            'role' => 'user', // CỐ ĐỊNH LÀ USER, KHÔNG CHO PHÉP THAY ĐỔI
+            'auth_provider' => 'local',
+            'email_verified_at' => now(), // Tự động xác thực email cho user đăng ký
         ]);
 
         // 3. Tự động đăng nhập cho người dùng mới
         Auth::login($user);
 
-        // 4. Chuyển hướng đến trang dashboard
-        return redirect('/dashboard'); // Hoặc bất kỳ trang nào bạn muốn
+        $request->session()->regenerate();
+
+        // 4. Chuyển hướng đến trang chủ với thông báo thành công
+        return redirect()->route('home')->with('status', [
+            'type' => 'success',
+            'message' => 'Đăng ký tài khoản thành công! Chào mừng bạn đến với EcoWaste.'
+        ]);
     }
 
     public function redirectToProvider($provider)
     {
-        // Nếu muốn request thêm scope (ví dụ Google openid)
         if ($provider === 'google') {
             return Socialite::driver('google')->redirect();
         }
@@ -102,10 +129,14 @@ class AuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Throwable $e) {
-            dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
+            // dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
             // ]);
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Không thể xác thực bằng ' . strtoupper($provider) . '. Vui lòng kiểm tra và thử lại.'
+            ]);
         }
 
         $providerId = $socialUser->getId();
@@ -125,9 +156,10 @@ class AuthController extends Controller
             if ($byEmail) {
                 // Tài khoản đã được tạo từ provider khác => Chặn (1 user = 1 provider)
                 if ($byEmail->auth_provider !== $provider) {
-                    return redirect()->route('login')->withErrors([
-                        'oauth' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
-                            '. Vui lòng đăng nhập bằng cách đó.',
+                    return redirect()->route('login')->with('status', [
+                        'type' => 'error',
+                        'message' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
+                            '. Vui lòng đăng nhập bằng cách đó.'
                     ]);
                 }
 
@@ -142,10 +174,10 @@ class AuthController extends Controller
 
         // 3) Nếu chưa có ai => tạo mới
         if (!$user) {
-
             if (!$email) {
-                return redirect()->route('login')->withErrors([
-                    'oauth' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.',
+                return redirect()->route('login')->with('status', [
+                    'type' => 'error',
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.'
                 ]);
             }
 
@@ -153,15 +185,33 @@ class AuthController extends Controller
                 'name' => $name ?: 'User ' . Str::random(6),
                 'email' => $email,
                 'password' => Hash::make(Str::random(16)),
+                'role' => 'user',
                 'auth_provider' => $provider,
                 'provider_id' => $providerId,
                 'email_verified_at' => now(),
             ]);
         }
 
-        // 4) Login
+        // 4) Login và chuyển hướng theo role
         Auth::login($user, true);
-        return redirect()->intended('/dashboard');
+        if (Auth::user()->role === 'admin') {
+            return redirect()->intended('/admin/home');
+        } else {
+            return redirect()->intended('/');
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        // Start lại session để đảm bảo token mới được tạo
+        $request->session()->start();
+        return redirect()->route('login')->with('status', [
+            'type' => 'success',
+            'message' => 'Log out successfully!'
+        ]);
     }
 
     public function showForgotPasswordForm()
@@ -199,7 +249,7 @@ class AuthController extends Controller
             ->with(
                 'valid',
                 'Nếu email hợp lệ, <strong>mã xác thực</strong> đã được gửi. Vui lòng kiểm tra và nhập vào thanh dưới đây.'
-        );
+            );
 
     }
 
@@ -288,5 +338,11 @@ class AuthController extends Controller
             'type' => 'success',
             'message' => 'Đặt lại mật khẩu thành công!'
         ]);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $keyword = $request->get('q', '');
+        return response()->json(User::where('name', 'like', "%{$keyword}%")->pluck('name'));
     }
 }

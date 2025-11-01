@@ -1,27 +1,50 @@
 <?php
-
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CollectionScheduleController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\PostHomeController;
 
-// Route mặc định, chuyển hướng đến trang đăng nhập nếu chưa đăng nhập,
-// hoặc đến dashboard nếu đã đăng nhập.
-// Route::get('/', function () {
-//     if (Auth::check()) {
-//         return redirect()->route('dashboard');
-//     }
-//     return redirect()->route('login');
-// });
+// Route để đánh dấu báo cáo đã đọc
+Route::post('/reports/user-reports/{id}/mark-read', function($id) {
+    $report = App\Models\UserReport::findOrFail($id);
+    $report->markAsRead();
+    
+    return response()->json(['success' => true]);
+});
+
+//------------------------------------ TRANG CHỦ -------------------------------------//
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [HomeController::class, 'about'])->name('home.about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+
+//------------------------------------ ADMIN HOME -------------------------------------//
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/home', [App\Http\Controllers\AdminHomeController::class, 'index'])->name('home');
+    Route::get('/home/about', [App\Http\Controllers\AdminHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/contact', [App\Http\Controllers\AdminHomeController::class, 'contact'])->name('home.contact');
+});
 
 //------------------------------------ AUTH -------------------------------------//
 // Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
+Route::post('logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout'); // Lê Tâm: Đã có hàm Logout trong Controller, nên chỉ cần Route::post('logout', [AuthController::class, 'logout'])->name('logout'); 
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
+
+// Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Login, register bằng social (Google, Facebook)
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
@@ -43,47 +66,88 @@ Route::middleware('guest')->group(function () {
     // Đặt lại mật khẩu
     Route::get('/reset_password', [AuthController::class, 'showResetPasswordForm'])->name('reset_password.form');
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
-
-use App\Http\Controllers\AuthController; // Giả sử bạn có controller này
-use App\Http\Controllers\PostController; // Giả sử bạn có controller này
-use App\Http\Controllers\BannerController;
-
-Route::get('dashboard', function () {
-    return view('welcome');
-
 });
 
-//--------------------------------------- OTHER FUNCTIONS -------------------------------------//
+//--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
+Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
+Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
 
-Route::get('/dashboard', [DashboardController::class, 'app'])->name('app');
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//--------------------------------------- USER REPORTS -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
+    Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
+});
+
+//--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
+Route::middleware('admin')->group(function () {
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
+
+    // Search users
+    Route::get('/search-users', [AuthController::class, 'searchUsers'])->name('search.users');
+
+    // Reports
+    Route::prefix('reports')->name('admin.reports.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('index');
+        Route::get('/users', [App\Http\Controllers\ReportController::class, 'users'])->name('users');
+        Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
+        Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
+        Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
+        
+        // User Reports
+        Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
+        Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
+        Route::post('/user-reports/{id}/status', [App\Http\Controllers\UserReportController::class, 'updateStatus'])->name('user-reports.update-status');
+        Route::post('/user-reports/{id}/mark-read', [App\Http\Controllers\UserReportController::class, 'markAsRead'])->name('user-reports.mark-read');
+        Route::post('/user-reports/{id}/mark-unread', [App\Http\Controllers\UserReportController::class, 'markAsUnread'])->name('user-reports.mark-unread');
+        Route::post('/user-reports/{id}/status-ajax', [App\Http\Controllers\UserReportController::class, 'updateStatusAjax'])->name('user-reports.update-status-ajax');
+    });
+
+    // CRUD Admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('posts', PostController::class);
+        Route::resource('users', UserController::class);
+
+        // Role Management
+        Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
+        Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
+        Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
+        Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
+    });
+
+    // Collection Schedule
+    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
+        ->name('admin.collection-schedules.search');
+
+    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
+        ->name('admin.collection-schedules.deleteMultiple');
+
+    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+        'index' => 'admin.collection-schedules.index',
+        'store' => 'admin.collection-schedules.store',
+        'edit' => 'admin.collection-schedules.edit',
+        'update' => 'admin.collection-schedules.update',
+        'destroy' => 'admin.collection-schedules.destroy',
+    ]);
+
+    // 🟢 Banners
+Route::prefix('banners')->name('admin.banners.')->group(function () {
+    Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
+        ->name('confirm-delete');
+    Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
+});
 
 
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show'); 
+    //Events
+    // Events
+    Route::prefix('events')->name('admin.events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/', [EventController::class, 'store'])->name('store');
+        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [EventController::class, 'update'])->name('update');
+        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [EventController::class, 'export'])->name('export');
+    });
 
-
-
-Route::get('/admin/posts', [PostController::class, 'index'])->name('admin.posts.index'); // Hiển thị danh sách bài viết
-Route::get('/admin/posts/create', [PostController::class, 'create'])->name('posts.create'); // Tạo bài viết mới
-Route::post('/admin/posts', [PostController::class, 'store'])->name('posts.store'); // Lưu bài viết mới
-Route::get('/admin/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
-Route::put('/admin/posts/{post}', [PostController::class, 'update'])->name('posts.update'); // Cập nhật bài viết
-Route::delete('/admin/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-
-// Collection Schedule Management
-Route::resource('collection-schedule', CollectionScheduleController::class);  
-
-
-
-Route::resource('posts', PostController::class);
-
-// Route cho chức năng crud banner
-Route::resource('banners', BannerController::class);
-Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
-Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
-Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
-Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banners.edit');
-Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
-Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
-
+});
