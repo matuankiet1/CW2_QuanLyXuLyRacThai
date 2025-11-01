@@ -15,12 +15,20 @@ class PostFactory extends Factory
         // Tiêu đề ngắn gọn 2 từ
         $title = ucfirst($this->faker->words(2, true));
 
-        // Lấy họ và tên
+        // Tên tác giả rút gọn
         $first = ucfirst($this->faker->firstName());
         $last = ucfirst($this->faker->lastName());
-
-        // Rút họ chỉ còn ký tự đầu, ví dụ: "N. An"
         $author = strtoupper(substr($last, 0, 1)) . '. ' . $first;
+
+        // 📸 Danh sách ảnh trong thư mục public/images/posts/
+        $images = [
+            'images/posts/Post 1.png',
+            'images/posts/Post 2.png',
+            'images/posts/Post 3.png',
+            'images/posts/Post 4.png',
+            'images/posts/Post 5.png',
+            'images/posts/Post 6.png',
+        ];
 
         return [
             'title' => $title,
@@ -29,7 +37,10 @@ class PostFactory extends Factory
             'excerpt' => $this->faker->sentence(2),
             'content' => $this->faker->paragraphs(4, true),
             'post_categories' => $this->faker->randomElement(['Tin tức', 'Tuyên truyền', 'Kiến thức']),
-            'image' => $this->faker->imageUrl(800, 600, 'nature', true, 'Post'),
+            
+            // 🎨 Lấy ngẫu nhiên một ảnh có sẵn
+            'image' => $this->faker->randomElement($images),
+
             'status' => $this->faker->randomElement(['draft', 'published', 'archived']),
             'published_at' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
         ];
