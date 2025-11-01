@@ -1,6 +1,6 @@
-@extends('dashboard.admin')
+@extends('layouts.admin-with-sidebar')
 
-@section('dashboard-content')
+@section('content')
 <div class="p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
