@@ -53,17 +53,18 @@
                                 </td>
 
                                 {{-- Ảnh thumbnail --}}
-                                <td class="p-3 text-center">
+                                <td class="p-3 text-center align-middle w-[60px]">
                                     @if ($post->image)
-                                        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}"
-                                            class="w-16 h-16 object-cover rounded-md mx-auto shadow-sm border">
+                                        <img src="{{ asset($post->image) }}" alt="{{ $post->title }}"
+                                            class="h-10 w-10 object-cover rounded-md mx-auto shadow-sm border border-gray-200">
                                     @else
                                         <div
-                                            class="w-16 h-16 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic mx-auto rounded-md">
+                                            class="w-10 h-10 bg-gray-100 flex items-center justify-center text-gray-400 text-[10px] italic mx-auto rounded-md">
                                             Không có
                                         </div>
                                     @endif
                                 </td>
+
 
                                 {{-- Tiêu đề & mô tả ngắn --}}
                                 <td class="p-3">
@@ -122,7 +123,6 @@
                     @endif
                 </tbody>
             </table>
-
 
             {{-- Phân trang --}}
             <div class="mt-4">
