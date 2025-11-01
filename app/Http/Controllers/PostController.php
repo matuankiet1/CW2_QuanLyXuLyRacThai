@@ -9,30 +9,6 @@ use Illuminate\Support\Facades\Log;
 class PostController extends Controller
 {
     /**
-     * Hiển thị danh sách bài viết cho người dùng thường
-     */
-    public function showAll(Request $request)
-    {
-        $posts = Post::where('status', 'published')->orderBy('publish_date', 'desc')->paginate(10);
-        return view('posts.home', compact('posts'));
-    }
-
-    /**
-     * Hiển thị chi tiết bài viết
-     */
-    public function show($id)
-    {
-        $post = Post::where('status', 'published')->findOrFail($id);
-        $relatedPosts = Post::where('status', 'published')
-            ->where('id', '!=', $id)
-            ->where('post_categories', $post->post_categories)
-            ->limit(3)
-            ->get();
-
-        return view('posts.show', compact('post', 'relatedPosts'));
-    }
-
-    /**
      * Danh sách bài viết
      */
     public function index(Request $request)
