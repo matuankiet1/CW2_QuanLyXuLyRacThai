@@ -1,30 +1,46 @@
 @extends('layouts.user')
 
 @section('content')
-<div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold mb-6">Bài viết mới nhất</h1>
+<div class="container py-5">
+    <h1 class="fw-bold mb-5 text-center">📰 Bài viết mới nhất</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="row g-4">
         @foreach ($posts as $post)
-            <div class="bg-white shadow rounded overflow-hidden">
-                @if ($post->image)
-                    <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
-                @endif
-                <div class="p-4">
-                    <h2 class="text-xl font-semibold mb-2">
-                        <a href="{{ route('user.posts.show', $post->slug) }}" class="text-blue-600 hover:underline">
-                            {{ $post->title }}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    @if ($post->image)
+                        <img src="{{ asset('storage/' . $post->image) }}" 
+                             alt="{{ $post->title }}" 
+                             class="card-img-top" 
+                             style="height: 200px; object-fit: cover;">
+                    @endif
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-2">
+                            <a href="{{ route('user.posts.show', $post->slug) }}" 
+                               class="text-decoration-none text-success fw-semibold">
+                                {{ $post->title }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small mb-2">
+                            ✍️ {{ $post->author }} · {{ \Carbon\Carbon::parse($post->published_at)->format('d/m/Y') }}
+                        </p>
+                        <p class="card-text text-secondary flex-grow-1">
+                            {{ Str::limit($post->excerpt, 100) }}
+                        </p>
+                        <a href="{{ route('user.posts.show', $post->slug) }}" 
+                           class="btn btn-outline-success mt-3 w-100">
+                            Đọc thêm <i class="fas fa-arrow-right ms-2"></i>
                         </a>
-                    </h2>
-                    <p class="text-sm text-gray-500 mb-2">Tác giả: {{ $post->author }} - {{ $post->published_at }}</p>
-                    <p class="text-gray-700">{{ Str::limit($post->excerpt, 100) }}</p>
+                    </div>
                 </div>
             </div>
         @endforeach
     </div>
 
-    <div class="mt-8">
-        {{ $posts->links() }}
+    {{-- Phân trang --}}
+    <div class="mt-5 d-flex justify-content-center">
+        {{ $posts->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection
