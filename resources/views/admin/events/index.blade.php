@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <div class="space-y-6">
     {{-- Thống kê --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -38,8 +38,14 @@
                 <input type="text" name="search" value="{{ $search }}" placeholder="Tìm kiếm sự kiện..."
                     class="border p-2 rounded w-64" />
                 <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Tìm</button>
+                <select name="status" class="border p-2 rounded">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="completed">Đã kết thúc</option>
+                        <option value="upcoming">Sắp diễn ra</option>
+                    </select>
+                    <button class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded">Lọc</button>
             </div>
-
+            
             {{-- Nút tạo mới --}}
             <a href="{{ route('admin.events.create') }}" class="bg-blue-600 text-white px-3 py-2 rounded">
                 + Tạo sự kiện mới

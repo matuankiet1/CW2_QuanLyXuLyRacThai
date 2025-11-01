@@ -165,9 +165,9 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
                                 <i class="fas fa-calendar me-1"></i>
-                                {{ $post->publish_date ? \Carbon\Carbon::parse($post->publish_date)->format('d/m/Y') : $post->created_at->format('d/m/Y') }}
+                                {{ $post->published_at ? \Carbon\Carbon::parse($post->published_at)->format('d/m/Y') : $post->created_at->format('d/m/Y') }}
                             </small>
-                            <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-outline-primary">Đọc thêm</a>
+                            <a href="{{ route('user.posts.show', $post->id) }}" class="btn btn-sm btn-outline-primary">Đọc thêm</a>
                         </div>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
             @endforeach
         </div>
         <div class="text-center mt-4">
-            <a href="{{ route('posts.home') }}" class="btn btn-primary">Xem tất cả bài viết</a>
+            <a href="{{ route('user.posts.home') }}" class="btn btn-primary">Xem tất cả bài viết</a>
         </div>
     </div>
 </section>
