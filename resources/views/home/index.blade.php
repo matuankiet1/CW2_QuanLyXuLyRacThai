@@ -17,7 +17,7 @@
                     và xây dựng cộng đồng bền vững.
                 </p>
                 <div class="d-flex gap-3 flex-wrap">
-                    <a href="{{ route('posts.home') }}" class="btn btn-light btn-lg">
+                    <a href="{{ route('user.posts.home') }}" class="btn btn-light btn-lg">
                         <i class="fas fa-newspaper me-2"></i>Xem bài viết
                     </a>
                     <a href="{{ route('home.about') }}" class="btn btn-outline-light btn-lg">
@@ -186,7 +186,7 @@
                                 <i class="fas fa-calendar me-1"></i>
                                 {{ $post->created_at->format('d/m/Y') }}
                             </small>
-                            <a href="{{ route('posts.show', $post->id) }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('user.posts.show', $post->id) }}" class="btn btn-outline-primary btn-sm">
                                 Đọc tiếp
                             </a>
                         </div>
@@ -197,7 +197,7 @@
         </div>
         
         <div class="text-center mt-4">
-            <a href="{{ route('posts.home') }}" class="btn btn-primary">
+            <a href="{{ route('user.posts.home') }}" class="btn btn-primary">
                 <i class="fas fa-newspaper me-2"></i>Xem tất cả bài viết
             </a>
         </div>
@@ -294,7 +294,7 @@
                     Tham gia vào cộng đồng EcoWaste để cùng nhau xây dựng một tương lai xanh và bền vững.
                 </p>
                 @auth
-                    <a href="{{ route('posts.home') }}" class="btn btn-light btn-lg me-3">
+                    <a href="{{ route('user.posts.home') }}" class="btn btn-light btn-lg me-3">
                         <i class="fas fa-newspaper me-2"></i>Khám phá ngay
                     </a>
                 @else

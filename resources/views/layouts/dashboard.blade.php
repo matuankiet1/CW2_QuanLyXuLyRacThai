@@ -33,10 +33,10 @@
                             'route' => 'admin.collection-schedules.index',
                         ],
                         ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
-                        ['id' => 'permissions', 'label' => 'Phân quyền'],
+                        ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
                         ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                         ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                        ['id' => 'reports', 'label' => 'Báo cáo người dùng'],
+                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
                         ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                         ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                         ['id' => 'finance', 'label' => 'Quản lý tài chính'],
@@ -181,4 +181,5 @@
 
         {{-- Include Chart.js --}}
         @vite(['resources/js/dashboard.js'])
+        @vite(['resources/js/offcanvas.js'])
     @endsection

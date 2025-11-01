@@ -13,10 +13,46 @@ class CollectionScheduleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'desc')->paginate(7);
+        $query = CollectionSchedule::query()->with('staff');
+
+        // 1. Sắp xếp theo nhân viên
+        if ($request->radioFilterStaff === 'asc') {
+            $query->join('users', 'collection_schedules.staff_id', '=', 'users.id')
+                ->orderBy('users.name', 'asc');
+        } elseif ($request->radioFilterStaff === 'desc') {
+            $query->join('users', 'collection_schedules.staff_id', '=', 'users.id')
+                ->orderBy('users.name', 'desc');
+        }
+
+        // 2. Sắp xếp theo ngày thu gom
+        if ($request->radioFilterScheduledDate === 'old_new') {
+            $query->orderBy('scheduled_date', 'asc');
+        } elseif ($request->radioFilterScheduledDate === 'new_old') {
+            $query->orderBy('scheduled_date', 'desc');
+        }
+
+        // 3. Sắp xếp theo ngày hoàn thành
+        if ($request->radioFilterCompletedAt === 'old_new') {
+            $query->orderBy('completed_at', 'asc');
+        } elseif ($request->radioFilterCompletedAt === 'new_old') {
+            $query->orderBy('completed_at', 'desc');
+        }
+
+        // 4. Lọc theo trạng thái
+        if ($request->radioFilterStatus === 'Đã hoàn thành') {
+            $query->where('status', 'Đã hoàn thành');
+        } elseif ($request->radioFilterStatus === 'Chưa thực hiện') {
+            $query->where('status', 'Chưa thực hiện');
+        }
+        $collectionSchedules = $query->select('collection_schedules.*')->paginate(7);
         $isSearching = false;
+        
+        // Nếu request là AJAX, chỉ trả về phần bảng
+        if ($request->ajax()) {
+            return view('admin.collection-schedules._table', compact('collectionSchedules'))->render();
+        }
         return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearching'));
     }
 
@@ -78,7 +114,8 @@ class CollectionScheduleController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {   $staff_name = $request['staff_id'];
+    {
+        $staff_name = $request['staff_id'];
         if ($staff_name) {
             $staff_id = User::where('name', $staff_name)->value('user_id');
             if (!$staff_id) {

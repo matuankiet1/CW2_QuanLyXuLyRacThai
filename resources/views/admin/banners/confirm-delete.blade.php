@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <div class="flex items-center justify-center h-[70vh]">
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center border border-gray-200">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">

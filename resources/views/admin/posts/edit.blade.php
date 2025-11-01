@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin-with-sidebar')
 
 @section('content')
     <div class="max-w-3xl mx-auto bg-white shadow p-6 rounded-lg">
@@ -61,8 +61,8 @@
 
                 <div>
                     <label class="block mb-1 font-medium">Ngày xuất bản *</label>
-                    <input type="date" name="publish_date"
-                        value="{{ old('publish_date', optional($post->publish_date)->format('Y-m-d')) }}" required
+                    <input type="date" name="published_at"
+                        value="{{ old('published_at', optional($post->published_at)->format('Y-m-d')) }}" required
                         class="w-full border p-2 rounded" />
                 </div>
             </div>

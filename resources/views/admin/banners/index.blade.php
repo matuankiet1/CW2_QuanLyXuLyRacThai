@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <!-- ✅ Thông báo thành công / lỗi -->
 @if (session('success') || session('error'))
     <div 
