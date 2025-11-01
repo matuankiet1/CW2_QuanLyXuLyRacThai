@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\PostHomeController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function($id) {
@@ -68,8 +69,8 @@ Route::middleware('guest')->group(function () {
 });
 
 //--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
+Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
 
 //--------------------------------------- USER REPORTS -------------------------------------//
 Route::middleware('auth')->group(function () {
