@@ -66,23 +66,27 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
-            // Ghi log để debug (nếu cần)
             Log::info("Đang xử lý thêm bài viết", $request->all());
 
-            // Validate dữ liệu
+            // ✅ Validate
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'excerpt' => 'required|string',
                 'content' => 'required|string',
                 'post_categories' => 'required|string',
-                'image' => 'nullable|string|max:255',
                 'author' => 'required|string|max:255',
                 'status' => 'required|in:draft,published,archived',
                 'published_at' => 'nullable|date',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
-            // Tạo bài viết
-            $post = Post::create($validated);
+            // ✅ Upload ảnh nếu có
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('posts', 'public');
+                $validated['image'] = $path; // Lưu đường dẫn tương đối, vd: posts/image.jpg
+            }
+
+            Post::create($validated);
 
             return redirect()
                 ->route('admin.posts.index')
@@ -91,7 +95,6 @@ class PostController extends Controller
             Log::error("Lỗi khi thêm bài viết: " . $e->getMessage());
             return back()->withErrors(['error' => 'Không thể thêm bài viết.'])->withInput();
         }
-
     }
 
 
