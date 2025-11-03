@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PostHomeController;
+use App\Http\Controllers\NotificationController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function($id) {
@@ -150,4 +151,23 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::get('/export', [EventController::class, 'export'])->name('export');
     });
 
+    // Notifications (Admin)
+    Route::prefix('notifications')->name('admin.notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/create', [NotificationController::class, 'create'])->name('create');
+        Route::post('/', [NotificationController::class, 'store'])->name('store');
+        Route::get('/{id}', [NotificationController::class, 'show'])->name('show');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('download');
+    });
+
+});
+
+//--------------------------------------- USER NOTIFICATIONS (Sinh viên) -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::prefix('notifications')->name('user.notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'userIndex'])->name('index');
+        Route::get('/{id}', [NotificationController::class, 'userShow'])->name('show');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+    });
 });
