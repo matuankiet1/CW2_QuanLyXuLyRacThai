@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notification_user', function (Blueprint $table) {
-            $table->id('notification_user_id');
+            $table->bigIncrements('notification_user_id');
             $table->foreignId('notification_id')->constrained('notifications', 'notification_id')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
             $table->timestamp('read_at')->nullable(); // Thời gian đọc

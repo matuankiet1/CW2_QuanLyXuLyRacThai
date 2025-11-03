@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id('notification_id');
+            $table->bigIncrements('notification_id');
             $table->foreignId('sender_id')->constrained('users', 'user_id')->onDelete('cascade'); // Người gửi (admin/giảng viên)
             $table->string('title'); // Tiêu đề thông báo
             $table->text('content'); // Nội dung
