@@ -281,6 +281,19 @@
                             <i class="fas fa-flag me-1"></i>Báo cáo
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.notifications.index') }}">
+                            <i class="fas fa-bell me-1"></i>Thông báo
+                            @php
+                                $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
+                                    ->whereNull('read_at')
+                                    ->count();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="badge bg-danger">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
                     @endauth
                 </ul>
                 
