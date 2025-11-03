@@ -152,22 +152,18 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
     });
 
     // Notifications (Admin)
-    Route::prefix('notifications')->name('admin.notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::get('/create', [NotificationController::class, 'create'])->name('create');
-        Route::post('/', [NotificationController::class, 'store'])->name('store');
-        Route::get('/{id}', [NotificationController::class, 'show'])->name('show');
-        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('download');
-    });
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('admin.notifications.store');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('admin.notifications.show');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::get('/notifications/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('admin.notifications.download');
 
 });
 
 //--------------------------------------- USER NOTIFICATIONS (Sinh viên) -------------------------------------//
 Route::middleware('auth')->group(function () {
-    Route::prefix('notifications')->name('user.notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'userIndex'])->name('index');
-        Route::get('/{id}', [NotificationController::class, 'userShow'])->name('show');
-        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
-    });
+    Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
+    Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
+    Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
 });
