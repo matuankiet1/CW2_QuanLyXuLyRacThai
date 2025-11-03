@@ -62,6 +62,24 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'user_id', 'user_id');
     }
 
+    /**
+     * Relationship với Notification (thông báo đã gửi)
+     */
+    public function sentNotifications()
+    {
+        return $this->hasMany(Notification::class, 'sender_id', 'user_id');
+    }
+
+    /**
+     * Relationship với Notification (thông báo đã nhận)
+     */
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_user', 'user_id', 'notification_id')
+                    ->withPivot('read_at')
+                    ->withTimestamps();
+    }
+
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
