@@ -1,7 +1,6 @@
 @extends('layouts.dashboard')
 
 @section('main-content')
-    <img src="{{ asset('storage/waste_logs/11/IYzItcx9yDeyRNogWx5faPr1TClHNPMl0gWtgjSf.jpg') }}" alt="">
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
@@ -410,6 +409,10 @@
         const $name = document.getElementById('itemName');
         const $hint = document.getElementById('aiHint');
 
+        const imgModal = document.getElementById('imgModal');
+        const imgModalImg = document.getElementById('imgModalImg');
+        const imgModalClose = document.getElementById('imgModalClose');
+
         const previewBtn = document.querySelectorAll('.preview-btn')
 
         function openModal(modal, modalBox) {
@@ -618,19 +621,27 @@
         previewBtn.forEach(btn => {
             btn.addEventListener('click', function() {
                 console.log('clicked');
-                
+
                 const url = this.dataset.url;
                 openImageModal(url);
             })
         });
 
+        imgModalClose.addEventListener('click', closeImageModal);
+        imgModal.addEventListener('click', (e) => {
+            if (e.target === imgModal) closeImageModal();
+        });
+
         function openImageModal(url) {
+
             if (!url) return;
             if (!url.startsWith('http') && !url.startsWith('/storage/')) {
                 url = '/storage/' + url.replace(/^\/?storage\//, '');
             }
 
             imgModalImg.src = url;
+            console.log(imgModalImg.src);
+
             imgModal.classList.remove('hidden');
             imgModal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
