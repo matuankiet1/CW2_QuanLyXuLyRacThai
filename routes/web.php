@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 
@@ -45,8 +46,6 @@ Route::post('logout', function () {
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
-// Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-
 // Login, register bằng social (Google, Facebook)
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
 Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
@@ -78,6 +77,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
     Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
 });
+
+// Waste Logs
+Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class, 'aiSuggestWasteClassifier'])
+    ->middleware('throttle:30,1')->name('waste.ai-suggest'); // rate limit nhẹ
+Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
+    ->name('waste-logs.get-by-collection-schedules');
+Route::resource('waste-logs', WasteLogController::class);
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
@@ -150,6 +156,7 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
         Route::get('/export', [EventController::class, 'export'])->name('export');
     });
+
 
     // Notifications (Admin)
     Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
