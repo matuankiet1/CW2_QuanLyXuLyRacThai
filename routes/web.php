@@ -10,6 +10,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\WasteLogController;
+use App\Http\Controllers\PostHomeController;
+use App\Http\Controllers\NotificationController;
+
+// Route để đánh dấu báo cáo đã đọc
+Route::post('/reports/user-reports/{id}/mark-read', function($id) {
+    $report = App\Models\UserReport::findOrFail($id);
+    $report->markAsRead();
+    
+    return response()->json(['success' => true]);
+});
 
 //------------------------------------ TRANG CHỦ -------------------------------------//
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -59,8 +69,14 @@ Route::middleware('guest')->group(function () {
 });
 
 //--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
-Route::get('/posts', [PostController::class, 'showAll'])->name('posts.home');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
+Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
+
+//--------------------------------------- USER REPORTS -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
+    Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
+});
 
 // Waste Logs
 Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class, 'aiSuggestWasteClassifier'])
@@ -84,6 +100,14 @@ Route::middleware('admin')->group(function () {
         Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
         Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
         Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
+        
+        // User Reports
+        Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
+        Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
+        Route::post('/user-reports/{id}/status', [App\Http\Controllers\UserReportController::class, 'updateStatus'])->name('user-reports.update-status');
+        Route::post('/user-reports/{id}/mark-read', [App\Http\Controllers\UserReportController::class, 'markAsRead'])->name('user-reports.mark-read');
+        Route::post('/user-reports/{id}/mark-unread', [App\Http\Controllers\UserReportController::class, 'markAsUnread'])->name('user-reports.mark-unread');
+        Route::post('/user-reports/{id}/status-ajax', [App\Http\Controllers\UserReportController::class, 'updateStatusAjax'])->name('user-reports.update-status-ajax');
     });
 
     // CRUD Admin
@@ -113,8 +137,13 @@ Route::middleware('admin')->group(function () {
         'destroy' => 'admin.collection-schedules.destroy',
     ]);
 
-    // Banners
-    Route::resource('banners', BannerController::class);
+    // 🟢 Banners
+Route::prefix('banners')->name('admin.banners.')->group(function () {
+    Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
+        ->name('confirm-delete');
+    Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
+});
+
 
     //Events
     // Events
@@ -129,4 +158,19 @@ Route::middleware('admin')->group(function () {
     });
 
 
+    // Notifications (Admin)
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('admin.notifications.store');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('admin.notifications.show');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::get('/notifications/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('admin.notifications.download');
+
+});
+
+//--------------------------------------- USER NOTIFICATIONS (Sinh viên) -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
+    Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
+    Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
 });

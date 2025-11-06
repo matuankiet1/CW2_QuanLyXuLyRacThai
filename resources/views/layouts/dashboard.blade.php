@@ -24,7 +24,7 @@
                 {{-- Menu --}}
                 @php
                     $menuItems = [
-                        ['id' => 'home', 'label' => 'Trang chủ'],
+                        ['id' => 'home', 'label' => 'Trang chủ' , 'route' => 'admin.home'],
                         ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
                         ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
                         [
@@ -37,12 +37,12 @@
                         ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                         ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
                         ['id' => 'waste-logs', 'label' => 'Báo cáo thu gom rác', 'route' => 'waste-logs.index'],
-                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.index'],
+                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
                         ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                         ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                         ['id' => 'finance', 'label' => 'Quản lý tài chính'],
                         ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
-                        ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
+                        ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'admin.banners.index'],
                     ];
 
                     $currentPage = request()->route() ? request()->route()->getName() : '';
@@ -64,25 +64,33 @@
 
                 <nav class="flex-1 p-4 overflow-y-auto">
                     <ul class="space-y-1">
-                        @foreach ($menuItems as $item)
-                            @if (isset($item['route']))
-                                @php
-                                    $base = Str::beforeLast($item['route'], '.');
-                                    $isActive = request()->routeIs($item['route']) || request()->routeIs($base . '.*');
-                                @endphp
-                                <a href="{{ route($item['route']) }}"
-                                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors
-                    {{ $isActive ? 'text-white bg-green-600 hover:bg-green-700' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    <span class="text-sm">{{ $item['label'] }}</span>
-                                </a>
-                            @else
-                                <span class="flex items-center gap-3 px-4 py-2.5 text-gray-400 cursor-not-allowed">
-                                    {{ $item['label'] }}
-                                </span>
-                            @endif
-                        @endforeach
+    @foreach ($menuItems as $item)
+        @if (isset($item['route']))
+            @php
+                $base = Str::beforeLast($item['route'], '.');
+                $isActive = request()->routeIs($item['route']);
 
-                    </ul>
+            @endphp
+            <li>
+                <a href="{{ route($item['route']) }}"
+                    class="block w-full px-4 py-2.5 rounded-lg transition-all duration-200
+                    {{ $isActive
+                        ? 'text-white bg-green-600 shadow-md'
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700' }}">
+                    <span class="text-sm font-medium">{{ $item['label'] }}</span>
+                </a>
+            </li>
+        @else
+            <li>
+                <span
+                    class="block w-full px-4 py-2.5 text-gray-400 cursor-not-allowed rounded-lg">
+                    {{ $item['label'] }}
+                </span>
+            </li>
+        @endif
+    @endforeach
+</ul>
+
                 </nav>
 
                 {{-- User profile --}}
