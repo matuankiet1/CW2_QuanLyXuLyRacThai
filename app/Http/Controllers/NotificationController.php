@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\NotificationUser;
 use App\Models\User;
+use App\Services\IntegratedNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -97,6 +99,11 @@ class NotificationController extends Controller
             'total_recipients' => $recipients->count(),
         ]);
 
+        // Nếu thông báo được gửi ngay (không phải scheduled), gửi qua IntegratedNotificationService
+        if ($notification->status === 'sent' && $notification->sent_at) {
+            $this->sendViaIntegratedService($notification, $recipients);
+        }
+
         return redirect()->route('admin.notifications.index')
             ->with('success', 'Thông báo đã được gửi thành công đến ' . $recipients->count() . ' người nhận.');
     }
@@ -169,18 +176,29 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
+        // Lấy danh sách notification_id trước khi update để cập nhật read_count
+        $unreadNotificationUsers = NotificationUser::where('user_id', $user->user_id)
+            ->whereNull('read_at')
+            ->with('notification')
+            ->get();
+
+        // Update read_at cho tất cả thông báo chưa đọc
         NotificationUser::where('user_id', $user->user_id)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
         // Cập nhật read_count cho mỗi notification
-        $unreadNotifications = NotificationUser::where('user_id', $user->user_id)
-            ->whereNull('read_at')
-            ->with('notification')
-            ->get();
+        $notificationIds = [];
+        foreach ($unreadNotificationUsers as $notificationUser) {
+            if ($notificationUser->notification) {
+                $notificationIds[] = $notificationUser->notification_id;
+            }
+        }
 
-        foreach ($unreadNotifications as $notificationUser) {
-            $notificationUser->notification->increment('read_count');
+        // Tăng read_count cho các notification (tránh duplicate)
+        $uniqueNotificationIds = array_unique($notificationIds);
+        foreach ($uniqueNotificationIds as $notificationId) {
+            Notification::where('notification_id', $notificationId)->increment('read_count');
         }
 
         return back()->with('success', 'Đã đánh dấu tất cả thông báo là đã đọc.');
