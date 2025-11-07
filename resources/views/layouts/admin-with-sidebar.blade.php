@@ -351,6 +351,12 @@
                         <span>Dashboard</span>
                     </a>
                 </div>
+                <div class="menu-item">
+                    <a href="{{ route('admin.notifications.index') }}" class="menu-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                        <i class="fas fa-bell"></i>
+                        <span>Thông báo</span>
+                    </a>
+                </div>
             </div>
 
             <div class="menu-section">
