@@ -88,6 +88,49 @@ class User extends Authenticatable
         return $this->hasOne(NotificationPreference::class, 'user_id', 'user_id');
     }
 
+    /**
+     * Relationship với SimpleNotification
+     */
+    public function simpleNotifications()
+    {
+        return $this->hasMany(SimpleNotification::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Lấy số lượng thông báo chưa đọc
+     */
+    public function getUnreadNotificationsCountAttribute()
+    {
+        return $this->simpleNotifications()->unread()->count();
+    }
+
+    /**
+     * Kiểm tra user có bật email notifications không
+     */
+    public function allowsEmailNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsEmail() : true;
+    }
+
+    /**
+     * Kiểm tra user có bật push notifications không
+     */
+    public function allowsPushNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsPush() : true;
+    }
+
+    /**
+     * Kiểm tra user có bật in-app notifications không
+     */
+    public function allowsInAppNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsInApp() : true;
+    }
+
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
