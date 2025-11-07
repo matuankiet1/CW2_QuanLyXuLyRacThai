@@ -173,4 +173,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
     Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
     Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
+    
+    // Simple Notifications
+    Route::get('/simple-notifications', [SimpleNotificationController::class, 'index'])->name('user.simple-notifications.index');
+    Route::get('/simple-notifications/{id}', [SimpleNotificationController::class, 'show'])->name('user.simple-notifications.show');
+    Route::post('/simple-notifications/{id}/mark-read', [SimpleNotificationController::class, 'markAsRead'])->name('user.simple-notifications.mark-read');
+    Route::post('/simple-notifications/mark-all-read', [SimpleNotificationController::class, 'markAllAsRead'])->name('user.simple-notifications.mark-all-read');
 });

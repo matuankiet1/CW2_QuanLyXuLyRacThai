@@ -294,6 +294,19 @@
                             @endif
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.simple-notifications.index') }}">
+                            <i class="fas fa-envelope me-1"></i>Thông báo mới
+                            @php
+                                $simpleUnreadCount = App\Models\SimpleNotification::where('user_id', auth()->user()->user_id)
+                                    ->where('is_read', false)
+                                    ->count();
+                            @endphp
+                            @if($simpleUnreadCount > 0)
+                                <span class="badge bg-danger">{{ $simpleUnreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
                     @endauth
                 </ul>
                 
