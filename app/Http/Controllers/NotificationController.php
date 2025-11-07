@@ -53,8 +53,12 @@ class NotificationController extends Controller
             'target_role' => 'nullable|required_if:send_to_type,role|in:admin,user',
             'user_ids' => 'nullable|required_if:send_to_type,user|array',
             'user_ids.*' => 'exists:users,user_id',
-            'attachment' => 'nullable|file|max:10240', // 10MB max
-            'scheduled_at' => 'nullable|date',
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
+            'scheduled_at' => 'nullable|date|after:now',
+        ], [
+            'scheduled_at.after' => 'Thời gian hẹn giờ phải trong tương lai.',
+            'attachment.mimes' => 'File đính kèm phải là định dạng: pdf, doc, docx, jpg, jpeg, png.',
+            'attachment.max' => 'File đính kèm không được vượt quá 10MB.',
         ]);
 
         // Upload attachment nếu có
