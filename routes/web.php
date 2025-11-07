@@ -13,6 +13,7 @@ use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function($id) {
@@ -180,4 +181,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/simple-notifications/{id}', [SimpleNotificationController::class, 'show'])->name('user.simple-notifications.show');
     Route::post('/simple-notifications/{id}/mark-read', [SimpleNotificationController::class, 'markAsRead'])->name('user.simple-notifications.mark-read');
     Route::post('/simple-notifications/mark-all-read', [SimpleNotificationController::class, 'markAllAsRead'])->name('user.simple-notifications.mark-all-read');
+    
+    // Notification Preferences
+    Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
+    Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');
 });
