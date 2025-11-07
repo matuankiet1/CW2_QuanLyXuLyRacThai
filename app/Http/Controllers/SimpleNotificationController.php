@@ -128,7 +128,7 @@ class SimpleNotificationController extends Controller
                 'notification_id' => $id,
             ]);
 
-            if (request()->ajax() || request()->wantsJson()) {
+            if (request()->ajax() || request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Có lỗi xảy ra khi đánh dấu thông báo.'
