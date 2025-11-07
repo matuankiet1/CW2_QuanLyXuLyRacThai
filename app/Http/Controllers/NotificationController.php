@@ -240,4 +240,38 @@ class NotificationController extends Controller
 
         return Storage::disk('public')->download($notification->attachment);
     }
+
+    /**
+     * Gửi thông báo qua IntegratedNotificationService (email, push, in-app)
+     *
+     * @param Notification $notification
+     * @param \Illuminate\Database\Eloquent\Collection $recipients
+     * @return void
+     */
+    private function sendViaIntegratedService($notification, $recipients)
+    {
+        try {
+            $recipientIds = $recipients->pluck('user_id')->toArray();
+            
+            // Gửi qua IntegratedNotificationService để có email và push
+            $results = IntegratedNotificationService::sendToMany(
+                $recipientIds,
+                $notification->title,
+                $notification->content
+            );
+
+            Log::info('Notification sent via IntegratedNotificationService', [
+                'notification_id' => $notification->notification_id,
+                'title' => $notification->title,
+                'total_recipients' => $results['total'],
+                'success_count' => $results['success'],
+                'failed_count' => $results['failed'],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send notification via IntegratedNotificationService', [
+                'notification_id' => $notification->notification_id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 }
