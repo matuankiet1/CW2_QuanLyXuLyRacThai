@@ -104,7 +104,7 @@ class SimpleNotificationController extends Controller
             $result = NotificationService::markAsRead($id, $user->user_id);
 
             if ($result) {
-                if (request()->ajax() || request()->wantsJson()) {
+                if (request()->ajax() || request()->expectsJson()) {
                     return response()->json([
                         'success' => true,
                         'message' => 'Đã đánh dấu thông báo là đã đọc.'
@@ -114,7 +114,7 @@ class SimpleNotificationController extends Controller
                 return back()->with('success', 'Đã đánh dấu thông báo là đã đọc.');
             }
 
-            if (request()->ajax() || request()->wantsJson()) {
+            if (request()->ajax() || request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Không tìm thấy thông báo hoặc đã được đánh dấu đọc.'
