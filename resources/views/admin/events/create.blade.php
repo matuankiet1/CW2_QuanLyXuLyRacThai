@@ -1,73 +1,73 @@
 @extends('layouts.admin-with-sidebar')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-8 col-xl-6">
-            <div class="card shadow-soft">
-                <div class="card-body">
-                    <h2 class="h4 mb-4">🆕 Tạo sự kiện mới</h2>
+<div class="container mx-auto px-4">
+    <div class="flex justify-center">
+        <div class="w-full lg:w-2/3 xl:w-1/2">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-4">
+                    <h2 class="text-xl font-semibold mb-4">🆕 Tạo sự kiện mới</h2>
                     <form method="POST" action="{{ route('admin.events.store') }}">
                         @csrf
 
                         <div class="mb-3">
-                            <label class="form-label">Tên sự kiện</label>
-                            <input type="text" name="title" value="{{ old('title') }}" required class="form-control">
-                            @error('title') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <label class="block text-sm font-medium mb-1">Tên sự kiện</label>
+                            <input type="text" name="title" value="{{ old('title') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            @error('title') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Ngày bắt đầu đăng ký tham gia</label>
-                                <input type="date" name="register_date" value="{{ old('register_date') }}" required class="form-control">
-                                @error('register_date') <div class="text-danger small">{{ $message }}</div> @enderror
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Ngày bắt đầu đăng ký tham gia</label>
+                                <input type="date" name="register_date" value="{{ old('register_date') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('register_date') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Ngày kết thúc đăng ký tham gia</label>
-                                <input type="date" name="register_end_date" value="{{ old('register_end_date') }}" required class="form-control">
-                                @error('register_end_date') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Ngày kết thúc đăng ký tham gia</label>
+                                <input type="date" name="register_end_date" value="{{ old('register_end_date') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('register_end_date') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Ngày bắt đầu sự kiện</label>
-                                <input type="date" name="event_start_date" value="{{ old('event_start_date') }}" required class="form-control">
-                                @error('event_start_date') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Ngày bắt đầu sự kiện</label>
+                                <input type="date" name="event_start_date" value="{{ old('event_start_date') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('event_start_date') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Ngày kết thúc sự kiện</label>
-                                <input type="date" name="event_end_date" value="{{ old('event_end_date') }}" required class="form-control">
-                                @error('event_end_date') <div class="text-danger small">{{ $message }}</div> @enderror
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mt-1">
-                            <div class="col-md-6">
-                                <label class="form-label">Địa điểm</label>
-                                <input type="text" name="location" value="{{ old('location') }}" required class="form-control">
-                                @error('location') <div class="text-danger small">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Người tham gia</label>
-                                <input type="text" name="participants" value="{{ old('participants') }}" required class="form-control">
-                                @error('participants') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Ngày kết thúc sự kiện</label>
+                                <input type="date" name="event_end_date" value="{{ old('event_end_date') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('event_end_date') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                             </div>
                         </div>
 
-                        <div class="mb-3 mt-1">
-                            <label class="form-label">Mô tả sự kiện</label>
-                            <input type="text" name="description" value="{{ old('description') }}" required class="form-control">
-                            @error('description') <div class="text-danger small">{{ $message }}</div> @enderror
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Địa điểm</label>
+                                <input type="text" name="location" value="{{ old('location') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('location') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Người tham gia</label>
+                                <input type="text" name="participants" value="{{ old('participants') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                @error('participants') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label class="block text-sm font-medium mb-1">Mô tả sự kiện</label>
+                            <input type="text" name="description" value="{{ old('description') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            @error('description') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Trạng thái</label>
-                            <select name="status" class="form-select">
+                            <label class="block text-sm font-medium mb-1">Trạng thái</label>
+                            <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                 <option value="upcoming" {{ old('status') == 'upcoming' ? 'selected' : '' }}>Sắp diễn ra</option>
                                 <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Đã kết thúc</option>
                             </select>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary">⬅️ Quay lại</a>
+                        <div class="flex justify-end gap-2">
+                            <a href="{{ route('admin.events.index') }}" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">⬅️ Quay lại</a>
                             <button type="submit" class="btn btn-admin">Lưu</button>
                         </div>
                     </form>
