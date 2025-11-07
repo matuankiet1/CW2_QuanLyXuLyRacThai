@@ -60,7 +60,16 @@ class NotificationController extends Controller
         // Upload attachment nếu có
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('notifications', 'public');
+            try {
+                $attachmentPath = $request->file('attachment')->store('notifications', 'public');
+            } catch (\Exception $e) {
+                Log::error('Failed to upload notification attachment', [
+                    'error' => $e->getMessage(),
+                    'user_id' => Auth::id(),
+                ]);
+                
+                return back()->withInput()->with('error', 'Không thể upload file đính kèm. Vui lòng thử lại.');
+            }
         }
 
         // Tạo thông báo
@@ -100,12 +109,19 @@ class NotificationController extends Controller
         ]);
 
         // Nếu thông báo được gửi ngay (không phải scheduled), gửi qua IntegratedNotificationService
-        if ($notification->status === 'sent' && $notification->sent_at) {
+        if ($notification->status === 'sent' && $notification->sent_at && $recipients->isNotEmpty()) {
+            // Gửi bất đồng bộ để không làm chậm response
             $this->sendViaIntegratedService($notification, $recipients);
+            
+            $message = 'Thông báo đã được gửi thành công đến ' . $recipients->count() . ' người nhận qua tất cả các kênh (in-app, email, push).';
+        } elseif ($notification->status === 'scheduled') {
+            $message = 'Thông báo đã được lên lịch gửi vào ' . $notification->scheduled_at->format('d/m/Y H:i') . '.';
+        } else {
+            $message = 'Thông báo đã được lưu thành công.';
         }
 
         return redirect()->route('admin.notifications.index')
-            ->with('success', 'Thông báo đã được gửi thành công đến ' . $recipients->count() . ' người nhận.');
+            ->with('success', $message);
     }
 
     /**
