@@ -12,6 +12,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SimpleNotificationController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function($id) {
