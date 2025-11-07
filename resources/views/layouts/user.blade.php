@@ -307,6 +307,11 @@
                             @endif
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.notification-preferences.index') }}">
+                            <i class="fas fa-cog me-1"></i>Cài đặt thông báo
+                        </a>
+                    </li>
                     @endauth
                 </ul>
                 
