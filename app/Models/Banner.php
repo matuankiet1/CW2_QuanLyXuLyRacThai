@@ -10,9 +10,28 @@ class Banner extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'link',
+        'title',
         'image',
-        'description',
+        'position',
+        'status',
+        'link',
     ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
+    /**
+     * Get the banner's position name
+     */
+    public function getPositionNameAttribute()
+    {
+        $positions = [
+            'top' => 'Trang chủ - Top',
+            'sidebar' => 'Sidebar',
+            'footer' => 'Footer',
+        ];
+
+        return $positions[$this->position] ?? 'Unknown';
+    }
 }

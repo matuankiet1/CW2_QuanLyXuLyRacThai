@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
 {
     Schema::create('banners', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->string('link')->nullable();
-        $table->string('image')->nullable();
-        $table->text('description')->nullable();
-        $table->timestamps();
-    });
+    $table->id();
+    $table->string('title')->nullable();
+    $table->string('image')->nullable();
+    $table->string('position')->nullable();
+    $table->boolean('status')->default(1);
+    $table->string('link')->nullable();
+    $table->timestamps();
+});
+
 }
 
 
