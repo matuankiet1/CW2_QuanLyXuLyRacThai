@@ -1,92 +1,92 @@
 @extends('layouts.admin-with-sidebar')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="card shadow-soft mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3 align-items-end">
-                    <div class="col-12 col-md-4">
-                        <label class="form-label">Tìm kiếm</label>
-                        <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Tiêu đề, tác giả...">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-md mb-4">
+            <div class="p-4">
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium mb-1">Tìm kiếm</label>
+                        <input type="text" name="search" value="{{ $search }}" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Tiêu đề, tác giả...">
                     </div>
-                    <div class="col-6 col-md-3">
-                        <label class="form-label">Danh mục</label>
-                        <select name="post_categories" class="form-select">
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium mb-1">Danh mục</label>
+                        <select name="post_categories" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             <option>Tất cả danh mục</option>
                             <option>Tin tức</option>
                             <option>Kiến thức</option>
                             <option>Tuyên truyền</option>
                         </select>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <label class="form-label">Trạng thái</label>
-                        <select name="status" class="form-select">
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium mb-1">Trạng thái</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             <option value="all">Tất cả trạng thái</option>
                             <option value="published">Đã xuất bản</option>
                             <option value="draft">Nháp</option>
                             <option value="archived">Lưu trữ</option>
                         </select>
                     </div>
-                    <div class="col-12 col-md-2 d-grid d-md-block">
-                        <button class="btn btn-outline-secondary me-md-2 mb-2 mb-md-0">Lọc</button>
+                    <div class="md:col-span-2 flex flex-col md:flex-row gap-2">
+                        <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Lọc</button>
                         <a href="{{ route('admin.posts.create') }}" class="btn btn-admin">+ Thêm bài viết</a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="card shadow-soft">
-            <div class="table-responsive">
-                <table class="table align-middle">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse table-auto">
                     <thead>
-                        <tr>
-                            <th class="text-center" style="width: 70px">STT</th>
-                            <th style="width: 100px">Ảnh</th>
-                            <th>Tiêu đề</th>
-                            <th>Tác giả</th>
-                            <th>Danh mục</th>
-                            <th>Ngày xuất bản</th>
-                            <th>Trạng thái</th>
-                            <th class="text-end">Lượt xem</th>
-                            <th class="text-end">Thao tác</th>
+                        <tr class="border-b">
+                            <th class="px-4 py-3 text-center font-semibold" style="width: 70px">STT</th>
+                            <th class="px-4 py-3 text-left font-semibold" style="width: 100px">Ảnh</th>
+                            <th class="px-4 py-3 text-left font-semibold">Tiêu đề</th>
+                            <th class="px-4 py-3 text-left font-semibold">Tác giả</th>
+                            <th class="px-4 py-3 text-left font-semibold">Danh mục</th>
+                            <th class="px-4 py-3 text-left font-semibold">Ngày xuất bản</th>
+                            <th class="px-4 py-3 text-left font-semibold">Trạng thái</th>
+                            <th class="px-4 py-3 text-right font-semibold">Lượt xem</th>
+                            <th class="px-4 py-3 text-right font-semibold">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if ($posts->count() > 0)
                             @foreach ($posts as $index => $post)
-                                <tr>
-                                    <td class="text-center">{{ $posts->firstItem() + $index }}</td>
-                                    <td class="text-center align-middle">
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-center">{{ $posts->firstItem() + $index }}</td>
+                                    <td class="px-4 py-3 text-center">
                                         @if ($post->image)
-                                            <img src="{{ asset($post->image) }}" alt="{{ $post->title }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                            <img src="{{ asset($post->image) }}" alt="{{ $post->title }}" class="border rounded" style="width: 60px; height: 60px; object-fit: cover;">
                                         @else
-                                            <div class="bg-light d-flex align-items-center justify-content-center text-muted small" style="width: 60px; height: 60px; border-radius: 4px;">Không có</div>
+                                            <div class="bg-gray-100 flex items-center justify-center text-gray-500 text-sm" style="width: 60px; height: 60px; border-radius: 4px;">Không có</div>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="fw-medium">{{ Str::limit($post->title, 40) }}</div>
-                                        <div class="text-muted small">{{ Str::limit($post->excerpt, 60) }}</div>
+                                    <td class="px-4 py-3">
+                                        <div class="font-medium">{{ Str::limit($post->title, 40) }}</div>
+                                        <div class="text-gray-500 text-sm">{{ Str::limit($post->excerpt, 60) }}</div>
                                     </td>
-                                    <td>{{ $post->author }}</td>
-                                    <td><span class="badge text-bg-light">{{ $post->post_categories }}</span></td>
-                                    <td>{{ optional($post->published_at)->format('d/m/Y') }}</td>
-                                    <td>
+                                    <td class="px-4 py-3">{{ $post->author }}</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">{{ $post->post_categories }}</span></td>
+                                    <td class="px-4 py-3">{{ optional($post->published_at)->format('d/m/Y') }}</td>
+                                    <td class="px-4 py-3">
                                         @if ($post->status === 'published')
-                                            <span class="badge text-bg-success">Đã xuất bản</span>
+                                            <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Đã xuất bản</span>
                                         @elseif ($post->status === 'draft')
-                                            <span class="badge text-bg-secondary">Nháp</span>
+                                            <span class="px-2 py-1 rounded text-xs font-medium bg-gray-500 text-white">Nháp</span>
                                         @else
-                                            <span class="badge text-bg-warning">Lưu trữ</span>
+                                            <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white">Lưu trữ</span>
                                         @endif
                                     </td>
-                                    <td class="text-end">{{ number_format($post->views) }}</td>
-                                    <td class="text-end">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ route('admin.posts.edit', $post) }}" class="btn btn-primary">Sửa</a>
-                                            <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
+                                    <td class="px-4 py-3 text-right">{{ number_format($post->views) }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex gap-2 text-sm justify-end">
+                                            <a href="{{ route('admin.posts.edit', $post) }}" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Sửa</a>
+                                            <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Xóa</button>
+                                                <button type="submit" class="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600">Xóa</button>
                                             </form>
                                         </div>
                                     </td>
@@ -94,13 +94,13 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-4">Không có bài viết nào.</td>
+                                <td colspan="9" class="text-center text-gray-500 py-4">Không có bài viết nào.</td>
                             </tr>
                         @endif
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer bg-white">
+            <div class="border-t pt-4 bg-white px-4 pb-4">
                 {{ $posts->withQueryString()->links() }}
             </div>
         </div>

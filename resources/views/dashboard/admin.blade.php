@@ -3,83 +3,68 @@
 @section('title', 'Dashboard - Admin')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Dashboard</h1>
-            <span class="badge bg-success">Bản thử nghiệm</span>
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-semibold mb-0">Dashboard</h1>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Bản thử nghiệm</span>
         </div>
 
-        <div class="row g-4">
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card shadow-soft hover-lift h-100">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Tổng rác thu gom tháng này</p>
-                        <h3 class="mb-0">534 kg</h3>
-                        <small class="text-success d-block mt-2">↑ 8.3% so với tháng trước</small>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full">
+                <div class="p-4">
+                    <p class="text-gray-500 mb-1 text-sm">Tổng rác thu gom tháng này</p>
+                    <h3 class="text-2xl font-semibold mb-0">534 kg</h3>
+                    <small class="text-green-500 block mt-2">↑ 8.3% so với tháng trước</small>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card shadow-soft hover-lift h-100">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Sinh viên tham gia</p>
-                        <h3 class="mb-0">167</h3>
-                        <small class="text-success d-block mt-2">↑ 12.8% so với tháng trước</small>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full">
+                <div class="p-4">
+                    <p class="text-gray-500 mb-1 text-sm">Sinh viên tham gia</p>
+                    <h3 class="text-2xl font-semibold mb-0">167</h3>
+                    <small class="text-green-500 block mt-2">↑ 12.8% so với tháng trước</small>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card shadow-soft hover-lift h-100">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Sự kiện trong tháng</p>
-                        <h3 class="mb-0">8</h3>
-                        <small class="text-success d-block mt-2">↑ 2 sự kiện mới</small>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full">
+                <div class="p-4">
+                    <p class="text-gray-500 mb-1 text-sm">Sự kiện trong tháng</p>
+                    <h3 class="text-2xl font-semibold mb-0">8</h3>
+                    <small class="text-green-500 block mt-2">↑ 2 sự kiện mới</small>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card shadow-soft hover-lift h-100">
-                    <div class="card-body">
-                        <p class="text-muted mb-1">Điểm thưởng phát ra</p>
-                        <h3 class="mb-0">2,850</h3>
-                        <small class="text-success d-block mt-2">↑ 15.4% so với tháng trước</small>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow h-full">
+                <div class="p-4">
+                    <p class="text-gray-500 mb-1 text-sm">Điểm thưởng phát ra</p>
+                    <h3 class="text-2xl font-semibold mb-0">2,850</h3>
+                    <small class="text-green-500 block mt-2">↑ 15.4% so với tháng trước</small>
                 </div>
             </div>
         </div>
 
-        <div class="row g-4 mt-1">
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-soft">
-                    <div class="card-body">
-                        <h5 class="card-title">Thống kê rác thải theo tháng</h5>
-                        <canvas id="wasteChart" height="300"></canvas>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-4">
+                    <h5 class="text-lg font-semibold mb-4">Thống kê rác thải theo tháng</h5>
+                    <canvas id="wasteChart" height="300"></canvas>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-soft">
-                    <div class="card-body">
-                        <h5 class="card-title">Phân loại rác thải</h5>
-                        <canvas id="wasteTypeChart" height="300"></canvas>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-4">
+                    <h5 class="text-lg font-semibold mb-4">Phân loại rác thải</h5>
+                    <canvas id="wasteTypeChart" height="300"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="row g-4 mt-1">
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-soft">
-                    <div class="card-body">
-                        <h5 class="card-title">Xu hướng tham gia sinh viên</h5>
-                        <canvas id="studentTrendChart" height="300"></canvas>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-4">
+                    <h5 class="text-lg font-semibold mb-4">Xu hướng tham gia sinh viên</h5>
+                    <canvas id="studentTrendChart" height="300"></canvas>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-soft">
-                    <div class="card-body">
-                        <h5 class="card-title">Top 5 sinh viên tích cực</h5>
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-4">
+                    <h5 class="text-lg font-semibold mb-4">Top 5 sinh viên tích cực</h5>
                 @php
                     $topStudents = [
                         ['name' => 'Nguyễn Văn A', 'points' => 450, 'waste' => 89],
@@ -89,22 +74,21 @@
                         ['name' => 'Hoàng Văn E', 'points' => 365, 'waste' => 71],
                     ];
                 @endphp
-                        <div class="vstack gap-3">
-                            @foreach($topStudents as $index => $student)
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;">
-                                        <small>{{ $index + 1 }}</small>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-medium">{{ $student['name'] }}</div>
-                                        <div class="text-muted small">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</div>
-                                    </div>
-                                    <div class="progress w-25" role="progressbar" aria-valuenow="{{ ($student['points'] / 500) * 100 }}" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar bg-success" style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
-                                    </div>
+                    <div class="flex flex-col gap-3">
+                        @foreach($topStudents as $index => $student)
+                            <div class="flex items-center gap-3">
+                                <div class="rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0" style="width:32px;height:32px;">
+                                    <small class="text-xs">{{ $index + 1 }}</small>
                                 </div>
-                            @endforeach
-                        </div>
+                                <div class="flex-grow">
+                                    <div class="font-medium">{{ $student['name'] }}</div>
+                                    <div class="text-gray-500 text-sm">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</div>
+                                </div>
+                                <div class="w-1/4 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

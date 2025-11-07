@@ -3,177 +3,169 @@
 @section('title', 'Quản lý phân quyền')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-start mb-3">
+<div class="container mx-auto px-4">
+    <div class="flex justify-between items-start mb-3">
         <div>
-            <h1 class="h3 mb-1">Quản lý phân quyền</h1>
-            <p class="text-muted">Quản lý quyền hạn của người dùng trong hệ thống</p>
+            <h1 class="text-2xl font-semibold mb-1">Quản lý phân quyền</h1>
+            <p class="text-gray-500">Quản lý quyền hạn của người dùng trong hệ thống</p>
         </div>
-        <button class="btn btn-admin" data-bs-toggle="modal" data-bs-target="#createAdminModal">
-            <i class="fas fa-user-shield me-2"></i>Tạo tài khoản admin mới
+        <button class="btn btn-admin" onclick="document.getElementById('createAdminModal').classList.remove('hidden')">
+            <i class="fas fa-user-shield mr-2"></i>Tạo tài khoản admin mới
         </button>
     </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-12 col-md-4">
-            <div class="card shadow-soft h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Tổng người dùng</div>
-                        <div class="h4 mb-0">{{ $users->total() }}</div>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="p-4 flex items-center gap-3">
+                <div class="rounded-full bg-blue-100 text-blue-600 flex items-center justify-center" style="width:40px;height:40px;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <div class="text-gray-500 text-sm">Tổng người dùng</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $users->total() }}</div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-4">
-            <div class="card shadow-soft h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Quản trị viên</div>
-                        <div class="h4 mb-0">{{ $adminCount }}</div>
-                    </div>
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="p-4 flex items-center gap-3">
+                <div class="rounded-full bg-red-100 text-red-600 flex items-center justify-center" style="width:40px;height:40px;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <div class="text-gray-500 text-sm">Quản trị viên</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $adminCount }}</div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-4">
-            <div class="card shadow-soft h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small">Người dùng</div>
-                        <div class="h4 mb-0">{{ $userCount }}</div>
-                    </div>
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="p-4 flex items-center gap-3">
+                <div class="rounded-full bg-green-100 text-green-600 flex items-center justify-center" style="width:40px;height:40px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="text-gray-500 text-sm">Người dùng</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $userCount }}</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-soft">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">Danh sách người dùng</h5>
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="border-b bg-white px-4 py-3">
+            <h5 class="mb-0 font-semibold">Danh sách người dùng</h5>
         </div>
-        <div class="table-responsive">
-            <table class="table align-middle mb-0">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse table-auto">
                 <thead>
-                    <tr>
-                        <th>Người dùng</th>
-                        <th>Email</th>
-                        <th>Số điện thoại</th>
-                        <th>Vai trò</th>
-                        <th>Ngày tạo</th>
-                        <th>Hành động</th>
+                    <tr class="border-b">
+                        <th class="px-4 py-3 text-left font-semibold">Người dùng</th>
+                        <th class="px-4 py-3 text-left font-semibold">Email</th>
+                        <th class="px-4 py-3 text-left font-semibold">Số điện thoại</th>
+                        <th class="px-4 py-3 text-left font-semibold">Vai trò</th>
+                        <th class="px-4 py-3 text-left font-semibold">Ngày tạo</th>
+                        <th class="px-4 py-3 text-left font-semibold">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($users as $user)
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                                    <span class="small fw-semibold">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="flex items-center">
+                                <div class="rounded-full bg-gray-100 flex items-center justify-center" style="width:40px;height:40px;">
+                                    <span class="text-sm font-semibold">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                                 </div>
-                                <div class="ms-3">
-                                    <div class="fw-medium">{{ $user->name }}</div>
+                                <div class="ml-3">
+                                    <div class="font-medium">{{ $user->name }}</div>
                                     @if($user->email === 'admin@ecowaste.com')
-                                        <span class="badge text-bg-danger">Super Admin</span>
+                                        <span class="px-2 py-1 rounded text-xs font-medium bg-red-500 text-white">Super Admin</span>
                                     @endif
                                 </div>
                             </div>
                         </td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->phone ?? 'Chưa cập nhật' }}</td>
-                        <td>
+                        <td class="px-4 py-3">{{ $user->email }}</td>
+                        <td class="px-4 py-3">{{ $user->phone ?? 'Chưa cập nhật' }}</td>
+                        <td class="px-4 py-3">
                             @if($user->role === 'admin')
-                                <span class="badge text-bg-danger">Admin</span>
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-red-500 text-white">Admin</span>
                             @else
-                                <span class="badge text-bg-success">User</span>
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">User</span>
                             @endif
                         </td>
-                        <td class="text-muted">{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
+                        <td class="px-4 py-3 text-gray-500">{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
                                 @if($user->id !== auth()->id() && $user->email !== 'admin@ecowaste.com')
-                                    <form action="{{ route('admin.roles.update', $user) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.roles.update', $user) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
-                                        <select name="role" onchange="this.form.submit()" class="form-select form-select-sm w-auto {{ $user->role === 'admin' ? 'is-invalid' : 'is-valid' }}">
+                                        <select name="role" onchange="this.form.submit()" class="px-2 py-1 text-sm border border-gray-300 rounded {{ $user->role === 'admin' ? 'border-red-500' : 'border-green-500' }}">
                                             <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
                                             <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
                                         </select>
                                     </form>
                                     @if($user->role === 'user')
-                                        <form action="{{ route('admin.roles.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
+                                        <form action="{{ route('admin.roles.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                            <button type="submit" class="px-3 py-1 text-sm border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white">Xóa</button>
                                         </form>
                                     @endif
                                 @else
-                                    <span class="text-muted small">Không thể thay đổi</span>
+                                    <span class="text-gray-500 text-sm">Không thể thay đổi</span>
                                 @endif
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Không có người dùng nào</td>
+                        <td colspan="6" class="text-center text-gray-500 py-4">Không có người dùng nào</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="card-footer bg-white">
+        <div class="border-t pt-4 bg-white px-4 pb-4">
             {{ $users->links() }}
         </div>
     </div>
 </div>
 
 <!-- Create Admin Modal -->
-<div class="modal fade" id="createAdminModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Tạo tài khoản admin mới</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form action="{{ route('admin.roles.create') }}" method="POST">
-        @csrf
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Họ và tên</label>
-            <input type="text" name="name" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Số điện thoại</label>
-            <input type="tel" name="phone" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Mật khẩu</label>
-            <input type="password" name="password" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Xác nhận mật khẩu</label>
-            <input type="password" name="password_confirmation" class="form-control" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-          <button type="submit" class="btn btn-admin">Tạo admin</button>
-        </div>
-      </form>
+<div id="createAdminModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="flex justify-between items-center mb-4">
+        <h5 class="text-lg font-semibold">Tạo tài khoản admin mới</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600" onclick="document.getElementById('createAdminModal').classList.add('hidden')">
+            <span class="text-2xl">&times;</span>
+        </button>
     </div>
+    <form action="{{ route('admin.roles.create') }}" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Họ và tên</label>
+            <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Email</label>
+            <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Số điện thoại</label>
+            <input type="tel" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Mật khẩu</label>
+            <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Xác nhận mật khẩu</label>
+            <input type="password" name="password_confirmation" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100" onclick="document.getElementById('createAdminModal').classList.add('hidden')">Hủy</button>
+            <button type="submit" class="btn btn-admin">Tạo admin</button>
+        </div>
+    </form>
   </div>
-  </div>
+</div>
 @endsection
