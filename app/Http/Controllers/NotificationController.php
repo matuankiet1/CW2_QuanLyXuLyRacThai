@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\NotificationUser;
 use App\Models\User;
+use App\Services\IntegratedNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -51,14 +53,27 @@ class NotificationController extends Controller
             'target_role' => 'nullable|required_if:send_to_type,role|in:admin,user',
             'user_ids' => 'nullable|required_if:send_to_type,user|array',
             'user_ids.*' => 'exists:users,user_id',
-            'attachment' => 'nullable|file|max:10240', // 10MB max
-            'scheduled_at' => 'nullable|date',
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
+            'scheduled_at' => 'nullable|date|after:now',
+        ], [
+            'scheduled_at.after' => 'Thời gian hẹn giờ phải trong tương lai.',
+            'attachment.mimes' => 'File đính kèm phải là định dạng: pdf, doc, docx, jpg, jpeg, png.',
+            'attachment.max' => 'File đính kèm không được vượt quá 10MB.',
         ]);
 
         // Upload attachment nếu có
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('notifications', 'public');
+            try {
+                $attachmentPath = $request->file('attachment')->store('notifications', 'public');
+            } catch (\Exception $e) {
+                Log::error('Failed to upload notification attachment', [
+                    'error' => $e->getMessage(),
+                    'user_id' => Auth::id(),
+                ]);
+                
+                return back()->withInput()->with('error', 'Không thể upload file đính kèm. Vui lòng thử lại.');
+            }
         }
 
         // Tạo thông báo
@@ -97,8 +112,20 @@ class NotificationController extends Controller
             'total_recipients' => $recipients->count(),
         ]);
 
+        // Nếu thông báo được gửi ngay (không phải scheduled), gửi qua IntegratedNotificationService
+        if ($notification->status === 'sent' && $notification->sent_at && $recipients->isNotEmpty()) {
+            // Gửi bất đồng bộ để không làm chậm response
+            $this->sendViaIntegratedService($notification, $recipients);
+            
+            $message = 'Thông báo đã được gửi thành công đến ' . $recipients->count() . ' người nhận qua tất cả các kênh (in-app, email, push).';
+        } elseif ($notification->status === 'scheduled') {
+            $message = 'Thông báo đã được lên lịch gửi vào ' . $notification->scheduled_at->format('d/m/Y H:i') . '.';
+        } else {
+            $message = 'Thông báo đã được lưu thành công.';
+        }
+
         return redirect()->route('admin.notifications.index')
-            ->with('success', 'Thông báo đã được gửi thành công đến ' . $recipients->count() . ' người nhận.');
+            ->with('success', $message);
     }
 
     /**
@@ -169,18 +196,29 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
+        // Lấy danh sách notification_id trước khi update để cập nhật read_count
+        $unreadNotificationUsers = NotificationUser::where('user_id', $user->user_id)
+            ->whereNull('read_at')
+            ->with('notification')
+            ->get();
+
+        // Update read_at cho tất cả thông báo chưa đọc
         NotificationUser::where('user_id', $user->user_id)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
         // Cập nhật read_count cho mỗi notification
-        $unreadNotifications = NotificationUser::where('user_id', $user->user_id)
-            ->whereNull('read_at')
-            ->with('notification')
-            ->get();
+        $notificationIds = [];
+        foreach ($unreadNotificationUsers as $notificationUser) {
+            if ($notificationUser->notification) {
+                $notificationIds[] = $notificationUser->notification_id;
+            }
+        }
 
-        foreach ($unreadNotifications as $notificationUser) {
-            $notificationUser->notification->increment('read_count');
+        // Tăng read_count cho các notification (tránh duplicate)
+        $uniqueNotificationIds = array_unique($notificationIds);
+        foreach ($uniqueNotificationIds as $notificationId) {
+            Notification::where('notification_id', $notificationId)->increment('read_count');
         }
 
         return back()->with('success', 'Đã đánh dấu tất cả thông báo là đã đọc.');
@@ -221,5 +259,39 @@ class NotificationController extends Controller
         }
 
         return Storage::disk('public')->download($notification->attachment);
+    }
+
+    /**
+     * Gửi thông báo qua IntegratedNotificationService (email, push, in-app)
+     *
+     * @param Notification $notification
+     * @param \Illuminate\Database\Eloquent\Collection $recipients
+     * @return void
+     */
+    private function sendViaIntegratedService($notification, $recipients)
+    {
+        try {
+            $recipientIds = $recipients->pluck('user_id')->toArray();
+            
+            // Gửi qua IntegratedNotificationService để có email và push
+            $results = IntegratedNotificationService::sendToMany(
+                $recipientIds,
+                $notification->title,
+                $notification->content
+            );
+
+            Log::info('Notification sent via IntegratedNotificationService', [
+                'notification_id' => $notification->notification_id,
+                'title' => $notification->title,
+                'total_recipients' => $results['total'],
+                'success_count' => $results['success'],
+                'failed_count' => $results['failed'],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send notification via IntegratedNotificationService', [
+                'notification_id' => $notification->notification_id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
