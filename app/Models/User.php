@@ -80,6 +80,14 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    /**
+     * Relationship với NotificationPreference
+     */
+    public function preference()
+    {
+        return $this->hasOne(NotificationPreference::class, 'user_id', 'user_id');
+    }
+
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
