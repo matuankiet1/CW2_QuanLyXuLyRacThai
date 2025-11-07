@@ -49,11 +49,10 @@ class SimpleNotificationController extends Controller
 
         $notifications = $query->paginate(15)->withQueryString();
 
-        $unreadCount = SimpleNotification::forUser($user->user_id)
-            ->unread()
-            ->count();
-
-        $totalCount = SimpleNotification::forUser($user->user_id)->count();
+        // Tối ưu: Tính toán stats trong một query duy nhất
+        $statsQuery = SimpleNotification::forUser($user->user_id);
+        $totalCount = (clone $statsQuery)->count();
+        $unreadCount = (clone $statsQuery)->unread()->count();
         $readCount = $totalCount - $unreadCount;
 
         $stats = [

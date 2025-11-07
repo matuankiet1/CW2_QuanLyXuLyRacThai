@@ -18,6 +18,11 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
+            
+            // Indexes for better performance
+            $table->index(['user_id', 'is_read']);
+            $table->index(['user_id', 'created_at']);
+            $table->index('created_at');
         });
     }
 
