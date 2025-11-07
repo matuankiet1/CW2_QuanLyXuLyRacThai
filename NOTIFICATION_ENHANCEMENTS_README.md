@@ -9,6 +9,7 @@ Branch này đã thêm các chức năng nâng cao cho hệ thống thông báo:
 3. ✅ Push Notifications (FCM)
 4. ✅ Notification Preferences
 5. ✅ Notification Templates
+6. ✅ Integrated Notification Service
 
 ## 🔧 Cài đặt
 
@@ -56,6 +57,16 @@ use App\Services\NotificationService;
 
 // Gửi thông báo đơn giản
 NotificationService::send($userId, 'Tiêu đề', 'Nội dung thông báo');
+
+// Gửi đến nhiều users
+$userIds = [1, 2, 3];
+NotificationService::sendToMany($userIds, 'Tiêu đề', 'Nội dung');
+
+// Đánh dấu đã đọc
+NotificationService::markAsRead($notificationId, $userId);
+
+// Đánh dấu tất cả đã đọc
+NotificationService::markAllAsRead($userId);
 ```
 
 ### 2. Email Notifications
@@ -64,7 +75,7 @@ NotificationService::send($userId, 'Tiêu đề', 'Nội dung thông báo');
 use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 
-Mail::to($user->email)->send(new NotificationMail('Tiêu đề', 'Nội dung'));
+Mail::to($user->email)->send(new NotificationMail('Tiêu đề', 'Nội dung', $user->name));
 ```
 
 ### 3. Push Notifications (FCM)
@@ -72,7 +83,11 @@ Mail::to($user->email)->send(new NotificationMail('Tiêu đề', 'Nội dung'));
 ```php
 use App\Notifications\FirebaseNotification;
 
+// Gửi push notification
 $user->notify(new FirebaseNotification('Tiêu đề', 'Nội dung'));
+
+// Với data payload
+$user->notify(new FirebaseNotification('Tiêu đề', 'Nội dung', ['key' => 'value']));
 ```
 
 ### 4. Notification Preferences
@@ -85,8 +100,20 @@ $user->preference()->updateOrCreate([], [
     'in_app' => true,
 ]);
 
+// Hoặc sử dụng helper method
+NotificationPreference::updateOrCreateForUser($userId, [
+    'email' => true,
+    'push' => false,
+    'in_app' => true,
+]);
+
 // Kiểm tra preferences
-if ($user->preference && $user->preference->email) {
+if ($user->preference && $user->preference->allowsEmail()) {
+    // Gửi email
+}
+
+// Hoặc sử dụng helper methods trong User model
+if ($user->allowsEmailNotifications()) {
     // Gửi email
 }
 ```
@@ -95,61 +122,138 @@ if ($user->preference && $user->preference->email) {
 
 ```php
 use App\Services\TemplateNotificationService;
+use App\Models\NotificationTemplate;
 
-// Sử dụng template với biến
-TemplateNotificationService::send(
-    $userId,
-    'event_reminder', // key của template
-    [
-        'username' => $user->name,
-        'event' => 'Dọn rác chủ nhật'
-    ]
-);
-```
-
-Template cần được tạo trong database:
-
-```php
+// Tạo template
 NotificationTemplate::create([
     'key' => 'event_reminder',
     'title' => 'Nhắc nhở: {{{event}}}',
     'content' => 'Xin chào {{{username}}}, sự kiện {{{event}}} sắp diễn ra!'
 ]);
+
+// Sử dụng template
+TemplateNotificationService::send(
+    $userId,
+    'event_reminder',
+    [
+        'username' => $user->name,
+        'event' => 'Dọn rác chủ nhật'
+    ]
+);
+
+// Validate variables trước khi gửi
+$missing = TemplateNotificationService::validateVariables('event_reminder', $variables);
+if (!empty($missing)) {
+    // Xử lý lỗi
+}
+```
+
+### 6. Integrated Notification Service (Khuyến nghị sử dụng)
+
+Service này tự động gửi thông báo qua tất cả các kênh (in-app + email + push) dựa trên preferences của user.
+
+```php
+use App\Services\IntegratedNotificationService;
+
+// Gửi thông báo tích hợp
+$result = IntegratedNotificationService::send(
+    $userId,
+    'Tiêu đề',
+    'Nội dung thông báo'
+);
+
+// Kiểm tra kết quả
+if ($result['success']) {
+    $results = $result['data'];
+    // $results['in_app'] - true/false
+    // $results['email'] - true/false
+    // $results['push'] - true/false
+}
+
+// Gửi đến nhiều users
+$stats = IntegratedNotificationService::sendToMany(
+    [1, 2, 3],
+    'Tiêu đề',
+    'Nội dung'
+);
+
+// Sử dụng template
+IntegratedNotificationService::sendTemplate(
+    $userId,
+    'event_reminder',
+    ['username' => $user->name, 'event' => 'Sự kiện']
+);
 ```
 
 ## 📝 Ví dụ tích hợp trong Controller
 
-### Ví dụ: Gửi thông báo khi tạo bài viết mới
+### Ví dụ 1: Gửi thông báo khi tạo bài viết mới
 
 ```php
-use App\Services\NotificationService;
-use App\Mail\NotificationMail;
-use Illuminate\Support\Facades\Mail;
+use App\Services\IntegratedNotificationService;
 
 public function store(Request $request)
 {
     // ... logic tạo bài viết ...
     
-    // Gửi thông báo đơn giản
-    NotificationService::send(
-        $adminId,
+    // Gửi thông báo tích hợp đến admin
+    $admins = User::where('role', 'admin')->pluck('user_id')->toArray();
+    
+    IntegratedNotificationService::sendToMany(
+        $admins,
         'Bài viết mới',
-        'Một bài viết mới vừa được đăng.'
+        'Một bài viết mới vừa được đăng: ' . $post->title
     );
     
-    // Gửi email (nếu user có preference email = true)
-    $admin = User::find($adminId);
-    if ($admin->preference && $admin->preference->email) {
-        Mail::to($admin->email)->send(
-            new NotificationMail('Bài viết mới', 'Một bài viết mới vừa được đăng!')
+    return redirect()->route('admin.posts.index')
+        ->with('success', 'Bài viết đã được tạo thành công!');
+}
+```
+
+### Ví dụ 2: Sử dụng template cho thông báo sự kiện
+
+```php
+use App\Services\IntegratedNotificationService;
+
+public function store(Request $request)
+{
+    // ... logic tạo sự kiện ...
+    
+    // Gửi thông báo đến tất cả users
+    $userIds = User::where('role', 'user')->pluck('user_id')->toArray();
+    
+    foreach ($userIds as $userId) {
+        $user = User::find($userId);
+        IntegratedNotificationService::sendTemplate(
+            $userId,
+            'event_created',
+            [
+                'username' => $user->name,
+                'event_title' => $event->title,
+                'event_date' => $event->event_start_date->format('d/m/Y'),
+                'event_location' => $event->location
+            ]
         );
     }
-    
-    // Gửi push notification (nếu user có preference push = true)
-    if ($admin->preference && $admin->preference->push) {
-        $admin->notify(new FirebaseNotification('Bài viết mới', 'Một bài viết mới vừa được đăng!'));
-    }
 }
+```
+
+### Ví dụ 3: Sử dụng Simple Notification với scopes
+
+```php
+use App\Models\SimpleNotification;
+
+// Lấy thông báo chưa đọc của user
+$unreadNotifications = SimpleNotification::forUser($userId)
+    ->unread()
+    ->latest()
+    ->get();
+
+// Đánh dấu đã đọc
+$notification->markAsRead();
+
+// Lấy số lượng thông báo chưa đọc
+$unreadCount = $user->unread_notifications_count;
 ```
 
 ## 🗂️ Cấu trúc Files
@@ -157,16 +261,17 @@ public function store(Request $request)
 ```
 app/
 ├── Models/
-│   ├── SimpleNotification.php
-│   ├── NotificationPreference.php
-│   └── NotificationTemplate.php
+│   ├── SimpleNotification.php          # Model cho thông báo đơn giản
+│   ├── NotificationPreference.php      # Model cho preferences
+│   └── NotificationTemplate.php        # Model cho templates
 ├── Services/
-│   ├── NotificationService.php
-│   └── TemplateNotificationService.php
+│   ├── NotificationService.php         # Service gửi thông báo đơn giản
+│   ├── TemplateNotificationService.php # Service sử dụng template
+│   └── IntegratedNotificationService.php # Service tích hợp (khuyến nghị)
 ├── Mail/
-│   └── NotificationMail.php
+│   └── NotificationMail.php            # Mail class cho email
 └── Notifications/
-    └── FirebaseNotification.php
+    └── FirebaseNotification.php        # Notification class cho FCM
 
 database/migrations/
 ├── 2025_11_07_035853_create_simple_notifications_table.php
@@ -174,8 +279,44 @@ database/migrations/
 └── 2025_11_07_040100_create_notification_templates_table.php
 
 resources/views/emails/
-└── notification.blade.php
+└── notification.blade.php              # Email template
 ```
+
+## 🎯 Features
+
+### NotificationService
+- ✅ Gửi thông báo đơn giản
+- ✅ Gửi đến nhiều users
+- ✅ Validation và error handling
+- ✅ Logging
+- ✅ Đánh dấu đã đọc
+
+### TemplateNotificationService
+- ✅ Sử dụng template với variables
+- ✅ Validate variables
+- ✅ Hỗ trợ {{key}} và {{{key}}}
+- ✅ Gửi đến nhiều users
+
+### IntegratedNotificationService
+- ✅ Tự động gửi qua tất cả kênh
+- ✅ Tự động kiểm tra preferences
+- ✅ Fallback khi một kênh fail
+- ✅ Thống kê kết quả
+- ✅ Hỗ trợ template
+
+### Models
+- ✅ Scopes (unread, read, forUser)
+- ✅ Helper methods
+- ✅ Relationships
+- ✅ Validation
+
+## ⚠️ Lưu ý
+
+- **FCM Package**: Chưa được cài đặt mặc định, cần chạy `composer require laravel-notification-channels/fcm` và uncomment code trong `FirebaseNotification.php`
+- **Migrations**: Cần chạy migrations trước khi sử dụng
+- **Mail Configuration**: Cần cấu hình mail trong `.env` để gửi email
+- **Firebase**: Cần có Firebase project và server key để sử dụng FCM
+- **Preferences**: Mặc định tất cả notifications đều được bật (email, push, in_app = true)
 
 ## 🔄 Commits
 
@@ -184,18 +325,25 @@ resources/views/emails/
 3. `feat: add push notifications (FCM) - config and notification class`
 4. `feat: add notification preferences (migration, model, user relationship)`
 5. `feat: add notification templates (migration, model, service)`
+6. `docs: add README for notification enhancements`
+7. `refactor: improve notification services and models with validation, error handling, and helper methods`
+8. `feat: add integrated notification service and improve email template`
+9. `refactor: improve FirebaseNotification with fallback and add helper methods to User model`
 
-## ⚠️ Lưu ý
+## 🚀 Best Practices
 
-- FCM package chưa được cài đặt, cần chạy `composer require laravel-notification-channels/fcm` và uncomment code trong `FirebaseNotification.php`
-- Cần chạy migrations trước khi sử dụng
-- Cần cấu hình mail trong `.env` để gửi email
-- Cần có Firebase project và server key để sử dụng FCM
+1. **Sử dụng IntegratedNotificationService**: Service này tự động xử lý tất cả các kênh và preferences
+2. **Sử dụng Templates**: Tạo templates cho các thông báo thường dùng
+3. **Validate Variables**: Luôn validate variables trước khi sử dụng template
+4. **Error Handling**: Các services đã có error handling và logging, không cần try-catch trong controller
+5. **Preferences**: Luôn tôn trọng preferences của user
 
-## 🚀 Next Steps
+## 📊 Performance
 
-- Tạo controller và routes cho Notification Preferences
-- Tạo admin panel để quản lý Notification Templates
-- Tích hợp vào các controller hiện có (PostController, EventController, etc.)
-- Tạo command/job để xử lý scheduled notifications
+- **Batch Operations**: Sử dụng `sendToMany()` cho nhiều users thay vì loop
+- **Scopes**: Sử dụng scopes để query hiệu quả hơn
+- **Lazy Loading**: Sử dụng `with()` để tránh N+1 query
 
+---
+
+*Last updated: {{ date('Y-m-d H:i:s') }}*
