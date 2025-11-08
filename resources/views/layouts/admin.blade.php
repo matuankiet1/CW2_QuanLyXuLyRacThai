@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Hệ thống quản lý xử lý rác thải - Admin')</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
@@ -18,405 +18,224 @@
             --primary-color: #10b981;
             --secondary-color: #059669;
             --accent-color: #34d399;
-            --admin-color: #dc2626;
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --bg-light: #f9fafb;
-            --border-color: #e5e7eb;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --sidebar-width: 280px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 1rem 0;
+        .sidebar {
+            width: var(--sidebar-width);
+            transition: transform 0.3s ease;
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem !important;
-            border-radius: 0.5rem;
-            margin: 0 0.25rem;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateY(-1px);
-        }
-
-        .admin-badge {
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.375rem;
-            margin-left: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-admin {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .btn-admin:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            color: white;
-        }
-
-        .card {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 4rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,100 1000,0"/></svg>');
-            background-size: cover;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-
-        .section-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            margin-bottom: 3rem;
-        }
-
-        .feature-icon {
-            width: 4rem;
-            height: 4rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .stats-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .footer {
-            background: var(--text-dark);
-            color: white;
-            padding: 3rem 0 1rem;
-            margin-top: 4rem;
-        }
-
-        .footer h5 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .footer a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: var(--accent-color);
-        }
-
-        .post-card {
-            height: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .post-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .post-image {
-            height: 200px;
-            object-fit: cover;
-            width: 100%;
-        }
-
-        .schedule-card {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .banner-slide {
-            height: 300px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .banner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
         }
 
         @media (max-width: 768px) {
-            .section-title {
-                font-size: 2rem;
+            .sidebar {
+                transform: translateX(-100%);
             }
             
-            .hero-section {
-                padding: 2rem 0;
+            .sidebar.show {
+                transform: translateX(0);
             }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Custom scrollbar for sidebar */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
     
     @stack('styles')
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('admin.home') }}">
-                <i class="fas fa-recycle me-2"></i>
-                EcoWaste Admin
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.home') }}">
-                            <i class="fas fa-home me-1"></i>Trang chủ
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('posts.home') }}">
-                            <i class="fas fa-newspaper me-1"></i>Bài viết
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.home.about') }}">
-                            <i class="fas fa-info-circle me-1"></i>Giới thiệu
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.home.contact') }}">
-                            <i class="fas fa-envelope me-1"></i>Liên hệ
-                        </a>
-                    </li>
-                </ul>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div class="px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="lg:hidden text-white p-2 mr-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <a href="{{ route('admin.home') }}" class="flex items-center text-white font-bold text-xl">
+                        <i class="fas fa-recycle mr-2"></i>
+                        <span>EcoWaste Admin</span>
+                    </a>
+                </div>
                 
-                <ul class="navbar-nav">
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link btn-admin" href="{{ route('dashboard.admin') }}">
-                                <i class="fas fa-tachometer-alt me-1"></i>Admin Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ auth()->user()->name }}
-                                <span class="admin-badge">ADMIN</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('dashboard.admin') }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">
-                                    <i class="fas fa-users me-2"></i>Quản lý người dùng
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.roles.index') }}">
-                                    <i class="fas fa-user-shield me-2"></i>Phân quyền
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        <div class="relative group">
+                            <button class="flex items-center text-white hover:bg-white/10 rounded-lg px-3 py-2 transition">
+                                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                                <span class="font-medium">{{ auth()->user()->name }}</span>
+                                <span class="ml-2 px-2 py-1 bg-green-400 rounded text-xs font-semibold">ADMIN</span>
+                                <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                <div class="py-2">
+                                    <a href="{{ route('dashboard.admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                                    </a>
+                                    <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-users mr-2"></i>Quản lý người dùng
+                                    </a>
+                                    <a href="{{ route('admin.roles.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-user-shield mr-2"></i>Phân quyền
+                                    </a>
+                                    <a href="{{ route('admin.reports.user-reports') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-flag mr-2"></i>Báo cáo
+                                    </a>
+                                    <hr class="my-2">
+                                    <form action="{{ route('logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50">
+                                            <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
-                                </li>
-                            </ul>
-                        </li>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">
-                                <i class="fas fa-user-plus me-1"></i>Đăng ký
-                            </a>
-                        </li>
+                        <a href="{{ route('login') }}" class="text-white hover:bg-white/10 rounded-lg px-4 py-2 transition">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
+                        </a>
                     @endauth
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main style="margin-top: 80px;">
-        @yield('content')
-    </main>
+    <div class="flex pt-16">
+        <!-- Sidebar -->
+        @include('layouts.partials.admin-sidebar')
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h5><i class="fas fa-recycle me-2"></i>EcoWaste Admin</h5>
-                    <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, góp phần bảo vệ môi trường và xây dựng tương lai bền vững.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        <!-- Main Content -->
+        <main class="main-content flex-1 min-h-screen">
+            <!-- Page Header -->
+            @hasSection('page-header')
+                <div class="bg-white border-b border-gray-200 px-6 py-4">
+                    @yield('page-header')
+                </div>
+            @endif
+
+            <!-- Breadcrumb -->
+            @hasSection('breadcrumb')
+                <div class="bg-gray-50 border-b border-gray-200 px-6 py-2">
+                    @yield('breadcrumb')
+                </div>
+            @endif
+
+            <!-- Content Wrapper -->
+            <div class="p-6">
+                <!-- Flash Messages -->
+                @if(session('success'))
+                    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">{{ session('success') }}</span>
+                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <span class="sr-only">Đóng</span>
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5>Liên kết</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ route('admin.home') }}">Trang chủ</a></li>
-                        <li class="mb-2"><a href="{{ route('posts.home') }}">Bài viết</a></li>
-                        <li class="mb-2"><a href="{{ route('admin.home.about') }}">Giới thiệu</a></li>
-                        <li class="mb-2"><a href="{{ route('admin.home.contact') }}">Liên hệ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Quản lý</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ route('dashboard.admin') }}">Dashboard</a></li>
-                        <li class="mb-2"><a href="{{ route('admin.users.index') }}">Người dùng</a></li>
-                        <li class="mb-2"><a href="{{ route('admin.roles.index') }}">Phân quyền</a></li>
-                        <li class="mb-2"><a href="{{ route('admin.reports.user-reports') }}">Báo cáo</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 mb-4">
-                    <h5>Liên hệ</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận XYZ, TP.HCM</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>admin@ecowaste.com</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 EcoWaste Admin. Tất cả quyền được bảo lưu.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="me-3">Chính sách bảo mật</a>
-                    <a href="#">Điều khoản sử dụng</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+                @endif
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                @if(session('error'))
+                    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">{{ session('error') }}</span>
+                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <span class="sr-only">Đóng</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('warning'))
+                    <div class="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">{{ session('warning') }}</span>
+                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <span class="sr-only">Đóng</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('info'))
+                    <div class="mb-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">{{ session('info') }}</span>
+                        <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <span class="sr-only">Đóng</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                <!-- Main Content -->
+                @yield('content')
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar?.classList.toggle('show');
+            overlay?.classList.toggle('hidden');
+        });
+
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar?.classList.remove('show');
+            overlay?.classList.add('hidden');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth <= 768 && sidebar && !sidebar.contains(event.target) && !toggle?.contains(event.target)) {
+                sidebar.classList.remove('show');
+                overlay?.classList.add('hidden');
+            }
+        });
+    </script>
     
     @stack('scripts')
 </body>

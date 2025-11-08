@@ -10,6 +10,6 @@ class EventSeeder extends Seeder
     public function run(): void
     {
         // Tạo 20 sự kiện mẫu
-        Event::factory()->count(20)->create();
+        Event::factory()->count(100)->create();
     }
 }

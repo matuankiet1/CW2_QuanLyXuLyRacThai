@@ -75,14 +75,69 @@ class PostController extends Controller
 
         // 1️⃣ Xác thực dữ liệu
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'excerpt' => 'required|string',
-            'content' => 'required|string',
-            'post_categories' => 'required|string',
-            'status' => 'required|string|in:draft,published,archived',
-            'published_at' => 'nullable|date',
-            'image' => 'nullable|string|max:255', // ảnh chọn sẵn (URL hoặc path)
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(?!\s*$).+$/', // Không cho phép toàn khoảng trắng
+            ],
+            'author' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\pL\s\-]+$/u', // Chỉ cho phép chữ cái, khoảng trắng và dấu gạch
+            ],
+            'excerpt' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^(?!\s*$).+$/',
+            ],
+            'content' => [
+                'required',
+                'string',
+                'min:20', // Tối thiểu 20 ký tự nội dung
+            ],
+            'post_categories' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[\pL\s,]+$/u', // Chỉ chữ và dấu phẩy, nếu lưu dạng text
+            ],
+            'status' => [
+                'required',
+                'string',
+                'in:draft,published,archived',
+            ],
+            'published_at' => [
+                'nullable',
+                'date',
+                'after_or_equal:today', // Ngày xuất bản phải từ hôm nay trở đi (nếu có)
+            ],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,gif,webp', // ✅ Giới hạn định dạng
+                'max:2048', // ✅ Giới hạn kích thước file (tính bằng KB, ở đây là 2MB)
+            ],
+        ], [
+            'title.required' => 'Tiêu đề không được để trống hoặc toàn khoảng trắng.',
+            'title.regex' => 'Tiêu đề không hợp lệ.',
+            'author.required' => 'Tên tác giả không được để trống.',
+            'author.regex' => 'Tên tác giả chỉ được chứa chữ cái, khoảng trắng hoặc dấu gạch.',
+            'excerpt.required' => 'Mô tả ngắn không được để trống.',
+            'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
+            'content.required' => 'Nội dung không được để trống.',
+            'content.min' => 'Nội dung phải có ít nhất 20 ký tự.',
+            'post_categories.required' => 'Danh mục bài viết không được để trống.',
+            'post_categories.regex' => 'Danh mục chỉ được chứa chữ cái và dấu phẩy.',
+            'status.required' => 'Trạng thái là bắt buộc.',
+            'status.in' => 'Trạng thái không hợp lệ.',
+            'published_at.date' => 'Ngày xuất bản không hợp lệ.',
+            'published_at.after_or_equal' => 'Ngày xuất bản không thể nhỏ hơn hôm nay.',
+            'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
+            'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
+            'image.max' => 'Ảnh không được vượt quá 2MB.',
         ]);
 
         // 2️⃣ Tạo slug tự động và xử lý trùng
@@ -96,6 +151,19 @@ class PostController extends Controller
 
         $validated['slug'] = $slug;
 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+
+            // Lưu vào public/images/posts
+            $file->move(public_path('images/posts'), $fileName);
+
+            // Lưu đường dẫn tương đối trong DB
+            $validated['image'] = 'images/posts/' . $fileName;
+        }
+
+
         // 3️⃣ Tạo bài viết
         $post = \App\Models\Post::create($validated);
 
@@ -104,6 +172,7 @@ class PostController extends Controller
             ->route('admin.posts.index')
             ->with('success', 'Bài viết đã được thêm thành công!');
     }
+
 
     /**
      * Hiển thị form chỉnh sửa bài viết
