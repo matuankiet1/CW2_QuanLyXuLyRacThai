@@ -68,7 +68,7 @@
             <div class="mb-3">
                 <label class="block text-sm font-medium mb-1">Trạng thái</label>
                 <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã phát hành</option>
+                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã xuất bản</option>
                     <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Lưu trữ</option>
                     <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Nháp</option>
                 </select>
