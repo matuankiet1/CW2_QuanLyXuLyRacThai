@@ -60,31 +60,35 @@
                     @endif
                 </div>
             </div>
-
-
             <div>
                 <label class="block mb-1 font-medium">Ngày xuất bản</label>
                 <input type="date" name="published_at" value="{{ old('published_at') }}"
                     class="w-full border p-2 rounded" />
             </div>
-    </div>
-    <p class="mt-2 text-sm text-gray-500">Trạng thái hiện tại:
-        <strong id="debug-status"></strong>
-    </p>
-
-    <script>
-        document.addEventListener('change', function (e) {
-            if (e.target.name === 'status') {
-                document.getElementById('debug-status').textContent = e.target.value;
-            }
-        });
-    </script>
-    <div class="flex justify-end gap-3 mt-6">
-        <a href="{{ route('admin.posts.index') }}" class="bg-gray-200 px-4 py-2 rounded">Hủy</a>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
-            Thêm bài viết
-        </button>
-    </div>
-    </form>
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">Trạng thái</label>
+                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã phát hành</option>
+                    <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Lưu trữ</option>
+                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Nháp</option>
+                </select>
+            </div>
+            <p class="mt-2 text-sm text-gray-500">Trạng thái hiện tại:
+                <strong id="debug-status"></strong>
+            </p>
+            <script>
+                document.addEventListener('change', function (e) {
+                    if (e.target.name === 'status') {
+                        document.getElementById('debug-status').textContent = e.target.value;
+                    }
+                });
+            </script>
+            <div class="flex justify-end gap-3 mt-6">
+                <a href="{{ route('admin.posts.index') }}" class="bg-gray-200 px-4 py-2 rounded">Hủy</a>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                    Thêm bài viết
+                </button>
+            </div>
+        </form>
     </div>
 @endsection
