@@ -153,10 +153,16 @@ class PostController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $fileName = time() . '-' . $file->getClientOriginalName();
-            $path = $file->storeAs('public/posts', $fileName);
-            $validated['image'] = str_replace('public/', 'storage/', $path); // Đổi đường dẫn để public hiển thị
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+
+            // Lưu vào public/images/posts
+            $file->move(public_path('images/posts'), $fileName);
+
+            // Lưu đường dẫn tương đối trong DB
+            $validated['image'] = 'images/posts/' . $fileName;
         }
+
 
         // 3️⃣ Tạo bài viết
         $post = \App\Models\Post::create($validated);
