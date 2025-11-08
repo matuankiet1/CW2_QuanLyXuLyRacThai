@@ -6,211 +6,50 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Hệ thống quản lý xử lý rác thải - Admin')</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(["resources/css/admin.css","resources/js/admin.js"])
     
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10b981',
+                        secondary: '#059669',
+                        accent: '#34d399',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
         :root {
             --primary-color: #10b981;
             --secondary-color: #059669;
             --accent-color: #34d399;
-            --admin-color: #dc2626;
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --bg-light: #f9fafb;
-            --border-color: #e5e7eb;
             --sidebar-width: 280px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 1rem 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1030;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem !important;
-            border-radius: 0.5rem;
-            margin: 0 0.25rem;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateY(-1px);
-        }
-
-        .admin-badge {
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.375rem;
-            margin-left: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-admin {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .btn-admin:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            color: white;
-        }
-
-        /* Sidebar Styles */
         .sidebar {
-            position: fixed;
-            top: 80px;
-            left: 0;
             width: var(--sidebar-width);
-            height: calc(100vh - 80px);
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            border-right: 1px solid var(--border-color);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            z-index: 1020;
-            overflow-y: auto;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        .sidebar-header h5 {
-            margin: 0;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .sidebar-header p {
-            margin: 0.25rem 0 0 0;
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-
-        .sidebar-menu {
-            padding: 1rem 0;
-        }
-
-        .menu-item {
-            margin: 0.25rem 0;
-        }
-
-        .menu-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .menu-link:hover {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--primary-color);
-            border-left-color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .menu-link.active {
-            background-color: rgba(16, 185, 129, 0.15);
-            color: var(--primary-color);
-            border-left-color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .menu-link i {
-            width: 20px;
-            margin-right: 0.75rem;
-            text-align: center;
-        }
-
-        .menu-section {
-            margin: 1.5rem 0 0.5rem 0;
-            padding: 0 1.5rem;
-        }
-
-        .menu-section-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
-            margin-top: 80px;
-            min-height: calc(100vh - 80px);
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
         }
 
-        .content-wrapper {
-            padding: 2rem;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -225,217 +64,315 @@
             }
         }
 
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 4rem 0;
-            margin-bottom: 2rem;
+        /* Custom scrollbar for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            color: white;
-            font-size: 1.5rem;
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
 
-        .section-title {
-            color: var(--text-dark);
-            font-weight: 700;
-            margin-bottom: 2rem;
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
         }
 
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Button styles */
+        .btn-admin {
+            @apply px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg;
+        }
+
+        .btn-primary {
+            @apply px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200;
+        }
+
+        .btn-secondary {
+            @apply px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-all duration-200;
+        }
+
+        .btn-danger {
+            @apply px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-all duration-200;
+        }
+
+        /* Card styles */
         .card {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
+            @apply bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        .card-header {
+            @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+        }
+
+        .card-body {
+            @apply px-6 py-4;
+        }
+
+        /* Table styles */
+        .table {
+            @apply w-full border-collapse;
+        }
+
+        .table thead {
+            @apply bg-gray-50;
+        }
+
+        .table th {
+            @apply px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200;
+        }
+
+        .table td {
+            @apply px-4 py-3 text-sm text-gray-900 border-b border-gray-200;
+        }
+
+        .table tbody tr:hover {
+            @apply bg-gray-50;
+        }
+
+        /* Form styles */
+        .form-control {
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500;
+        }
+
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+
+        /* Alert styles */
+        .alert {
+            @apply px-4 py-3 rounded-lg mb-4 border;
+        }
+
+        .alert-success {
+            @apply bg-green-100 border-green-400 text-green-700;
+        }
+
+        .alert-danger {
+            @apply bg-red-100 border-red-400 text-red-700;
+        }
+
+        .alert-warning {
+            @apply bg-yellow-100 border-yellow-400 text-yellow-700;
+        }
+
+        .alert-info {
+            @apply bg-blue-100 border-blue-400 text-blue-700;
+        }
+
+        /* Badge styles */
+        .badge {
+            @apply px-2 py-1 text-xs font-semibold rounded;
+        }
+
+        .badge-success {
+            @apply bg-green-500 text-white;
+        }
+
+        .badge-danger {
+            @apply bg-red-500 text-white;
+        }
+
+        .badge-warning {
+            @apply bg-yellow-500 text-white;
+        }
+
+        .badge-info {
+            @apply bg-blue-500 text-white;
+        }
+
+        .badge-primary {
+            @apply bg-green-500 text-white;
+        }
+
+        /* Breadcrumb styles */
+        .breadcrumb {
+            @apply flex items-center space-x-2 text-sm text-gray-600;
+        }
+
+        .breadcrumb-item {
+            @apply flex items-center;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            @apply mx-2 text-gray-400;
+        }
+
+        .breadcrumb-item.active {
+            @apply text-gray-900 font-semibold;
         }
     </style>
     
     @stack('styles')
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('admin.home') }}">
-                <i class="fas fa-recycle me-2"></i>
-                EcoWaste Admin
-            </a>
-            
-            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div class="px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="lg:hidden text-white p-2 mr-2 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <a href="{{ route('admin.home') }}" class="flex items-center text-white font-bold text-xl hover:text-white/90 transition">
+                        <i class="fas fa-recycle mr-2"></i>
+                        <span>EcoWaste Admin</span>
+                    </a>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
                     @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ auth()->user()->name }}
-                                <span class="admin-badge">ADMIN</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ route('dashboard.admin') }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">
-                                    <i class="fas fa-users me-2"></i>Quản lý người dùng
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.roles.index') }}">
-                                    <i class="fas fa-user-shield me-2"></i>Phân quyền
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.reports.user-reports') }}">
-                                    <i class="fas fa-flag me-2"></i>Báo cáo
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        <div class="relative group">
+                            <button class="flex items-center text-white hover:bg-white/10 rounded-lg px-3 py-2 transition">
+                                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                                <span class="font-medium">{{ auth()->user()->name }}</span>
+                                <span class="ml-2 px-2 py-1 bg-green-400 rounded text-xs font-semibold">ADMIN</span>
+                                <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="py-2">
+                                    <a href="{{ route('dashboard.admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                                    </a>
+                                    <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                        <i class="fas fa-users mr-2"></i>Quản lý người dùng
+                                    </a>
+                                    <a href="{{ route('admin.roles.index') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                        <i class="fas fa-user-shield mr-2"></i>Phân quyền
+                                    </a>
+                                    <a href="{{ route('admin.reports.user-reports') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                        <i class="fas fa-flag mr-2"></i>Báo cáo
+                                    </a>
+                                    <hr class="my-2 border-gray-200">
+                                    <form action="{{ route('logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition">
+                                            <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
-                                </li>
-                            </ul>
-                        </li>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">
-                                <i class="fas fa-user-plus me-1"></i>Đăng ký
-                            </a>
-                        </li>
+                        <a href="{{ route('login') }}" class="text-white hover:bg-white/10 rounded-lg px-4 py-2 transition">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
+                        </a>
                     @endauth
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h5><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</h5>
-            <p>Quản lý hệ thống</p>
-        </div>
-        
-        <nav class="sidebar-menu">
-            <div class="menu-section">
-                <div class="menu-section-title">Tổng quan</div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.home') }}" class="menu-link {{ request()->routeIs('admin.home') ? 'active' : '' }}">
-                        <i class="fas fa-home"></i>
-                        <span>Trang chủ</span>
-                    </a>
+    <div class="flex pt-16">
+        <!-- Sidebar -->
+        @include('layouts.partials.admin-sidebar')
+
+        <!-- Main Content -->
+        <main class="main-content flex-1 min-h-screen">
+            <!-- Page Header -->
+            @hasSection('page-header')
+                <div class="bg-white border-b border-gray-200 px-6 py-4">
+                    @yield('page-header')
                 </div>
-                <div class="menu-item">
-                    <a href="{{ route('dashboard.admin') }}" class="menu-link {{ request()->routeIs('dashboard.admin') ? 'active' : '' }}">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
+            @endif
+
+            <!-- Breadcrumb -->
+            @hasSection('breadcrumb')
+                <div class="bg-gray-50 border-b border-gray-200 px-6 py-2">
+                    <nav class="breadcrumb">
+                        @yield('breadcrumb')
+                    </nav>
                 </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.notifications.index') }}" class="menu-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
-                        <i class="fas fa-bell"></i>
-                        <span>Thông báo</span>
-                    </a>
-                </div>
+            @endif
+
+            <!-- Content Wrapper -->
+            <div class="p-6">
+                <!-- Flash Messages -->
+                @if(session('success'))
+                    <div class="alert alert-success relative" role="alert">
+                        <span>{{ session('success') }}</span>
+                        <button type="button" class="absolute top-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger relative" role="alert">
+                        <span>{{ session('error') }}</span>
+                        <button type="button" class="absolute top-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('warning'))
+                    <div class="alert alert-warning relative" role="alert">
+                        <span>{{ session('warning') }}</span>
+                        <button type="button" class="absolute top-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('info'))
+                    <div class="alert alert-info relative" role="alert">
+                        <span>{{ session('info') }}</span>
+                        <button type="button" class="absolute top-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                <!-- Main Content -->
+                @yield('content')
             </div>
+        </main>
+    </div>
 
-            <div class="menu-section">
-                <div class="menu-section-title">Quản lý</div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.users.index') }}" class="menu-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        <i class="fas fa-users"></i>
-                        <span>Người dùng</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.posts.index') }}" class="menu-link {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
-                        <i class="fas fa-newspaper"></i>
-                        <span>Bài viết</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.collection-schedules.index') }}" class="menu-link {{ request()->routeIs('admin.collection-schedules.*') ? 'active' : '' }}">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Lịch thu gom</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.events.index') }}" class="menu-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Sự kiện</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.banners.index') }}" class="menu-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
-                        <i class="fas fa-image"></i>
-                        <span>Banner</span>
-                    </a>
-                </div>
-            </div>
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 
-            <div class="menu-section">
-                <div class="menu-section-title">Báo cáo & Phân quyền</div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.reports.user-reports') }}" class="menu-link {{ request()->routeIs('admin.reports.user-reports*') ? 'active' : '' }}">
-                        <i class="fas fa-flag"></i>
-                        <span>Báo cáo người dùng</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.roles.index') }}" class="menu-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Phân quyền</span>
-                    </a>
-                </div>
-            </div>
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar?.classList.toggle('show');
+            overlay?.classList.toggle('hidden');
+        });
 
-            <div class="menu-section">
-                <div class="menu-section-title">Hỗ trợ</div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.home.about') }}" class="menu-link {{ request()->routeIs('admin.home.about') ? 'active' : '' }}">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Giới thiệu</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('admin.home.contact') }}" class="menu-link {{ request()->routeIs('admin.home.contact') ? 'active' : '' }}">
-                        <i class="fas fa-envelope"></i>
-                        <span>Liên hệ</span>
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </aside>
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar?.classList.remove('show');
+            overlay?.classList.add('hidden');
+        });
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="content-wrapper">
-            @yield('content')
-        </div>
-    </main>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth <= 768 && sidebar && !sidebar.contains(event.target) && !toggle?.contains(event.target)) {
+                sidebar.classList.remove('show');
+                overlay?.classList.add('hidden');
+            }
+        });
+    </script>
     
     @stack('scripts')
 </body>
