@@ -1,0 +1,19 @@
+[33m40d187b[m	refs/heads/main feat(notifications): create user notification views (list and detail pages)
+[33md066ecb[m	refs/remotes/origin/Post_Home[33m ([m[1;31morigin/Post_Home[m[33m)[m update view PostHome
+[33m277b1ab[m	refs/remotes/origin/hieu/crud-banner hoan thien tat ca chuc nang crud banner
+[33m289a214[m	refs/heads/main feat(admin-ui): add Vite-managed admin.css and admin.js; include in admin-with-sidebar
+[33m0b73812[m	refs/remotes/origin/feature/sidebar-user-reports[33m ([m[1;31morigin/feature/sidebar-user-reports[m[33m)[m feat: Add sidebar layout for admin pages and update user reports page
+[33mca5f006[m	refs/heads/trang_chu_admin feat: create admin homepage with dashboard integration
+[33mb85a79f[m	refs/heads/them_trang-chu_user[33m ([m[1;31morigin/them_trang-chu_user[m[33m, [m[1;32mthem_trang-chu_user[m[33m)[m feat: implement comprehensive user home page system
+[33m1ad7a07[m	refs/remotes/origin/baiviet post update
+[33m24ef485[m	refs/remotes/origin/LeTam/3-Create_Collection_Schedule Add "3-Create_Collection_Schedule" branch
+[33m77bebd6[m	refs/remotes/origin/dashboard dashboard update
+[33ma2b0110[m	refs/remotes/origin/LeTam/2-Login_with_Google Update UI/UX
+[33m801a3c1[m	refs/remotes/origin/LeTam/2-Login_with_Google Commit Login with Google function and edit Forgot password function
+[33m36cf12d[m	refs/remotes/origin/baiviet update
+[33m90483a1[m	refs/remotes/origin/LeTam/forgot_password Re-add files after .gitignore update
+[33m01eca44[m	refs/remotes/origin/hieu/crud-banner crud banner
+[33mb4e109a[m	refs/remotes/origin/baiviet post UI
+[33md0c09aa[m	refs/remotes/origin/LeTam/8-Delete_All_Collection_Schedule commit
+[33m001dd63[m	refs/remotes/origin/dangnhap dangnhap UI
+[33m756de5c[m	refs/remotes/origin/dangnhap commit
