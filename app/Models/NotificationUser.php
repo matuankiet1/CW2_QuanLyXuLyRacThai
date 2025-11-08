@@ -2,22 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Carbon\Carbon;
 
-class NotificationUser extends Model
+class NotificationUser extends Pivot
 {
-    use HasFactory;
-
     protected $table = 'notification_user';
-    protected $primaryKey = 'notification_user_id';
-
-    protected $fillable = [
-        'notification_id',
-        'user_id',
-        'read_at',
-    ];
 
     protected $casts = [
         'read_at' => 'datetime',
@@ -26,23 +16,7 @@ class NotificationUser extends Model
     ];
 
     /**
-     * Relationship với Notification
-     */
-    public function notification(): BelongsTo
-    {
-        return $this->belongsTo(Notification::class, 'notification_id', 'notification_id');
-    }
-
-    /**
-     * Relationship với User
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
-    }
-
-    /**
-     * Kiểm tra đã đọc chưa
+     * Kiểm tra thông báo đã được đọc chưa
      */
     public function isRead(): bool
     {
@@ -50,10 +24,13 @@ class NotificationUser extends Model
     }
 
     /**
-     * Đánh dấu đã đọc
+     * Đánh dấu thông báo đã đọc
      */
     public function markAsRead(): void
     {
-        $this->update(['read_at' => now()]);
+        if (!$this->isRead()) {
+            $this->read_at = Carbon::now();
+            $this->save();
+        }
     }
 }
