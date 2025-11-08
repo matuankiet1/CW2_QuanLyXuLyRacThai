@@ -88,7 +88,7 @@
                                             <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-500 text-white">Lưu trữ</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right">{{ number_format($post->views) }}</td>
+                                    <td class="px-4 py-3 text-right">{{ number_format($post->post_views) }}</td>
                                     <td class="px-4 py-3 text-right">
                                         <div class="flex gap-2 text-sm justify-end">
                                             {{-- Nút Sửa --}}
