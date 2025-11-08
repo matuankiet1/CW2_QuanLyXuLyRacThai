@@ -9,7 +9,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SimpleNotificationController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function($id) {
@@ -44,8 +48,6 @@ Route::post('logout', function () {
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
-// Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-
 // Login, register bằng social (Google, Facebook)
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
 Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
@@ -77,6 +79,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
     Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
 });
+
+// Waste Logs
+Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class, 'aiSuggestWasteClassifier'])
+    ->middleware('throttle:30,1')->name('waste.ai-suggest'); // rate limit nhẹ
+Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
+    ->name('waste-logs.get-by-collection-schedules');
+Route::resource('waste-logs', WasteLogController::class);
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
@@ -150,4 +159,30 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::get('/export', [EventController::class, 'export'])->name('export');
     });
 
+
+    // Notifications (Admin)
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('admin.notifications.store');
+    Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('admin.notifications.show');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::get('/notifications/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('admin.notifications.download');
+
+});
+
+//--------------------------------------- USER NOTIFICATIONS (Sinh viên) -------------------------------------//
+Route::middleware('auth')->group(function () {
+    Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
+    Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
+    Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
+    
+    // Simple Notifications
+    Route::get('/simple-notifications', [SimpleNotificationController::class, 'index'])->name('user.simple-notifications.index');
+    Route::get('/simple-notifications/{id}', [SimpleNotificationController::class, 'show'])->name('user.simple-notifications.show');
+    Route::post('/simple-notifications/{id}/mark-read', [SimpleNotificationController::class, 'markAsRead'])->name('user.simple-notifications.mark-read');
+    Route::post('/simple-notifications/mark-all-read', [SimpleNotificationController::class, 'markAllAsRead'])->name('user.simple-notifications.mark-all-read');
+    
+    // Notification Preferences
+    Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
+    Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');
 });

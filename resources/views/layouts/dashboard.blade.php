@@ -36,6 +36,7 @@
                         ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
                         ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                         ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
+                        ['id' => 'waste-logs', 'label' => 'Báo cáo thu gom rác', 'route' => 'waste-logs.index'],
                         ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
                         ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                         ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
@@ -93,7 +94,7 @@
                 </nav>
 
                 {{-- User profile --}}
-                <div class="p-4 border-t border-gray-200">
+                {{-- <div class="p-4 border-t border-gray-200">
                     <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
                         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -110,7 +111,7 @@
                             </button>
                         </form>
                     </div>
-                </div>
+                </div> --}}
             </aside>
 
             <div class="flex-1 flex flex-col overflow-hidden">
@@ -123,8 +124,8 @@
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <p class="text-sm text-gray-900 flex items-center">{{ auth()->user()->name }}</p>
-                            <button
-                                class="btn-user-dropdown hover:bg-gray-50 focus:outline-none rounded-2xl p-1 cursor-pointer">
+                            <button type="button"
+                                class="btn-user-dropdown hover:bg-gray-100 focus:outline-none rounded-2xl p-1 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
                                     color="#ffffff" fill="none">
                                     <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke="#141B34"
@@ -181,5 +182,5 @@
 
         {{-- Include Chart.js --}}
         @vite(['resources/js/dashboard.js'])
-        @vite(['resources/js/offcanvas.js'])
+        
     @endsection
