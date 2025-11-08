@@ -1,6 +1,6 @@
-@extends('layouts.admin-with-sidebar')
+@extends('layouts.dashboard')
 
-@section('content')
+@section('main-content')
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
