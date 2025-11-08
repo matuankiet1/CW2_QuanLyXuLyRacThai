@@ -351,6 +351,12 @@
                         <span>Dashboard</span>
                     </a>
                 </div>
+                <div class="menu-item">
+                    <a href="{{ route('admin.notifications.index') }}" class="menu-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                        <i class="fas fa-bell"></i>
+                        <span>Thông báo</span>
+                    </a>
+                </div>
             </div>
 
             <div class="menu-section">
@@ -380,7 +386,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="{{ route('banners.index') }}" class="menu-link {{ request()->routeIs('banners.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.banners.index') }}" class="menu-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                         <i class="fas fa-image"></i>
                         <span>Banner</span>
                     </a>

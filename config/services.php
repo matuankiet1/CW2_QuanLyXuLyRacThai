@@ -47,4 +47,8 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT'),
     ],
 
+    'fcm' => [
+        'key' => env('FCM_SERVER_KEY'),
+    ],
+
 ];

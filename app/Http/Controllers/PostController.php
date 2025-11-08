@@ -57,7 +57,12 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create');
+        $images = collect(\File::files(public_path('images/posts')))
+            ->map(function ($file) {
+                return 'images/posts/' . $file->getFilename();
+            });
+
+        return view('admin.posts.create', compact('images'));
     }
 
     /**
@@ -65,36 +70,40 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            // Ghi log để debug (nếu cần)
-            Log::info("Đang xử lý thêm bài viết", $request->all());
+        // Ghi log để kiểm tra dữ liệu form gửi lên
+        \Log::info('store() đang chạy', $request->all());
 
-            // Validate dữ liệu
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'excerpt' => 'required|string',
-                'content' => 'required|string',
-                'post_categories' => 'required|string',
-                'image' => 'nullable|string|max:255',
-                'author' => 'required|string|max:255',
-                'status' => 'required|in:draft,published,archived',
-                'published_at' => 'nullable|date',
-            ]);
+        // 1️⃣ Xác thực dữ liệu
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'excerpt' => 'required|string',
+            'content' => 'required|string',
+            'post_categories' => 'required|string',
+            'status' => 'required|string|in:draft,published,archived',
+            'published_at' => 'nullable|date',
+            'image' => 'nullable|string|max:255', // ảnh chọn sẵn (URL hoặc path)
+        ]);
 
-            // Tạo bài viết
-            $post = Post::create($validated);
+        // 2️⃣ Tạo slug tự động và xử lý trùng
+        $slug = \Str::slug($validated['title']);
+        $originalSlug = $slug;
+        $count = 1;
 
-            return redirect()
-                ->route('admin.posts.index')
-                ->with('success', 'Thêm bài viết thành công!');
-        } catch (\Exception $e) {
-            Log::error("Lỗi khi thêm bài viết: " . $e->getMessage());
-            return back()->withErrors(['error' => 'Không thể thêm bài viết.'])->withInput();
+        while (\App\Models\Post::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count++;
         }
 
+        $validated['slug'] = $slug;
+
+        // 3️⃣ Tạo bài viết
+        $post = \App\Models\Post::create($validated);
+
+        // 4️⃣ Chuyển hướng về danh sách + thông báo
+        return redirect()
+            ->route('admin.posts.index')
+            ->with('success', 'Bài viết đã được thêm thành công!');
     }
-
-
 
     /**
      * Hiển thị form chỉnh sửa bài viết
