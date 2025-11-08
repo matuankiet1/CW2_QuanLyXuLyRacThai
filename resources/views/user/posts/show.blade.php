@@ -9,7 +9,7 @@
         </p>
 
         @if ($post->image)
-            <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="img-fluid rounded mb-4">
+            <img src="{{ asset( $post->image) }}" alt="{{ $post->title }}" class="img-fluid rounded mb-4">
         @endif
 
         <div class="mb-5" style="white-space: pre-line;">
