@@ -49,6 +49,7 @@ class Notification extends Model
     public function recipients(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'notification_user', 'notification_id', 'user_id')
+                    ->using(NotificationUser::class)
                     ->withPivot('read_at')
                     ->withTimestamps();
     }
