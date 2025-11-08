@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin-with-sidebar')
 
 @section('content')
     <div class="max-w-3xl mx-auto bg-white shadow p-6 rounded-lg">
@@ -35,49 +35,56 @@
                     <option value="Tin tức" {{ old('post_categories') == 'Tin tức' ? 'selected' : '' }}>Tin tức</option>
                     <option value="Kiến thức" {{ old('post_categories') == 'Kiến thức' ? 'selected' : '' }}>Kiến thức
                     </option>
-                    <option value="Tuyên truyền" {{ old('post_categories') == 'Tuyên truyền' ? 'selected' : '' }}>Tuyên truyền</option>
+                    <option value="Tuyên truyền" {{ old('post_categories') == 'Tuyên truyền' ? 'selected' : '' }}>Tuyên truyền
+                    </option>
                 </select>
             </div>
 
             <div class="mt-4">
-                <label class="block mb-1 font-medium">Ảnh đại diện (URL)</label>
-                <input name="image" value="{{ old('image') }}" class="w-full border p-2 rounded" />
-            </div>
+                <label class="block mb-1 font-medium">Ảnh đại diện *</label>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                    <label class="block mb-1 font-medium">Trạng thái *</label>
-                    <select name="status" required class="w-full border p-2 rounded">
-                        <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Nháp</option>
-                        <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Đã xuất bản</option>
-                        <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Lưu trữ</option>
-                    </select>
-                </div>
+                {{-- Dropdown chọn ảnh --}}
+                <select name="image" id="imageSelect" class="w-full border p-2 rounded">
+                    <option value="">-- Chọn ảnh có sẵn --</option>
+                    @foreach ($images as $img)
+                        <option value="{{ $img }}" {{ old('image') == $img ? 'selected' : '' }}>
+                            {{ basename($img) }}
+                        </option>
+                    @endforeach
+                </select>
 
-
-                <div>
-                    <label class="block mb-1 font-medium">Ngày xuất bản</label>
-                    <input type="date" name="published_at" value="{{ old('published_at') }}"
-                        class="w-full border p-2 rounded" />
+                {{-- Hiển thị ảnh preview --}}
+                <div id="imagePreview" class="mt-3">
+                    @if (old('image'))
+                        <img src="{{ asset(old('image')) }}" class="w-40 rounded shadow">
+                    @endif
                 </div>
             </div>
-            <p class="mt-2 text-sm text-gray-500">Trạng thái hiện tại:
-                <strong id="debug-status"></strong>
-            </p>
 
-            <script>
-                document.addEventListener('change', function (e) {
-                    if (e.target.name === 'status') {
-                        document.getElementById('debug-status').textContent = e.target.value;
-                    }
-                });
-            </script>
-            <div class="flex justify-end gap-3 mt-6">
-                <a href="{{ route('admin.posts.index') }}" class="bg-gray-200 px-4 py-2 rounded">Hủy</a>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
-                    Thêm bài viết
-                </button>
+
+            <div>
+                <label class="block mb-1 font-medium">Ngày xuất bản</label>
+                <input type="date" name="published_at" value="{{ old('published_at') }}"
+                    class="w-full border p-2 rounded" />
             </div>
-        </form>
+    </div>
+    <p class="mt-2 text-sm text-gray-500">Trạng thái hiện tại:
+        <strong id="debug-status"></strong>
+    </p>
+
+    <script>
+        document.addEventListener('change', function (e) {
+            if (e.target.name === 'status') {
+                document.getElementById('debug-status').textContent = e.target.value;
+            }
+        });
+    </script>
+    <div class="flex justify-end gap-3 mt-6">
+        <a href="{{ route('admin.posts.index') }}" class="bg-gray-200 px-4 py-2 rounded">Hủy</a>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+            Thêm bài viết
+        </button>
+    </div>
+    </form>
     </div>
 @endsection
