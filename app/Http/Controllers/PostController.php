@@ -85,7 +85,7 @@ class PostController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\pL\s\-]+$/u', // Chỉ cho phép chữ cái, khoảng trắng và dấu gạch
+                'regex:/^[\pL\s\.]+$/u', // Chỉ cho phép chữ cái, khoảng trắng và dấu gạch
             ],
             'excerpt' => [
                 'required',
@@ -124,7 +124,7 @@ class PostController extends Controller
             'title.required' => 'Tiêu đề không được để trống hoặc toàn khoảng trắng.',
             'title.regex' => 'Tiêu đề không hợp lệ.',
             'author.required' => 'Tên tác giả không được để trống.',
-            'author.regex' => 'Tên tác giả chỉ được chứa chữ cái, khoảng trắng hoặc dấu gạch.',
+            'author.regex' => 'Tên tác giả chỉ được chứa chữ cái, khoảng trắng hoặc dấu chấm.',
             'excerpt.required' => 'Mô tả ngắn không được để trống.',
             'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
             'content.required' => 'Nội dung không được để trống.',
