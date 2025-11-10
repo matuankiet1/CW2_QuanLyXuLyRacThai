@@ -73,7 +73,7 @@ class EventController extends Controller
             $file->move(public_path('images/events'), $fileName);
 
             // Lưu đường dẫn tương đối trong DB
-            $validated['image'] = 'images/events/' . $fileName;
+            $data['image'] = 'images/events/' . $fileName;
         }
 
         Event::create($data);
