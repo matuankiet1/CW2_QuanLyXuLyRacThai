@@ -14,23 +14,51 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $status = $request->input('status');
+        $statusFilter = $request->input('status', 'all');
 
         $query = Event::query();
 
+        // 🔍 Filter theo từ khóa
         if ($search) {
-            $query->where('title', 'like', "%$search%")
-                ->orWhere('location', 'like', "%$search%");
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('location', 'like', "%$search%");
+            });
         }
 
-        if ($status && $status !== 'all') {
-            $query->where('status', $status);
+        $today = Carbon::today();
+
+        // ⚡ Filter theo dynamic status
+        if ($statusFilter && $statusFilter !== 'all') {
+            $query->where(function ($q) use ($statusFilter, $today) {
+                switch ($statusFilter) {
+                    case 'Kết thúc':
+                        $q->whereDate('event_end_date', '<', $today);
+                        break;
+                    case 'Đang diễn ra':
+                        $q->whereDate('event_start_date', '<=', $today)
+                            ->whereDate('event_end_date', '>=', $today);
+                        break;
+                    case 'Đang đăng ký':
+                        $q->whereDate('register_end_date', '>=', $today)
+                            ->whereDate('event_start_date', '>', $today);
+                        break;
+                    case 'Hết đăng ký':
+                        $q->whereDate('register_end_date', '<', $today)
+                            ->whereDate('event_start_date', '>', $today);
+                        break;
+                    case 'Sắp diễn ra':
+                        $q->whereDate('event_start_date', '>', $today);
+                        break;
+                }
+            });
         }
 
         $events = $query->orderBy('id', 'asc')->paginate(10);
 
-        return view('admin.events.index', compact('events', 'search'));
+        return view('admin.events.index', compact('events', 'search', 'statusFilter'));
     }
+
 
     public function create()
     {
