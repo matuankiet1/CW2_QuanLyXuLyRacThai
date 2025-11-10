@@ -1,181 +1,392 @@
-@extends('layouts.app') {{-- Hoặc bỏ dòng này nếu bạn không có layout chính --}}
+@extends('layouts.admin-with-sidebar')
+
+@section('title', 'Dashboard - Admin')
 
 @section('content')
-    <div class="flex h-screen bg-gray-100">
-
-        {{-- Sidebar --}}
-        <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200">
-            {{-- Logo --}}
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-gray-900 font-bold">EcoSchool</h2>
-                        <p class="text-xs text-gray-500">Quản lý rác thải</p>
-                    </div>
-                </div>
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p class="text-gray-500 mt-1">Tổng quan hệ thống quản lý xử lý rác thải</p>
             </div>
-
-            {{-- Menu --}}
-            @php
-                $menuItems = [
-                    ['id' => 'home', 'label' => 'Trang chủ'],
-                    ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
-                    ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
-                    ['id' => 'schedules', 'label' => 'Quản lý lịch thu gom', 'route' => 'admin.collection-schedules.index'],
-                    ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
-                    ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
-                    ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
-                    ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                    ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
-                    ['id' => 'notifications', 'label' => 'Gửi thông báo'],
-                    ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
-                    ['id' => 'finance', 'label' => 'Quản lý tài chính'],
-                    ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
-                    ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
-                ];
-                $currentPage = request()->route() ? request()->route()->getName() : '';
-            @endphp
-
-            <nav class="flex-1 p-4 overflow-y-auto">
-                <ul class="space-y-1">
-                    @foreach ($menuItems as $item)
-                        @if (isset($item['route']))
-                            <a href="{{ route($item['route']) }}"
-                                class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors
-                              {{ $currentPage == $item['route'] ? 'bg-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                                <span class="text-sm">{{ $item['label'] }}</span>
-                            </a>
-                        @else
-                            <span class="flex items-center gap-3 px-4 py-2.5 text-gray-400 cursor-not-allowed">
-                                {{ $item['label'] }}
-                            </span>
-                        @endif
-                    @endforeach
-
-                </ul>
-            </nav>
-
-            {{-- User profile --}}
-            <div class="p-4 border-t border-gray-200">
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-                    <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
-                    </div>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200" title="Đăng xuất">
-                            ⏻
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </aside>
-
-        {{-- Main Content --}}
-        <div class="flex-1 flex flex-col overflow-hidden">
-            {{-- Header --}}
-            <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
-                <button class="px-3 py-1 border rounded hover:bg-gray-100">Thông báo</button>
-            </header>
-
-            {{-- Content --}}
-            <main class="flex-1 overflow-y-auto bg-gray-100">
-                @yield('content')
-                
-                @section('dashboard-content')
-                {{-- Overview Cards --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="p-6 border-l-4 border-green-500 bg-white rounded-lg shadow">
-                        <p class="text-sm text-gray-500 mb-1">Tổng rác thu gom tháng này</p>
-                        <h3 class="text-2xl font-semibold text-gray-900">534 kg</h3>
-                        <p class="text-xs text-green-600 mt-2">↑ 8.3% so với tháng trước</p>
-                    </div>
-                    <div class="p-6 border-l-4 border-emerald-500 bg-white rounded-lg shadow">
-                        <p class="text-sm text-gray-500 mb-1">Sinh viên tham gia</p>
-                        <h3 class="text-2xl font-semibold text-gray-900">167</h3>
-                        <p class="text-xs text-green-600 mt-2">↑ 12.8% so với tháng trước</p>
-                    </div>
-                    <div class="p-6 border-l-4 border-teal-500 bg-white rounded-lg shadow">
-                        <p class="text-sm text-gray-500 mb-1">Sự kiện trong tháng</p>
-                        <h3 class="text-2xl font-semibold text-gray-900">8</h3>
-                        <p class="text-xs text-green-600 mt-2">↑ 2 sự kiện mới</p>
-                    </div>
-                    <div class="p-6 border-l-4 border-cyan-500 bg-white rounded-lg shadow">
-                        <p class="text-sm text-gray-500 mb-1">Điểm thưởng phát ra</p>
-                        <h3 class="text-2xl font-semibold text-gray-900">2,850</h3>
-                        <p class="text-xs text-green-600 mt-2">↑ 15.4% so với tháng trước</p>
-                    </div>
-                </div>
-
-                {{-- Charts --}}
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <h3 class="mb-4 font-semibold text-gray-900">Thống kê rác thải theo tháng</h3>
-                        <canvas id="wasteChart" height="300"></canvas>
-                    </div>
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <h3 class="mb-4 font-semibold text-gray-900">Phân loại rác thải</h3>
-                        <canvas id="wasteTypeChart" height="300"></canvas>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <h3 class="mb-4 font-semibold text-gray-900">Xu hướng tham gia sinh viên</h3>
-                        <canvas id="studentTrendChart" height="300"></canvas>
-                    </div>
-
-                    {{-- Top students --}}
-                    <div class="p-6 bg-white rounded-lg shadow">
-                        <h3 class="mb-4 font-semibold text-gray-900">Top 5 sinh viên tích cực</h3>
-                        @php
-                            $topStudents = [
-                                ['name' => 'Nguyễn Văn A', 'points' => 450, 'waste' => 89],
-                                ['name' => 'Trần Thị B', 'points' => 420, 'waste' => 82],
-                                ['name' => 'Lê Văn C', 'points' => 395, 'waste' => 78],
-                                ['name' => 'Phạm Thị D', 'points' => 380, 'waste' => 75],
-                                ['name' => 'Hoàng Văn E', 'points' => 365, 'waste' => 71],
-                            ];
-                        @endphp
-                        <div class="space-y-4">
-                            @foreach($topStudents as $index => $student)
-                                <div class="flex items-center gap-4">
-                                    <div
-                                        class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span class="text-sm text-green-700">{{ $index + 1 }}</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm text-gray-900">{{ $student['name'] }}</p>
-                                        <div class="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                                            <span>{{ $student['points'] }} điểm</span> • <span>{{ $student['waste'] }} kg</span>
-                                        </div>
-                                    </div>
-                                    <div class="w-32">
-                                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-green-500 rounded-full"
-                                                style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                @show
-            </main>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">Bản thử nghiệm</span>
         </div>
 
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Tổng rác thu gom tháng này -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-green-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trash-alt text-green-600 text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">↑ 8.3%</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Tổng rác thu gom tháng này</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">534 <span class="text-lg text-gray-500">kg</span></h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 8.3% so với tháng trước</p>
+                </div>
+            </div>
+
+            <!-- Sinh viên tham gia -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">↑ 12.8%</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Sinh viên tham gia</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">167</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 12.8% so với tháng trước</p>
+                </div>
+            </div>
+
+            <!-- Sự kiện trong tháng -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-yellow-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-yellow-600 text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs font-semibold rounded-full">+2</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Sự kiện trong tháng</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $upcomingEventsCount }}</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 2 sự kiện mới</p>
+                </div>
+            </div>
+
+            <!-- Điểm thưởng phát ra -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-purple-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-star text-purple-600 text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">↑ 15.4%</span>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Điểm thưởng phát ra</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">2,850</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 15.4% so với tháng trước</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Thống kê rác thải theo tháng -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Thống kê rác thải theo tháng</h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="wasteChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phân loại rác thải -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-pie text-blue-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Phân loại rác thải</h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="wasteTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Xu hướng tham gia sinh viên -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-area text-purple-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Xu hướng tham gia sinh viên</h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="studentTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top 5 sinh viên tích cực -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trophy text-yellow-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Top 5 sinh viên tích cực</h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    @php
+                        $topStudents = [
+                            ['name' => 'Nguyễn Văn A', 'points' => 450, 'waste' => 89],
+                            ['name' => 'Trần Thị B', 'points' => 420, 'waste' => 82],
+                            ['name' => 'Lê Văn C', 'points' => 395, 'waste' => 78],
+                            ['name' => 'Phạm Thị D', 'points' => 380, 'waste' => 75],
+                            ['name' => 'Hoàng Văn E', 'points' => 365, 'waste' => 71],
+                        ];
+                    @endphp
+                    <div class="space-y-4">
+                        @foreach($topStudents as $index => $student)
+                            <div class="flex items-center gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                                        {{ $index + 1 }}
+                                    </div>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="font-semibold text-gray-900 truncate">{{ $student['name'] }}</div>
+                                    <div class="text-sm text-gray-500">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</div>
+                                </div>
+                                <div class="flex-shrink-0 w-24">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500" style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart colors
+    const primaryColor = '#10b981';
+    const successColor = '#059669';
+    const infoColor = '#34d399';
+    const warningColor = '#f59e0b';
+    const blueColor = '#3b82f6';
+    const purpleColor = '#8b5cf6';
+
+    // Thống kê rác thải theo tháng
+    const wasteCtx = document.getElementById('wasteChart');
+    if (wasteCtx) {
+        new Chart(wasteCtx, {
+            type: 'line',
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                datasets: [{
+                    label: 'Rác thu gom (kg)',
+                    data: [420, 480, 510, 490, 520, 534],
+                    borderColor: primaryColor,
+                    backgroundColor: primaryColor + '40',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: primaryColor,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Phân loại rác thải
+    const wasteTypeCtx = document.getElementById('wasteTypeChart');
+    if (wasteTypeCtx) {
+        new Chart(wasteTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Rác tái chế', 'Rác hữu cơ', 'Rác vô cơ', 'Rác nguy hại'],
+                datasets: [{
+                    data: [35, 30, 25, 10],
+                    backgroundColor: [
+                        primaryColor,
+                        successColor,
+                        blueColor,
+                        warningColor
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12
+                            },
+                            color: '#374151',
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Xu hướng tham gia sinh viên
+    const studentTrendCtx = document.getElementById('studentTrendChart');
+    if (studentTrendCtx) {
+        new Chart(studentTrendCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                datasets: [{
+                    label: 'Sinh viên tham gia',
+                    data: [120, 135, 145, 150, 160, 167],
+                    backgroundColor: purpleColor,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            },
+                            stepSize: 20
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+@endpush
 @endsection

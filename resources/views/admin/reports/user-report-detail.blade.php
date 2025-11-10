@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">

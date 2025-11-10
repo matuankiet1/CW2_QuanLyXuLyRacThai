@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="max-w-7xl mx-auto">
-        @if ($collectionSchedules->isEmpty() && $isSearching == false)
+        @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
                 <p>Không có lịch thu gom nào.
                     <a type="button"
@@ -15,26 +15,27 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     {{-- Button open canvas to fillter --}}
+                    <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
+                        <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                color="#ffffff" fill="none">
+                                <path
+                                    d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
+                                    stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
 
-                    <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                            color="#ffffff" fill="none">
-                            <path
-                                d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
-                                stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
-
-                    <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
-                        class="relative w-full md:w-1/2">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
-                        </svg>
-                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
-                            class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
-                    </form>
+                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
+                            class="relative w-full">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
+                            </svg>
+                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
+                                class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                        </form>
+                    </div>
 
                     <div class="flex items-center gap-3 ml-auto">
                         <button id="btnDeleteAll"
@@ -143,10 +144,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 italic">
-                                        @if ($isSearching == true)
-                                            Không có kết quả tìm kiếm cho từ khóa
-                                            "<strong class="text-gray-700">{{ $q }}</strong>".
+                                    <td colspan="7" class="px-4 py-6 text-center text-gray-500 italic">
+                                        @if ($isSearch == true || $isFilter == true)
+                                            Không có kết quả tìm kiếm
                                         @endif
                                     </td>
                                 </tr>
@@ -177,7 +177,7 @@
                 </div> --}}
                 @if ($collectionSchedules->hasPages())
                     <div class="mt-3">
-                        {{ $collectionSchedules->links() }}
+                        {{ $collectionSchedules->appends(request()->except('page'))->links() }}
                     </div>
                 @endif
         @endif
@@ -205,7 +205,7 @@
                                 class="text-red-500">*</span></label>
                         <input type="text" id="inputName" name="staff_id"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                            placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}">
+                            placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}" autocomplete="off">
                         @error('staff_id')
                             <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
@@ -246,6 +246,10 @@
                         @error('status')
                             <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <div>
+                        <span class="mx-auto border border-top">Lượng rác đã thu gom</span>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-3">
@@ -303,7 +307,8 @@
                 </button>
             </div>
 
-            <form action="{{ route('admin.collection-schedules.index') }}" method="GET" id="filterForm" class="space-y-4 flex-1 flex flex-col">
+            <form action="{{ route('admin.collection-schedules.index') }}" method="GET" id="filterForm"
+                class="space-y-4 flex-1 flex flex-col">
                 <!-- Nội dung bộ lọc -->
                 <div class="p-4 flex-1 space-y-4 overflow-y-auto">
                     <!-- Bộ lọc theo nhân viên -->
@@ -341,14 +346,14 @@
                     <!-- Bộ lọc theo ngày hoàn thành -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Ngày hoàn thành:</label>
-                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt"
-                            id="radioFilterCompletedAt1" value="old_new">
+                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt" id="radioFilterCompletedAt1"
+                            value="asc">
                         <label class="form-check-label" for="radioFilterCompletedAt1">
                             Cũ - Mới
                         </label>
                         <br>
-                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt"
-                            id="radioFilterCompletedAt2" value="new_old">
+                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt" id="radioFilterCompletedAt2"
+                            value="desc">
                         <label class="form-check-label" for="radioFilterCompletedAt2">
                             Mới - Cũ
                         </label>
@@ -467,6 +472,7 @@
             clearValidationState(form);
             resetForm(form);
         });
+
         cancelBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
             clearValidationState(form);
@@ -529,36 +535,40 @@
         });
 
         // Confirm Delete Modal logic
-        deleteBtn.forEach(button => {
-            button.addEventListener('click', function() {
-                const id = button.id;
-                confirmModalBox.querySelector('form').action = `/collection-schedules/${id}`;
-                openModal(confirmModal, confirmModalBox);
+        if (deleteBtn.length > 0) {
+            deleteBtn.forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = button.id;
+                    confirmModalBox.querySelector('form').action = `/collection-schedules/${id}`;
+                    openModal(confirmModal, confirmModalBox);
+                });
             });
-        });
+        }
 
         // Confirm Delete All Modal logic
-        btnDeleteAll.addEventListener('click', function() {
-            const selectedCheckboxes = document.querySelectorAll('input[name="ids[]"]:checked');
-            if (selectedCheckboxes.length === 0) {
-                alert('Vui lòng chọn ít nhất một lịch thu gom để xóa.');
-                return;
-            }
-            const ids = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
-            const confirmForm = confirmModalBox.querySelector('form');
-            confirmForm.action = `/collection-schedules/delete-multiple`;
-            const idsContainer = document.getElementById('idsContainer');
-            idsContainer.innerHTML = '';
-            ids.forEach(id => {
-                const hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = 'ids[]';
-                hidden.value = id;
-                idsContainer.appendChild(hidden);
-            });
+        if (btnDeleteAll) {
+            btnDeleteAll.addEventListener('click', function() {
+                const selectedCheckboxes = document.querySelectorAll('input[name="ids[]"]:checked');
+                if (selectedCheckboxes.length === 0) {
+                    alert('Vui lòng chọn ít nhất một lịch thu gom để xóa.');
+                    return;
+                }
+                const ids = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+                const confirmForm = confirmModalBox.querySelector('form');
+                confirmForm.action = `/collection-schedules/delete-multiple`;
+                const idsContainer = document.getElementById('idsContainer');
+                idsContainer.innerHTML = '';
+                ids.forEach(id => {
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'ids[]';
+                    hidden.value = id;
+                    idsContainer.appendChild(hidden);
+                });
 
-            openModal(confirmModal, confirmModalBox);
-        });
+                openModal(confirmModal, confirmModalBox);
+            });
+        }
 
         confirmModal.addEventListener('click', e => {
             if (e.target === e.currentTarget) closeModal(confirmModal, confirmModalBox);
@@ -622,4 +632,7 @@
             form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => el.value = '');
         }
     </script>
+
+    @vite(['resources/js/offcanvas.js'])
+
 @endsection
