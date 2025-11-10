@@ -19,5 +19,6 @@ class Event extends Model
         'participants',
         'status',
         'description',
+        'image',
     ];
 }

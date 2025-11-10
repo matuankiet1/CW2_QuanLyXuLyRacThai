@@ -16,7 +16,7 @@
             </div>
             <div class="p-6 border-l-4 border-teal-500 bg-white rounded-lg shadow">
                 <p class="text-sm text-gray-500 mb-1">Sự kiện trong tháng</p>
-                <h3 class="text-2xl font-semibold text-gray-900">8</h3>
+                <h3 class="text-2xl font-semibold text-gray-900">{{ $upcomingEventsCount }}</h3>
                 <p class="text-xs text-green-600 mt-2">↑ 2 sự kiện mới</p>
             </div>
             <div class="p-6 border-l-4 border-cyan-500 bg-white rounded-lg shadow">

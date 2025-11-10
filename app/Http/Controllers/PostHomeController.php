@@ -16,10 +16,15 @@ class PostHomeController extends Controller
 
         return view('user.posts.home', compact('posts'));
     }
-
     public function show($slug)
     {
+        // Lấy bài viết theo slug
         $post = Post::where('slug', $slug)->firstOrFail();
+
+        // Tăng lượt xem
+        $post->increment('post_views');
+
         return view('user.posts.show', compact('post'));
     }
+
 }

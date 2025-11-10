@@ -62,6 +62,7 @@
                     <tr class="border-b">
                         <th class="px-4 py-3 text-left font-semibold" style="width:80px">STT</th>
                         <th class="px-4 py-3 text-left font-semibold">Tên sự kiện</th>
+                        <th class="px-4 py-3 text-left font-semibold">Hình ảnh</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày bắt đầu đăng ký</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày kết thúc đăng ký</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày bắt đầu sự kiện</th>
@@ -77,6 +78,15 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3 text-center">{{ $events->firstItem() + $index }}</td>
                             <td class="px-4 py-3">{{ $event->title }}</td>
+                            <td class="px-4 py-3 text-center">
+                                        @if ($event->image)
+                                            <img src="{{ asset($event->image) }}" alt="{{ $event->title }}" class="border rounded"
+                                                style="width: 60px; height: 60px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
+                                                style="width: 60px; height: 60px; border-radius: 4px;">Không có</div>
+                                        @endif
+                                    </td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->register_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->register_end_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
