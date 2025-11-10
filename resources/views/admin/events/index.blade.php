@@ -92,7 +92,7 @@
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ $event->location }}</td>
-                            <td class="px-4 py-3">{{ $event->participants }} người</td>
+                            <td class="px-4 py-3">{{ $event->participants }}</td>
                             <td class="px-4 py-3">
                                 @if ($event->status === 'completed')
                                     <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Đã kết thúc</span>
