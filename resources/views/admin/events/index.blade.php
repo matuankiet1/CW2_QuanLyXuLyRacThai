@@ -51,7 +51,7 @@
                 </div>
                 <div class="md:col-span-2 flex flex-col md:flex-row gap-3 justify-end">
                     <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Lọc</button>
-                    <a href="{{ route('admin.events.create') }}" class="btn btn-admin">+ Tạo sự kiện mới</a>
+                    <a href="{{ route('admin.events.create') }}" class="inline-block px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 text-sm">+ Tạo sự kiện mới</a>
                 </div>
             </form>
         </div>
