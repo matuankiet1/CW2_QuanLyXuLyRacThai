@@ -18,6 +18,11 @@ class EventFactory extends Factory
         $eventStart    = (clone $registerEnd)->modify('+3 days');
         $eventEnd      = (clone $eventStart)->modify('+2 days');
 
+         $images = [
+            'images/events/Event1.png',
+            'images/events/Event2.png'
+        ];
+
         return [
             'title' => ucfirst($this->faker->words(3, true)), // Tên sự kiện
             'register_date' => $registerStart,
@@ -28,6 +33,7 @@ class EventFactory extends Factory
             'participants' => $this->faker->numberBetween(50, 500),
             'status' => $this->faker->randomElement(['upcoming', 'completed']),
             'description' => $this->faker->paragraphs(3, true),
+            'image' => $this->faker->randomElement($images),
         ];
     }
 }

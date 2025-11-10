@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('participants')->default(0); // Số người tham gia
             $table->enum('status', ['upcoming', 'completed'])->default('upcoming'); // Trạng thái
             $table->text('description')->nullable(); // Mô tả chi tiết
+            $table->string('image')->nullable(); // Hình ảnh
             $table->timestamps();
         });
     }
