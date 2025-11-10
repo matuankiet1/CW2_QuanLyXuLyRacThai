@@ -13,12 +13,17 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status');
 
         $query = Event::query();
 
         if ($search) {
             $query->where('title', 'like', "%$search%")
-                  ->orWhere('location', 'like', "%$search%");
+                ->orWhere('location', 'like', "%$search%");
+        }
+
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
         }
 
         $events = $query->orderBy('id', 'asc')->paginate(10);
@@ -26,11 +31,13 @@ class EventController extends Controller
         return view('admin.events.index', compact('events', 'search'));
     }
 
-    public function create(){
+    public function create()
+    {
         return view('admin.events.create');
     }
 
-    public function edit(Event $event){
+    public function edit(Event $event)
+    {
         return view('admin.events.edit', compact('event'));
     }
 
@@ -48,13 +55,32 @@ class EventController extends Controller
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
             'description' => 'nullable|string',
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,gif,webp', // ✅ Giới hạn định dạng
+                'max:2048', // ✅ Giới hạn kích thước file (tính bằng KB, ở đây là 2MB)
+            ],
+
         ]);
+
+         if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+
+            // Lưu vào public/images/posts
+            $file->move(public_path('images/posts'), $fileName);
+
+            // Lưu đường dẫn tương đối trong DB
+            $validated['image'] = 'images/posts/' . $fileName;
+        }
 
         Event::create($data);
 
-       return redirect()
-                ->route('admin.events.index')
-                ->with('success', 'Thêm sự kiện thành công!');
+        return redirect()
+            ->route('admin.events.index')
+            ->with('success', 'Thêm sự kiện thành công!');
     }
 
     // ✅ Cập nhật sự kiện
@@ -75,8 +101,8 @@ class EventController extends Controller
         $event->update($data);
 
         return redirect()
-                ->route('admin.events.index')
-                ->with('success', 'Sửa sự kiện thành công!');
+            ->route('admin.events.index')
+            ->with('success', 'Sửa sự kiện thành công!');
     }
 
     // ✅ Xóa sự kiện

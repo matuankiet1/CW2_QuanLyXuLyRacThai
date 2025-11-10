@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 
@@ -9,8 +11,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Có thể truyền dữ liệu động sau này, tạm thời chỉ hiển thị view
-        return view('dashboard.index');
+        $today = Carbon::today();
+
+        $upcomingEventsCount = Event::where('status', 'upcoming') -> whereDate('event_start_date', '>=', $today) -> count();
+
+        return view('dashboard.admin', compact('upcomingEventsCount'));
     }
 
     public function app(){
