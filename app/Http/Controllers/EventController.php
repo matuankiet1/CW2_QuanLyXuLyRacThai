@@ -53,6 +53,7 @@ class EventController extends Controller
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
             'description' => 'nullable|string',
+            
         ]);
 
         Event::create($data);
