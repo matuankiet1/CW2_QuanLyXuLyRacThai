@@ -70,10 +70,10 @@ class EventController extends Controller
             $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
 
             // Lưu vào public/images/posts
-            $file->move(public_path('images/posts'), $fileName);
+            $file->move(public_path('images/events'), $fileName);
 
             // Lưu đường dẫn tương đối trong DB
-            $validated['image'] = 'images/posts/' . $fileName;
+            $validated['image'] = 'images/events/' . $fileName;
         }
 
         Event::create($data);
