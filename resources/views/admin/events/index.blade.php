@@ -41,18 +41,17 @@
                 </div>
                 <div class="md:col-span-3">
                     <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-    <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
-    <option value="Kết thúc" {{ $statusFilter === 'Kết thúc' ? 'selected' : '' }}>Đã kết thúc</option>
-    <option value="Đang diễn ra" {{ $statusFilter === 'Đang diễn ra' ? 'selected' : '' }}>Đang diễn ra</option>
-    <option value="Đang đăng ký" {{ $statusFilter === 'Đang đăng ký' ? 'selected' : '' }}>Đang đăng ký</option>
-    <option value="Hết đăng ký" {{ $statusFilter === 'Hết đăng ký' ? 'selected' : '' }}>Hết đăng ký</option>
-    <option value="Sắp diễn ra" {{ $statusFilter === 'Sắp diễn ra' ? 'selected' : '' }}>Sắp diễn ra</option>
-</select>
-
+                        <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
+                        <option value="Kết thúc" {{ $statusFilter === 'Kết thúc' ? 'selected' : '' }}>Đã kết thúc</option>
+                        <option value="Đang diễn ra" {{ $statusFilter === 'Đang diễn ra' ? 'selected' : '' }}>Đang diễn ra</option>
+                        <option value="Đang đăng ký" {{ $statusFilter === 'Đang đăng ký' ? 'selected' : '' }}>Đang đăng ký</option>
+                        <option value="Hết đăng ký" {{ $statusFilter === 'Hết đăng ký' ? 'selected' : '' }}>Hết đăng ký</option>
+                        <option value="Sắp diễn ra" {{ $statusFilter === 'Sắp diễn ra' ? 'selected' : '' }}>Sắp diễn ra</option>
+                    </select>
                 </div>
-                <div class="md:col-span-5 flex flex-col md:flex-row gap-2 justify-end">
+                <div class="md:col-span-2 flex flex-col md:flex-row gap-3 justify-end">
                     <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Lọc</button>
-                    <a href="{{ route('admin.events.create') }}" class="btn btn-admin">+ Tạo sự kiện mới</a>
+                    <a href="{{ route('admin.events.create') }}" class="inline-block px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 text-sm">+ Tạo sự kiện mới</a>
                 </div>
             </form>
         </div>
