@@ -261,7 +261,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('posts.home') }}">
+                        <a class="nav-link" href="{{ route('user.posts.home') }}">
                             <i class="fas fa-newspaper me-1"></i>Bài viết
                         </a>
                     </li>
@@ -275,6 +275,44 @@
                             <i class="fas fa-envelope me-1"></i>Liên hệ
                         </a>
                     </li>
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.reports.create') }}">
+                            <i class="fas fa-flag me-1"></i>Báo cáo
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.notifications.index') }}">
+                            <i class="fas fa-bell me-1"></i>Thông báo
+                            @php
+                                $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
+                                    ->whereNull('read_at')
+                                    ->count();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="badge bg-danger">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.simple-notifications.index') }}">
+                            <i class="fas fa-envelope me-1"></i>Thông báo mới
+                            @php
+                                $simpleUnreadCount = App\Models\SimpleNotification::where('user_id', auth()->user()->user_id)
+                                    ->where('is_read', false)
+                                    ->count();
+                            @endphp
+                            @if($simpleUnreadCount > 0)
+                                <span class="badge bg-danger">{{ $simpleUnreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.notification-preferences.index') }}">
+                            <i class="fas fa-cog me-1"></i>Cài đặt thông báo
+                        </a>
+                    </li>
+                    @endauth
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -340,7 +378,7 @@
                     <h5>Liên kết</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="{{ route('home') }}">Trang chủ</a></li>
-                        <li class="mb-2"><a href="{{ route('posts.home') }}">Bài viết</a></li>
+                        <li class="mb-2"><a href="{{ route('user.posts.home') }}">Bài viết</a></li>
                         <li class="mb-2"><a href="{{ route('home.about') }}">Giới thiệu</a></li>
                         <li class="mb-2"><a href="{{ route('home.contact') }}">Liên hệ</a></li>
                     </ul>

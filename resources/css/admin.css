@@ -1,0 +1,47 @@
+/* Admin custom styles - keep lightweight, complement Bootstrap */
+
+/* Smooth transitions */
+* {
+    transition: color .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+/* Cards */
+.card.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.12);
+}
+
+/* Sidebar tweaks */
+.sidebar .menu-link {
+    border-radius: .5rem;
+}
+
+.sidebar .menu-link.active {
+    box-shadow: inset 2px 0 0 var(--primary-color);
+}
+
+/* Tables */
+.table thead th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+.table tr:hover td {
+    background: #fbfcfe;
+}
+
+/* Forms */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 .2rem rgba(16,185,129,.2);
+    border-color: #10b981;
+}
+
+/* Badges */
+.badge-gradient {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Utilities */
+.shadow-soft { box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.rounded-xl { border-radius: 1rem; }
+
+

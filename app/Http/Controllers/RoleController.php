@@ -24,13 +24,11 @@ class RoleController extends Controller
     /**
      * Cập nhật role của user
      */
-    public function updateRole(Request $request, $id)
+    public function updateRole(Request $request, User $user)
     {
         $request->validate([
             'role' => ['required', 'in:admin,user'],
         ]);
-
-        $user = User::findOrFail($id);
         
         // Kiểm tra quyền: chỉ admin mới có thể thay đổi role
         if (auth()->user()->role !== 'admin') {
@@ -108,9 +106,8 @@ class RoleController extends Controller
     /**
      * Xóa tài khoản (chỉ user, không được xóa admin)
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
         
         // Kiểm tra quyền
         if (auth()->user()->role !== 'admin') {

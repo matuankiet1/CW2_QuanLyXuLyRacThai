@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->unique(['auth_provider', 'provider_id'], 'users_authprovider_providerid_unique');
             $table->rememberToken();
             $table->timestamps();
+            $table->string('phone')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

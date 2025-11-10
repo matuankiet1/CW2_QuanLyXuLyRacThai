@@ -10,12 +10,49 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     /**
-     * Hiển thị danh sách người dùng
+     * Hiển thị danh sách người dùng với phân trang và tìm kiếm
+     * 
+     * Route: GET /admin/users
+     * 
+     * Chức năng:
+     * - Lấy danh sách người dùng từ database
+     * - Phân trang 10 người dùng mỗi trang
+     * - Sắp xếp theo ngày tạo (created_at) giảm dần (mới nhất trước)
+     * - Hỗ trợ tìm kiếm theo tên và email (nếu có từ khóa)
+     * - Giữ lại từ khóa tìm kiếm khi chuyển trang
+     * 
+     * @param Request $request - Request chứa từ khóa tìm kiếm (keyword)
+     * @return \Illuminate\View\View - View hiển thị danh sách người dùng
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.users.index', compact('users'));
+        // Lấy từ khóa tìm kiếm từ request (nếu có)
+        $keyword = $request->input('keyword');
+        
+        // Bắt đầu query để lấy danh sách người dùng
+        $query = User::query();
+        
+        // Nếu có từ khóa tìm kiếm, thêm điều kiện tìm kiếm vào query
+        if ($keyword) {
+            $query->where(function($q) use ($keyword) {
+                // Tìm kiếm theo tên (name) - không phân biệt hoa thường
+                $q->where('name', 'LIKE', '%' . $keyword . '%')
+                  // Hoặc tìm kiếm theo email - không phân biệt hoa thường
+                  ->orWhere('email', 'LIKE', '%' . $keyword . '%');
+            });
+        }
+        
+        // Sắp xếp theo ngày tạo giảm dần (mới nhất trước)
+        // Phân trang 10 người dùng mỗi trang
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
+        
+        // Nếu có từ khóa tìm kiếm, thêm vào link phân trang để giữ lại khi chuyển trang
+        if ($keyword) {
+            $users->appends(['keyword' => $keyword]);
+        }
+        
+        // Trả về view với dữ liệu người dùng và từ khóa tìm kiếm
+        return view('admin.users.index', compact('users', 'keyword'));
     }
 
     /**

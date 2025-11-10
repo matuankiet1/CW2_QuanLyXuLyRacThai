@@ -54,6 +54,83 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Relationship với Post model
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relationship với Notification (thông báo đã gửi)
+     */
+    public function sentNotifications()
+    {
+        return $this->hasMany(Notification::class, 'sender_id', 'user_id');
+    }
+
+    /**
+     * Relationship với Notification (thông báo đã nhận)
+     */
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_user', 'user_id', 'notification_id')
+                    ->withPivot('read_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relationship với NotificationPreference
+     */
+    public function preference()
+    {
+        return $this->hasOne(NotificationPreference::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relationship với SimpleNotification
+     */
+    public function simpleNotifications()
+    {
+        return $this->hasMany(SimpleNotification::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Lấy số lượng thông báo chưa đọc
+     */
+    public function getUnreadNotificationsCountAttribute()
+    {
+        return $this->simpleNotifications()->unread()->count();
+    }
+
+    /**
+     * Kiểm tra user có bật email notifications không
+     */
+    public function allowsEmailNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsEmail() : true;
+    }
+
+    /**
+     * Kiểm tra user có bật push notifications không
+     */
+    public function allowsPushNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsPush() : true;
+    }
+
+    /**
+     * Kiểm tra user có bật in-app notifications không
+     */
+    public function allowsInAppNotifications(): bool
+    {
+        $preference = $this->preference;
+        return $preference ? $preference->allowsInApp() : true;
+    }
+
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }

@@ -24,7 +24,7 @@
                 {{-- Menu --}}
                 @php
                     $menuItems = [
-                        ['id' => 'home', 'label' => 'Trang chủ'],
+                        ['id' => 'home', 'label' => 'Trang chủ' , 'route' => 'admin.home'],
                         ['id' => 'dashboard', 'label' => 'Dashboard', 'route' => 'dashboard.admin'],
                         ['id' => 'users', 'label' => 'Quản lý người dùng', 'route' => 'admin.users.index'],
                         [
@@ -33,15 +33,16 @@
                             'route' => 'admin.collection-schedules.index',
                         ],
                         ['id' => 'posts', 'label' => 'Quản lý bài viết', 'route' => 'admin.posts.index'],
-                        ['id' => 'permissions', 'label' => 'Phân quyền'],
-                        ['id' => 'events', 'label' => 'Quản lý sự kiện'],
+                        ['id' => 'permissions', 'label' => 'Phân quyền', 'route' => 'admin.roles.index'],
+                        ['id' => 'events', 'label' => 'Quản lý sự kiện', 'route' => 'admin.events.index'],
                         ['id' => 'participants', 'label' => 'Quản lý sinh viên tham gia'],
-                        ['id' => 'reports', 'label' => 'Báo cáo người dùng'],
+                        ['id' => 'waste-logs', 'label' => 'Báo cáo thu gom rác', 'route' => 'waste-logs.index'],
+                        ['id' => 'reports', 'label' => 'Báo cáo người dùng', 'route' => 'admin.reports.user-reports'],
                         ['id' => 'notifications', 'label' => 'Gửi thông báo'],
                         ['id' => 'personal-stats', 'label' => 'Thống kê cá nhân'],
                         ['id' => 'finance', 'label' => 'Quản lý tài chính'],
                         ['id' => 'rewards', 'label' => 'Danh sách điểm thưởng'],
-                        ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'banners.index'],
+                        ['id' => 'banners', 'label' => 'Quản lý banner', 'route' => 'admin.banners.index'],
                     ];
 
                     $currentPage = request()->route() ? request()->route()->getName() : '';
@@ -63,29 +64,37 @@
 
                 <nav class="flex-1 p-4 overflow-y-auto">
                     <ul class="space-y-1">
-                        @foreach ($menuItems as $item)
-                            @if (isset($item['route']))
-                                @php
-                                    $base = Str::beforeLast($item['route'], '.');
-                                    $isActive = request()->routeIs($item['route']) || request()->routeIs($base . '.*');
-                                @endphp
-                                <a href="{{ route($item['route']) }}"
-                                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors
-                    {{ $isActive ? 'text-white bg-green-600 hover:bg-green-700' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    <span class="text-sm">{{ $item['label'] }}</span>
-                                </a>
-                            @else
-                                <span class="flex items-center gap-3 px-4 py-2.5 text-gray-400 cursor-not-allowed">
-                                    {{ $item['label'] }}
-                                </span>
-                            @endif
-                        @endforeach
+    @foreach ($menuItems as $item)
+        @if (isset($item['route']))
+            @php
+                $base = Str::beforeLast($item['route'], '.');
+                $isActive = request()->routeIs($item['route']);
 
-                    </ul>
+            @endphp
+            <li>
+                <a href="{{ route($item['route']) }}"
+                    class="block w-full px-4 py-2.5 rounded-lg transition-all duration-200
+                    {{ $isActive
+                        ? 'text-white bg-green-600 shadow-md'
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700' }}">
+                    <span class="text-sm font-medium">{{ $item['label'] }}</span>
+                </a>
+            </li>
+        @else
+            <li>
+                <span
+                    class="block w-full px-4 py-2.5 text-gray-400 cursor-not-allowed rounded-lg">
+                    {{ $item['label'] }}
+                </span>
+            </li>
+        @endif
+    @endforeach
+</ul>
+
                 </nav>
 
                 {{-- User profile --}}
-                <div class="p-4 border-t border-gray-200">
+                {{-- <div class="p-4 border-t border-gray-200">
                     <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
                         <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -102,7 +111,7 @@
                             </button>
                         </form>
                     </div>
-                </div>
+                </div> --}}
             </aside>
 
             <div class="flex-1 flex flex-col overflow-hidden">
@@ -115,8 +124,8 @@
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <p class="text-sm text-gray-900 flex items-center">{{ auth()->user()->name }}</p>
-                            <button
-                                class="btn-user-dropdown hover:bg-gray-50 focus:outline-none rounded-2xl p-1 cursor-pointer">
+                            <button type="button"
+                                class="btn-user-dropdown hover:bg-gray-100 focus:outline-none rounded-2xl p-1 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
                                     color="#ffffff" fill="none">
                                     <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke="#141B34"
@@ -173,4 +182,5 @@
 
         {{-- Include Chart.js --}}
         @vite(['resources/js/dashboard.js'])
+        
     @endsection

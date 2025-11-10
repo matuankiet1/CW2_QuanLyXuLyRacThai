@@ -13,6 +13,7 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status');
 
         $query = Event::query();
 
@@ -21,27 +22,44 @@ class EventController extends Controller
                   ->orWhere('location', 'like', "%$search%");
         }
 
-        $events = $query->orderBy('date', 'desc')->paginate(10);
+       if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $events = $query->orderBy('id', 'asc')->paginate(10);
 
         return view('admin.events.index', compact('events', 'search'));
+    }
+
+    public function create(){
+        return view('admin.events.create');
+    }
+
+    public function edit(Event $event){
+        return view('admin.events.edit', compact('event'));
     }
 
     // ✅ Tạo sự kiện mới
     public function store(Request $request)
     {
+        \Log::info('Dữ liệu gửi lên:', $request->all());
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'date' => 'required|date',
+            'register_date' => 'required|date',
+            'register_end_date' => 'required|date',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
-            'waste' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
 
         Event::create($data);
 
-        return redirect()->back()->with('success', 'Thêm sự kiện thành công!');
+       return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Thêm sự kiện thành công!');
     }
 
     // ✅ Cập nhật sự kiện
@@ -49,17 +67,21 @@ class EventController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'date' => 'required|date',
+            'register_date' => 'required|date',
+            'register_end_date' => 'required|date',
+            'event_start_date' => 'required|date',
+            'event_end_date' => 'required|date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
             'status' => 'required|in:upcoming,completed',
-            'waste' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
         ]);
 
         $event->update($data);
 
-        return redirect()->back()->with('success', 'Cập nhật sự kiện thành công!');
+        return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Sửa sự kiện thành công!');
     }
 
     // ✅ Xóa sự kiện

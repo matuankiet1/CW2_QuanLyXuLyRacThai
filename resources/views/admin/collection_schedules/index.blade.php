@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="max-w-7xl mx-auto">
-        @if ($collectionSchedules->isEmpty() && $isSearching == false)
+        @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
                 <p>Không có lịch thu gom nào.
                     <a type="button"
@@ -14,16 +14,28 @@
         @else
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
-                        class="relative w-full md:w-1/2">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
-                        </svg>
-                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
-                            class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
-                    </form>
+                    {{-- Button open canvas to fillter --}}
+                    <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
+                        <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                color="#ffffff" fill="none">
+                                <path
+                                    d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
+                                    stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+
+                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
+                            class="relative w-full">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
+                            </svg>
+                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
+                                class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                        </form>
+                    </div>
 
                     <div class="flex items-center gap-3 ml-auto">
                         <button id="btnDeleteAll"
@@ -51,7 +63,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" id="tableContainer">
                     <table class="min-w-full border-t border-gray-100">
                         <thead class="bg-green-50 text-gray-600 text-sm font-semibold">
                             <tr>
@@ -132,16 +144,16 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 italic">
-                                        @if ($isSearching == true)
-                                            Không có kết quả tìm kiếm cho từ khóa
-                                            "<strong class="text-gray-700">{{ $q }}</strong>".
+                                    <td colspan="7" class="px-4 py-6 text-center text-gray-500 italic">
+                                        @if ($isSearch == true || $isFilter == true)
+                                            Không có kết quả tìm kiếm
                                         @endif
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+
                 </div>
 
                 <!-- Phân trang -->
@@ -165,7 +177,7 @@
                 </div> --}}
                 @if ($collectionSchedules->hasPages())
                     <div class="mt-3">
-                        {{ $collectionSchedules->links() }}
+                        {{ $collectionSchedules->appends(request()->except('page'))->links() }}
                     </div>
                 @endif
         @endif
@@ -193,7 +205,7 @@
                                 class="text-red-500">*</span></label>
                         <input type="text" id="inputName" name="staff_id"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                            placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}">
+                            placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}" autocomplete="off">
                         @error('staff_id')
                             <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
@@ -236,6 +248,10 @@
                         @enderror
                     </div>
 
+                    <div>
+                        <span class="mx-auto border border-top">Lượng rác đã thu gom</span>
+                    </div>
+
                     <div class="flex justify-end gap-3 pt-3">
                         <button type="button" id="cancelBtn"
                             class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
@@ -276,150 +292,250 @@
             </div>
         </div>
 
-    </div>
+        {{-- Offcanvas fillter --}}
+        <div id="overlayOffCanvas"
+            class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 transition-opacity duration-300"></div>
+
+        <!-- Offcanvas panel -->
+        <div id="offCanvas"
+            class="fixed top-0 left-0 h-full w-80 justify-between bg-white shadow-xl transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-700">BỘ LỌC</h2>
+                <button id="closeOffCanvasBtn" class="text-gray-500 hover:text-gray-800 cursor-pointer">
+                    ✕
+                </button>
+            </div>
+
+            <form action="{{ route('admin.collection-schedules.index') }}" method="GET" id="filterForm"
+                class="space-y-4 flex-1 flex flex-col">
+                <!-- Nội dung bộ lọc -->
+                <div class="p-4 flex-1 space-y-4 overflow-y-auto">
+                    <!-- Bộ lọc theo nhân viên -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện:</label>
+                        <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff1"
+                            value="asc">
+                        <label class="form-check-label" for="radioFilterStaff1">
+                            A - Z
+                        </label>
+                        <br>
+                        <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff2"
+                            value="desc">
+                        <label class="form-check-label" for="radioFilterStaff2">
+                            Z - A
+                        </label>
+                    </div>
+
+                    <!-- Bộ lọc theo ngày thu gom -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ngày thu gom:</label>
+                        <input type="radio" class="w-4 h-4" name="radioFilterScheduledDate"
+                            id="radioFilterScheduledDate1" value="asc">
+                        <label class="form-check-label" for="radioFilterScheduledDate1">
+                            Cũ - Mới
+                        </label>
+                        <br>
+                        <input type="radio" class="w-4 h-4" name="radioFilterScheduledDate"
+                            id="radioFilterScheduledDate2" value="desc">
+                        <label class="form-check-label" for="radioFilterScheduledDate2">
+                            Mới - Cũ
+                        </label>
+                    </div>
+
+                    <!-- Bộ lọc theo ngày hoàn thành -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ngày hoàn thành:</label>
+                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt" id="radioFilterCompletedAt1"
+                            value="asc">
+                        <label class="form-check-label" for="radioFilterCompletedAt1">
+                            Cũ - Mới
+                        </label>
+                        <br>
+                        <input type="radio" class="w-4 h-4" name="radioFilterCompletedAt" id="radioFilterCompletedAt2"
+                            value="desc">
+                        <label class="form-check-label" for="radioFilterCompletedAt2">
+                            Mới - Cũ
+                        </label>
+                    </div>
+
+                    <!-- Bộ lọc theo trạng thái -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái:</label>
+                        <input type="radio" class="w-4 h-4" name="radioFilterStatus" id="radioFilterStatus1"
+                            value="Chưa thực hiện">
+                        <label class="form-check-label" for="radioFilterStatus1">
+                            Chưa thực hiện
+                        </label>
+                        <br>
+                        <input type="radio" class="w-4 h-4" name="radioFilterStatus" id="radioFilterStatus2"
+                            value="Đã hoàn thành">
+                        <label class="form-check-label" for="radioFilterStatus2">
+                            Đã hoàn thành
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+                    <button id="resetFilter"
+                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition cursor-pointer">
+                        Đặt lại
+                    </button>
+                    <button type="submit" id="applyFilter"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer">
+                        Áp dụng
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
-            // Modal logic
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modalBox');
-            const openBtn = document.querySelectorAll('.openModalBtn');
-            const closeBtn = document.getElementById('closeModalBtn');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const saveBtn = document.getElementById('saveBtn');
+        // Modal logic
+        const modal = document.getElementById('modal');
+        const modalBox = document.getElementById('modalBox');
+        const openBtn = document.querySelectorAll('.openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
 
-            const confirmModal = document.getElementById('confirmModal');
-            const confirmModalBox = document.getElementById('confirmModalBox');
-            const editBtn = document.querySelectorAll('.editBtn');
-            const deleteBtn = document.querySelectorAll('.deleteBtn');
-            const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
-            const cancelConfirmModalBtn = document.getElementById('cancelConfirmModalBtn');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmModalBox = document.getElementById('confirmModalBox');
+        const editBtn = document.querySelectorAll('.editBtn');
+        const deleteBtn = document.querySelectorAll('.deleteBtn');
+        const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
+        const cancelConfirmModalBtn = document.getElementById('cancelConfirmModalBtn');
 
-            const form = modalBox.querySelector('form');
-            const inputName = document.getElementById('inputName');
-            const inputScheduledDate = document.getElementById('inputScheduledDate');
-            const inputCompletedAt = document.getElementById('inputCompletedAt');
-            const selectStatus = document.getElementById('selectStatus');
-            const statusHidden = document.getElementById('statusHidden');
+        const form = modalBox.querySelector('form');
+        const inputName = document.getElementById('inputName');
+        const inputScheduledDate = document.getElementById('inputScheduledDate');
+        const inputCompletedAt = document.getElementById('inputCompletedAt');
+        const selectStatus = document.getElementById('selectStatus');
+        const statusHidden = document.getElementById('statusHidden');
 
-            const titleModal = document.querySelector('.titleModal');
+        const titleModal = document.querySelector('.titleModal');
 
-            const btnDeleteAll = document.getElementById('btnDeleteAll');
+        const btnDeleteAll = document.getElementById('btnDeleteAll');
 
-            function openModal(modal, modalBox) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modal.classList.add('opacity-100');
-                    modalBox.classList.remove('opacity-0', 'translate-y-5', 'scale-95');
-                    modalBox.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-                }, 10);
-            }
+        const filterForm = document.getElementById('filterForm');
 
-            function closeModal(modal, modalBox) {
-                modalBox.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
-                modalBox.classList.add('opacity-0', 'translate-y-5', 'scale-95');
-                modal.classList.remove('opacity-100');
-                modal.classList.add('opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            }
+        function openModal(modal, modalBox) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                modalBox.classList.remove('opacity-0', 'translate-y-5', 'scale-95');
+                modalBox.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+            }, 10);
+        }
 
-            @if (session('show_modal') || $errors->any())
-                document.addEventListener('DOMContentLoaded', () => {
-                    openModal(modal, modalBox);
-                });
-            @endif
+        function closeModal(modal, modalBox) {
+            modalBox.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+            modalBox.classList.add('opacity-0', 'translate-y-5', 'scale-95');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
 
-            modal.addEventListener('click', e => {
-                if (e.target === e.currentTarget) closeModal(modal, modalBox);
-                clearValidationState(form);
-                // resetForm(form);
+        @if (session('show_modal') || $errors->any())
+            document.addEventListener('DOMContentLoaded', () => {
+                openModal(modal, modalBox);
             });
+        @endif
 
-            openBtn.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    resetForm(form);
-                    titleModal.textContent = 'Thêm lịch thu gom mới';
-                    
-                    form.action = "/collection-schedules";
+        modal.addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeModal(modal, modalBox);
+            clearValidationState(form);
+            // resetForm(form);
+        });
 
-                    // Xóa input hidden _method nếu có
-                    const methodInput = form.querySelector('input[name="_method"]');
-                    if (methodInput) methodInput.remove();
-
-                    // displayCompletedAtField(false);
-                    // displayStatusField(false);
-                    openModal(modal, modalBox);
-                });
-            });
-
-            closeBtn.addEventListener('click', function() {
-                closeModal(modal, modalBox);
-                clearValidationState(form);
+        openBtn.forEach(btn => {
+            btn.addEventListener('click', function() {
                 resetForm(form);
+                titleModal.textContent = 'Thêm lịch thu gom mới';
+
+                form.action = "/collection-schedules";
+
+                // Xóa input hidden _method nếu có
+                const methodInput = form.querySelector('input[name="_method"]');
+                if (methodInput) methodInput.remove();
+
+                // displayCompletedAtField(false);
+                // displayStatusField(false);
+                openModal(modal, modalBox);
             });
-            cancelBtn.addEventListener('click', function() {
-                closeModal(modal, modalBox);
-                clearValidationState(form);
-                resetForm(form);
-            });
+        });
 
-            // Edit Modal logic
-            editBtn.forEach(button => {
-                button.addEventListener('click', async function() {
-                    const id = button.dataset.id;
-                    const res = await fetch(`/collection-schedules/${id}`);
-                    const data = await res.json();
-                    console.log(data);
+        closeBtn.addEventListener('click', function() {
+            closeModal(modal, modalBox);
+            clearValidationState(form);
+            resetForm(form);
+        });
 
-                    if (data) {
-                        inputName.value = data.staff.name;
-                        inputScheduledDate.value = data.scheduled_date ? new Date(data
-                            .scheduled_date).toISOString().split('T')[0] : '';
-                        inputCompletedAt.value = data.completed_at ? new Date(data.completed_at)
-                            .toISOString().split('T')[0] : '';
-                        selectStatus.value = data.status;
-                        statusHidden.value = data.status;
-                    }
-                    titleModal.textContent = 'Chỉnh sửa lịch thu gom';
-                    // displayCompletedAtField(true);
-                    // displayStatusField(true);
-                    openModal(modal, modalBox);
+        cancelBtn.addEventListener('click', function() {
+            closeModal(modal, modalBox);
+            clearValidationState(form);
+            resetForm(form);
+        });
 
-                    const form = modalBox.querySelector('form');
-                    form.action = `/collection-schedules/${id}`;
-                    if (form.querySelector('input[name="_method"]')) {
-                        return; // Nếu đã có input hidden _method thì không thêm nữa
-                    }
-                    form.insertAdjacentHTML('beforeend', `
+        // Edit Modal logic
+        editBtn.forEach(button => {
+            button.addEventListener('click', async function() {
+                const id = button.dataset.id;
+                const res = await fetch(`/collection-schedules/${id}`);
+                const data = await res.json();
+                console.log(data);
+
+                if (data) {
+                    inputName.value = data.staff.name;
+                    inputScheduledDate.value = data.scheduled_date ? new Date(data
+                        .scheduled_date).toISOString().split('T')[0] : '';
+                    inputCompletedAt.value = data.completed_at ? new Date(data.completed_at)
+                        .toISOString().split('T')[0] : '';
+                    selectStatus.value = data.status;
+                    statusHidden.value = data.status;
+                }
+                titleModal.textContent = 'Chỉnh sửa lịch thu gom';
+                // displayCompletedAtField(true);
+                // displayStatusField(true);
+                openModal(modal, modalBox);
+
+                const form = modalBox.querySelector('form');
+                form.action = `/collection-schedules/${id}`;
+                if (form.querySelector('input[name="_method"]')) {
+                    return; // Nếu đã có input hidden _method thì không thêm nữa
+                }
+                form.insertAdjacentHTML('beforeend', `
                     <input type="hidden" name="_method" value="PUT">
                 `);
-                });
             });
+        });
 
-            function displayCompletedAtField(show) {
-                const completedAtField = document.querySelector('.completed-at-field');
-                if (show) {
-                    completedAtField.classList.remove('hidden');
-                } else {
-                    completedAtField.classList.add('hidden');
-                }
+        function displayCompletedAtField(show) {
+            const completedAtField = document.querySelector('.completed-at-field');
+            if (show) {
+                completedAtField.classList.remove('hidden');
+            } else {
+                completedAtField.classList.add('hidden');
             }
+        }
 
-            function displayStatusField(show) {
-                const statusField = document.querySelector('.status-field');
-                if (show) {
-                    statusField.classList.remove('hidden');
-                } else {
-                    statusField.classList.add('hidden');
-                }
+        function displayStatusField(show) {
+            const statusField = document.querySelector('.status-field');
+            if (show) {
+                statusField.classList.remove('hidden');
+            } else {
+                statusField.classList.add('hidden');
             }
+        }
 
-            selectStatus.addEventListener('change', () => {
-                statusHidden.value = selectStatus.value;
-            });
+        selectStatus.addEventListener('change', () => {
+            statusHidden.value = selectStatus.value;
+        });
 
-            // Confirm Delete Modal logic
+        // Confirm Delete Modal logic
+        if (deleteBtn.length > 0) {
             deleteBtn.forEach(button => {
                 button.addEventListener('click', function() {
                     const id = button.id;
@@ -427,8 +543,10 @@
                     openModal(confirmModal, confirmModalBox);
                 });
             });
+        }
 
-            // Confirm Delete All Modal logic
+        // Confirm Delete All Modal logic
+        if (btnDeleteAll) {
             btnDeleteAll.addEventListener('click', function() {
                 const selectedCheckboxes = document.querySelectorAll('input[name="ids[]"]:checked');
                 if (selectedCheckboxes.length === 0) {
@@ -450,67 +568,71 @@
 
                 openModal(confirmModal, confirmModalBox);
             });
+        }
 
-            confirmModal.addEventListener('click', e => {
-                if (e.target === e.currentTarget) closeModal(confirmModal, confirmModalBox);
-            });
+        confirmModal.addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeModal(confirmModal, confirmModalBox);
+        });
 
-            closeConfirmModalBtn.addEventListener('click', function() {
-                closeModal(confirmModal, confirmModalBox);
-            });
-            cancelConfirmModalBtn.addEventListener('click', function() {
-                closeModal(confirmModal, confirmModalBox);
-            });
+        closeConfirmModalBtn.addEventListener('click', function() {
+            closeModal(confirmModal, confirmModalBox);
+        });
+        cancelConfirmModalBtn.addEventListener('click', function() {
+            closeModal(confirmModal, confirmModalBox);
+        });
 
-            //   Suggestions logic
-            const input = document.getElementById('inputName');
-            const suggestions = document.getElementById('suggestions');
+        //   Suggestions logic
+        const input = document.getElementById('inputName');
+        const suggestions = document.getElementById('suggestions');
 
-            input.addEventListener('input', async function() {
-                const keyword = this.value.toLowerCase().trim();
+        input.addEventListener('input', async function() {
+            const keyword = this.value.toLowerCase().trim();
+            suggestions.innerHTML = '';
+
+            if (keyword === '') {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            const res = await fetch(`/search-users?q=${encodeURIComponent(keyword)}`);
+            const data = await res.json();
+            if (data.length === 0) {
+                suggestions.innerHTML =
+                    '<li class="px-4 py-2 text-gray-500">Không tìm thấy nhân viên</li>';
+            } else {
                 suggestions.innerHTML = '';
-
-                if (keyword === '') {
-                    suggestions.classList.add('hidden');
-                    return;
-                }
-
-                const res = await fetch(`/search-users?q=${encodeURIComponent(keyword)}`);
-                const data = await res.json();
-                if (data.length === 0) {
-                    suggestions.innerHTML =
-                        '<li class="px-4 py-2 text-gray-500">Không tìm thấy nhân viên</li>';
-                } else {
-                    suggestions.innerHTML = '';
-                    data.forEach(name => {
-                        const li = document.createElement('li');
-                        li.textContent = name;
-                        li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer';
-                        li.addEventListener('click', () => {
-                            input.value = name;
-                            suggestions.classList.add('hidden');
-                        });
-                        suggestions.appendChild(li);
+                data.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer';
+                    li.addEventListener('click', () => {
+                        input.value = name;
+                        suggestions.classList.add('hidden');
                     });
-                }
-                suggestions.classList.remove('hidden');
-            });
-
-            document.addEventListener('click', e => {
-                if (!e.target.closest('#inputName') && !e.target.closest('#suggestions')) {
-                    suggestions.classList.add('hidden');
-                }
-            });
-
-            function clearValidationState(form) {
-                if (!form) return;
-                form.querySelectorAll('.error-text').forEach(el => el.remove());
+                    suggestions.appendChild(li);
+                });
             }
+            suggestions.classList.remove('hidden');
+        });
 
-            function resetForm(form) {
-                if (!form) return;
-                form.reset();
-                form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => el.value = '');
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#inputName') && !e.target.closest('#suggestions')) {
+                suggestions.classList.add('hidden');
             }
+        });
+
+        function clearValidationState(form) {
+            if (!form) return;
+            form.querySelectorAll('.error-text').forEach(el => el.remove());
+        }
+
+        function resetForm(form) {
+            if (!form) return;
+            form.reset();
+            form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => el.value = '');
+        }
     </script>
+
+    @vite(['resources/js/offcanvas.js'])
+
 @endsection
