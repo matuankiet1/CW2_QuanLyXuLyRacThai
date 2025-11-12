@@ -358,9 +358,9 @@
                                         </a>
                                         <hr class="my-1 border-gray-200">
                                     @endif
-                                    <form action="{{ route('logout') }}" method="POST">
+                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                                         @csrf
-                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition">
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg">
                                             <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
@@ -509,6 +509,17 @@
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Logout confirmation
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                        e.preventDefault();
+                        return false;
+                    }
                 });
             }
         });
