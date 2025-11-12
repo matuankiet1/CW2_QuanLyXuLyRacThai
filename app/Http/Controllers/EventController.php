@@ -46,14 +46,18 @@ class EventController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'register_date' => 'required|date',
-            'register_end_date' => 'required|date',
-            'event_start_date' => 'required|date',
-            'event_end_date' => 'required|date',
+            'register_end_date' => 'required|date|after_or_equal:register_date',
+            'event_start_date' => 'required|date|after_or_equal:register_end_date',
+            'event_end_date' => 'required|date|after_or_equal:event_start_date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
+            'capacity' => 'nullable|integer|min:1',
             'status' => 'required|in:upcoming,completed',
             'description' => 'nullable|string',
         ]);
+
+        // Thêm created_by (người tạo sự kiện)
+        $data['created_by'] = auth()->id();
 
         Event::create($data);
 
@@ -68,11 +72,12 @@ class EventController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'register_date' => 'required|date',
-            'register_end_date' => 'required|date',
-            'event_start_date' => 'required|date',
-            'event_end_date' => 'required|date',
+            'register_end_date' => 'required|date|after_or_equal:register_date',
+            'event_start_date' => 'required|date|after_or_equal:register_end_date',
+            'event_end_date' => 'required|date|after_or_equal:event_start_date',
             'location' => 'required|string|max:255',
             'participants' => 'nullable|integer|min:0',
+            'capacity' => 'nullable|integer|min:1',
             'status' => 'required|in:upcoming,completed',
             'description' => 'nullable|string',
         ]);
