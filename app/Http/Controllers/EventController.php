@@ -90,6 +90,7 @@ class EventController extends Controller
 
             // 👥 Số người tham gia
             'participants' => 'nullable|integer|min:0',
+            'capacity' => 'nullable|integer|min:1',
 
             // 📝 Mô tả
             'description' => 'nullable|string|max:5000',
@@ -128,6 +129,9 @@ class EventController extends Controller
             $data['image'] = 'images/events/' . $fileName;
         }
 
+        // Thêm created_by (người tạo sự kiện)
+        $data['created_by'] = auth()->id();
+
         // 3️⃣ Lưu dữ liệu cơ bản (không lưu status)
         Event::create($data);
 
@@ -155,6 +159,7 @@ class EventController extends Controller
 
                 // 👥 Số người tham gia
                 'participants' => 'nullable|integer|min:0',
+                'capacity' => 'nullable|integer|min:1',
 
                 // 🔖 Trạng thái
                 'status' => 'required|in:upcoming,completed',
