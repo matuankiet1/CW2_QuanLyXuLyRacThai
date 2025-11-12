@@ -319,6 +319,20 @@
                                 <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                             @endif
                         </a>
+                        <a href="{{ route('user.simple-notifications.index') }}" class="nav-link-item relative" title="Thông báo mới">
+                            <i class="fas fa-envelope mr-1"></i><span>Thông báo mới</span>
+                            @php
+                                $simpleUnreadCount = App\Models\SimpleNotification::where('user_id', auth()->user()->user_id)
+                                    ->where('is_read', false)
+                                    ->count();
+                            @endphp
+                            @if($simpleUnreadCount > 0)
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
+                            @endif
+                        </a>
+                        <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item" title="Cài đặt thông báo">
+                            <i class="fas fa-cog mr-1"></i><span>Cài đặt</span>
+                        </a>
                         @endauth
                     </nav>
                 </div>
