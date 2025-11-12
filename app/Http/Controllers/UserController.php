@@ -26,8 +26,9 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // Lấy từ khóa tìm kiếm từ request (nếu có)
+        // Lấy từ khóa tìm kiếm và role filter từ request (nếu có)
         $keyword = $request->input('keyword');
+        $roleFilter = $request->input('role', 'all');
         
         // Bắt đầu query để lấy danh sách người dùng
         $query = User::query();
@@ -42,17 +43,25 @@ class UserController extends Controller
             });
         }
         
+        // Lọc theo role nếu được chọn
+        if ($roleFilter && $roleFilter !== 'all') {
+            $query->where('role', $roleFilter);
+        }
+        
         // Sắp xếp theo ngày tạo giảm dần (mới nhất trước)
         // Phân trang 10 người dùng mỗi trang
         $users = $query->orderBy('created_at', 'desc')->paginate(10);
         
-        // Nếu có từ khóa tìm kiếm, thêm vào link phân trang để giữ lại khi chuyển trang
-        if ($keyword) {
-            $users->appends(['keyword' => $keyword]);
+        // Thêm các tham số vào link phân trang để giữ lại khi chuyển trang
+        if ($keyword || ($roleFilter && $roleFilter !== 'all')) {
+            $users->appends([
+                'keyword' => $keyword,
+                'role' => $roleFilter
+            ]);
         }
         
-        // Trả về view với dữ liệu người dùng và từ khóa tìm kiếm
-        return view('admin.users.index', compact('users', 'keyword'));
+        // Trả về view với dữ liệu người dùng, từ khóa tìm kiếm và role filter
+        return view('admin.users.index', compact('users', 'keyword', 'roleFilter'));
     }
 
     /**
