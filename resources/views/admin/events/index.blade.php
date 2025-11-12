@@ -40,16 +40,18 @@
                     <input type="text" name="search" value="{{ $search }}" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Tìm sự kiện...">
                 </div>
                 <div class="md:col-span-3">
-                    <label class="block text-sm font-medium mb-1">Trạng thái</label>
                     <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                        <option value="all">Tất cả trạng thái</option>
-                        <option value="completed">Đã kết thúc</option>
-                        <option value="upcoming">Sắp diễn ra</option>
+                        <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
+                        <option value="Kết thúc" {{ $statusFilter === 'Kết thúc' ? 'selected' : '' }}>Đã kết thúc</option>
+                        <option value="Đang diễn ra" {{ $statusFilter === 'Đang diễn ra' ? 'selected' : '' }}>Đang diễn ra</option>
+                        <option value="Đang đăng ký" {{ $statusFilter === 'Đang đăng ký' ? 'selected' : '' }}>Đang đăng ký</option>
+                        <option value="Hết đăng ký" {{ $statusFilter === 'Hết đăng ký' ? 'selected' : '' }}>Hết đăng ký</option>
+                        <option value="Sắp diễn ra" {{ $statusFilter === 'Sắp diễn ra' ? 'selected' : '' }}>Sắp diễn ra</option>
                     </select>
                 </div>
-                <div class="md:col-span-5 flex flex-col md:flex-row gap-2 justify-end">
+                <div class="md:col-span-2 flex flex-col md:flex-row gap-3 justify-end">
                     <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Lọc</button>
-                    <a href="{{ route('admin.events.create') }}" class="btn btn-admin">+ Tạo sự kiện mới</a>
+                    <a href="{{ route('admin.events.create') }}" class="inline-block px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 text-sm">+ Tạo sự kiện mới</a>
                 </div>
             </form>
         </div>
@@ -62,6 +64,7 @@
                     <tr class="border-b">
                         <th class="px-4 py-3 text-left font-semibold" style="width:80px">STT</th>
                         <th class="px-4 py-3 text-left font-semibold">Tên sự kiện</th>
+                        <th class="px-4 py-3 text-left font-semibold">Hình ảnh</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày bắt đầu đăng ký</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày kết thúc đăng ký</th>
                         <th class="px-4 py-3 text-left font-semibold">Ngày bắt đầu sự kiện</th>
@@ -77,18 +80,35 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3 text-center">{{ $events->firstItem() + $index }}</td>
                             <td class="px-4 py-3">{{ $event->title }}</td>
+                            <td class="px-4 py-3 text-center">
+                                @if ($event->image)
+                                    <img src="{{ asset($event->image) }}" alt="{{ $event->title }}" class="border rounded"
+                                        style="width: 60px; height: 60px; object-fit: cover;">
+                                @else
+                                    <div class="bg-gray-100 flex items-center justify-center text-gray-500 text-sm"
+                                        style="width: 60px; height: 60px; border-radius: 4px;">Không có</div>
+                                @endif
+                            </td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->register_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->register_end_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
-                            <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_end_date)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ $event->location }}</td>
-                            <td class="px-4 py-3">{{ $event->participants }} người</td>
+                            <td class="px-4 py-3">{{ $event->participants }}</td>
                             <td class="px-4 py-3">
-                                @if ($event->status === 'completed')
-                                    <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Đã kết thúc</span>
-                                @else
-                                    <span class="px-2 py-1 rounded text-xs font-medium bg-gray-500 text-white">Sắp diễn ra</span>
-                                @endif
+                                @php
+                                    $status = $event->status;
+                                    $statusClasses = [
+                                        'Kết thúc' => 'bg-red-500 text-white',
+                                        'Đang diễn ra' => 'bg-green-500 text-white',
+                                        'Đang đăng ký' => 'bg-blue-500 text-white',
+                                        'Hết đăng ký' => 'bg-gray-500 text-white',
+                                        'Sắp diễn ra' => 'bg-yellow-500 text-white',
+                                    ];
+                                @endphp
+                                <span class="px-2 py-1 rounded text-xs font-medium {{ $statusClasses[$status] ?? 'bg-gray-300 text-black' }}">
+                                    {{ $status }}
+                                </span>
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex gap-2 text-sm justify-end">
@@ -105,7 +125,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-gray-500 py-4">Không có sự kiện nào</td>
+                            <td colspan="11" class="text-center text-gray-500 py-4">Không có sự kiện nào</td>
                         </tr>
                     @endforelse
                 </tbody>
