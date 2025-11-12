@@ -30,35 +30,62 @@
 
         {{-- Card chứa bảng danh sách --}}
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            {{-- Form tìm kiếm --}}
+            {{-- Form tìm kiếm và lọc --}}
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center gap-4">
-                    {{-- Ô nhập từ khóa tìm kiếm --}}
-                    <div class="flex-1">
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                name="keyword" 
-                                value="{{ $keyword ?? '' }}" 
-                                placeholder="Tìm kiếm theo tên hoặc email..." 
-                                class="form-control pl-10 pr-4 py-2 w-full"
-                            >
-                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-4">
+                    <div class="flex items-center gap-4 flex-wrap">
+                        {{-- Ô nhập từ khóa tìm kiếm --}}
+                        <div class="flex-1 min-w-[250px]">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="keyword" 
+                                    value="{{ $keyword ?? '' }}" 
+                                    placeholder="Tìm kiếm theo tên hoặc email..." 
+                                    class="form-control pl-10 pr-4 py-2 w-full"
+                                >
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
                         </div>
+                        
+                        {{-- Dropdown lọc theo role --}}
+                        <div class="min-w-[150px]">
+                            <select name="role" class="form-control py-2 w-full">
+                                <option value="all" {{ ($roleFilter ?? 'all') === 'all' ? 'selected' : '' }}>Tất cả vai trò</option>
+                                <option value="admin" {{ ($roleFilter ?? 'all') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="user" {{ ($roleFilter ?? 'all') === 'user' ? 'selected' : '' }}>User</option>
+                            </select>
+                        </div>
+                        
+                        {{-- Nút tìm kiếm --}}
+                        <button type="submit" class="btn-primary px-6 py-2 flex items-center whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        
+                        {{-- Nút xóa bộ lọc (hiển thị khi có filter) --}}
+                        @if(($keyword ?? false) || (($roleFilter ?? 'all') !== 'all'))
+                            <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 flex items-center whitespace-nowrap">
+                                <i class="fas fa-times mr-2"></i>
+                                <span>Xóa bộ lọc</span>
+                            </a>
+                        @endif
                     </div>
                     
-                    {{-- Nút tìm kiếm --}}
-                    <button type="submit" class="btn-primary px-6 py-2 flex items-center">
-                        <i class="fas fa-search mr-2"></i>
-                        <span>Tìm kiếm</span>
-                    </button>
-                    
-                    {{-- Nút xóa bộ lọc (hiển thị khi có từ khóa) --}}
-                    @if($keyword ?? false)
-                        <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 flex items-center">
-                            <i class="fas fa-times mr-2"></i>
-                            <span>Xóa</span>
-                        </a>
+                    {{-- Hiển thị thông tin kết quả tìm kiếm --}}
+                    @if(($keyword ?? false) || (($roleFilter ?? 'all') !== 'all'))
+                        <div class="text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            <span>
+                                @if($keyword && ($roleFilter ?? 'all') !== 'all')
+                                    Đang tìm kiếm "{{ $keyword }}" với vai trò {{ $roleFilter === 'admin' ? 'Admin' : 'User' }}
+                                @elseif($keyword)
+                                    Đang tìm kiếm "{{ $keyword }}"
+                                @elseif(($roleFilter ?? 'all') !== 'all')
+                                    Đang lọc theo vai trò: {{ $roleFilter === 'admin' ? 'Admin' : 'User' }}
+                                @endif
+                            </span>
+                        </div>
                     @endif
                 </form>
             </div>
@@ -79,6 +106,10 @@
                             {{-- Cột Email --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                                 Email
+                            </th>
+                            {{-- Cột Vai trò --}}
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
+                                Vai trò
                             </th>
                             {{-- Cột Ngày tạo --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
@@ -112,6 +143,19 @@
                                     {{ $user->email }}
                                 </td>
                                 
+                                {{-- Hiển thị vai trò với badge màu sắc --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($user->role === 'admin')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-shield-alt mr-1"></i>Admin
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <i class="fas fa-user mr-1"></i>User
+                                        </span>
+                                    @endif
+                                </td>
+                                
                                 {{-- Hiển thị ngày tạo (định dạng: dd/mm/yyyy) --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $user->created_at->format('d/m/Y') }}
@@ -120,7 +164,7 @@
                         @empty
                             {{-- Hiển thị thông báo khi không có người dùng --}}
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center">
+                                <td colspan="5" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
                                         <p class="text-gray-500 text-lg font-medium">
