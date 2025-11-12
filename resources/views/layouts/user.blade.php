@@ -333,6 +333,9 @@
                         <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item" title="Cài đặt thông báo">
                             <i class="fas fa-cog mr-1"></i><span>Cài đặt</span>
                         </a>
+                        <a href="{{ route('user.statistics.index') }}" class="nav-link-item" title="Thống kê cá nhân">
+                            <i class="fas fa-chart-line mr-1"></i><span>Thống kê</span>
+                        </a>
                         @endauth
                     </nav>
                 </div>
@@ -429,6 +432,9 @@
                     </a>
                     <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item">
                         <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
+                    </a>
+                    <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
+                        <i class="fas fa-chart-line mr-2"></i>Thống kê cá nhân
                     </a>
                     @endauth
                 </div>
