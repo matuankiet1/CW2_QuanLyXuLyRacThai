@@ -88,6 +88,9 @@ Route::middleware('auth')->group(function () {
     // Đăng ký và hủy đăng ký sự kiện (yêu cầu đăng nhập)
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
     Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    
+    // Thống kê cá nhân
+    Route::get('/statistics', [App\Http\Controllers\UserStatisticsController::class, 'index'])->name('user.statistics.index');
 });
 
 // Waste Logs
