@@ -25,7 +25,7 @@ class EventController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%$search%")
-                    ->orWhere('location', 'like', "%$search%");
+                  ->orWhere('location', 'like', "%$search%");
             });
         }
 
@@ -149,7 +149,7 @@ class EventController extends Controller
 
         $data = $request->validate(
             [
-                'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
 
                 // 📅 Các ngày phải hợp lệ và theo thứ tự logic
                 'register_date' => 'required|date|before_or_equal:register_end_date|after_or_equal:today',
@@ -158,14 +158,14 @@ class EventController extends Controller
                 'event_end_date' => 'required|date|after_or_equal:event_start_date',
 
                 // 🏠 Địa điểm
-                'location' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
 
                 // 👥 Số người tham gia
-                'participants' => 'nullable|integer|min:0',
+            'participants' => 'nullable|integer|min:0',
                 'capacity' => 'nullable|integer|min:1',
 
                 // 🔖 Trạng thái
-                'status' => 'required|in:upcoming,completed',
+            'status' => 'required|in:upcoming,completed',
 
                 // 📝 Mô tả
                 'description' => 'nullable|string|max:5000',
@@ -217,8 +217,8 @@ class EventController extends Controller
         $event->update($data);
 
         return redirect()
-            ->route('admin.events.index')
-            ->with('success', 'Sửa sự kiện thành công!');
+                ->route('admin.events.index')
+                ->with('success', 'Sửa sự kiện thành công!');
     }
 
 
