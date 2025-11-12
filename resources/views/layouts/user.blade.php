@@ -340,8 +340,8 @@
                 <!-- User Profile - Right Side -->
                 <div class="flex items-center gap-2 flex-shrink-0">
                     @auth
-                        <div class="relative group">
-                            <button class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
+                        <div class="relative">
+                            <button id="userMenuToggle" class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
                                 <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
                                     <span class="text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                                 </div>
@@ -350,17 +350,17 @@
                             </button>
                             
                             <!-- Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div id="userMenuDropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
                                 <div class="py-2">
                                     @if(auth()->user()->role === 'admin')
-                                        <a href="{{ route('dashboard.admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">
+                                        <a href="{{ route('dashboard.admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard
                                         </a>
                                         <hr class="my-1 border-gray-200">
                                     @endif
                                     <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                                         @csrf
-                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg">
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg mx-1">
                                             <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
@@ -509,6 +509,30 @@
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // User menu dropdown toggle
+            const userMenuToggle = document.getElementById('userMenuToggle');
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
+            
+            if (userMenuToggle && userMenuDropdown) {
+                userMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !userMenuDropdown.classList.contains('invisible');
+                    
+                    if (isVisible) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        userMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuToggle.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
                 });
             }
 
