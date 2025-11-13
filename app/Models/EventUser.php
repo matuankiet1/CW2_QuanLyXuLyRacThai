@@ -35,6 +35,7 @@ class EventUser extends Pivot
         'registered_at',
         'confirmed_at',
         'attended_at',
+        'reward_points', // Điểm thưởng khi tham gia sự kiện
     ];
 
     /**
