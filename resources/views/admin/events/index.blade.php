@@ -115,6 +115,9 @@
                                     <a href="{{ route('admin.events.participants', $event) }}" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" title="Quản lý sinh viên">
                                         <i class="fas fa-users mr-1"></i>Sinh viên
                                     </a>
+                                    <a href="{{ route('admin.events.rewards.index', $event) }}" class="px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700" title="Xem điểm thưởng">
+                                        <i class="fas fa-trophy mr-1"></i>Điểm thưởng
+                                    </a>
                                     <a href="{{ route('admin.events.edit', $event) }}" class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Sửa</a>
                                     <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Xóa sự kiện này?');" class="inline">
                                         @csrf @method('DELETE')

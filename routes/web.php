@@ -178,6 +178,11 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])->name('participants.bulk-confirm');
         Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])->name('participants.bulk-attend');
         Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])->name('participants.export');
+        
+        // Quản lý điểm thưởng cho sinh viên tham gia sự kiện
+        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
+        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
+        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
     });
 
 
