@@ -33,6 +33,11 @@
             {{-- Form tìm kiếm và lọc --}}
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-4">
+                    {{-- Giữ lại tham số sắp xếp khi submit form --}}
+                    @if(($sortBy ?? 'created_at') !== 'created_at' || ($sortOrder ?? 'desc') !== 'desc')
+                        <input type="hidden" name="sort_by" value="{{ $sortBy ?? 'created_at' }}">
+                        <input type="hidden" name="sort_order" value="{{ $sortOrder ?? 'desc' }}">
+                    @endif
                     <div class="flex items-center gap-4 flex-wrap">
                         {{-- Ô nhập từ khóa tìm kiếm --}}
                         <div class="flex-1 min-w-[250px]">
@@ -95,25 +100,95 @@
                 <table class="w-full border-collapse">
                     <thead class="bg-gray-50">
                         <tr>
-                            {{-- Cột ID --}}
+                            {{-- Cột ID với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                ID
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'user_id',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'user_id' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>ID</span>
+                                    @if(($sortBy ?? 'created_at') === 'user_id')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Tên --}}
+                            {{-- Cột Tên với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Tên
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'name',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'name' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Tên</span>
+                                    @if(($sortBy ?? 'created_at') === 'name')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Email --}}
+                            {{-- Cột Email với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Email
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'email',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'email' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Email</span>
+                                    @if(($sortBy ?? 'created_at') === 'email')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Vai trò --}}
+                            {{-- Cột Vai trò với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Vai trò
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'role',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'role' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Vai trò</span>
+                                    @if(($sortBy ?? 'created_at') === 'role')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Ngày tạo --}}
+                            {{-- Cột Ngày tạo với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Ngày tạo
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'created_at',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'created_at' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Ngày tạo</span>
+                                    @if(($sortBy ?? 'created_at') === 'created_at')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
                         </tr>
                     </thead>
