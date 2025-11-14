@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
@@ -10,17 +10,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
-                        <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                                color="#ffffff" fill="none">
-                                <path
-                                    d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
-                                    stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </button>
-
-                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
-                            class="relative w-full">
+                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full">
                             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -149,9 +139,21 @@
                 </div>
 
                 <label class="block text-sm font-medium mb-1 px-7">Không chắc loại rác? Nhập tên vật:</label>
-                <input id="itemName"
-                    class="border border-gray-300 rounded-lg mx-7 px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                    placeholder="Túi nilon, vỏ chuối, pin...">
+                <div class="relative mx-7">
+                    <input id="itemName"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
+                        placeholder="Túi nilon, vỏ chuối, pin...">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                        color="#000000" fill="none"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <path
+                            d="M10 7L9.48415 8.39405C8.80774 10.222 8.46953 11.136 7.80278 11.8028C7.13603 12.4695 6.22204 12.8077 4.39405 13.4842L3 14L4.39405 14.5158C6.22204 15.1923 7.13603 15.5305 7.80278 16.1972C8.46953 16.864 8.80774 17.778 9.48415 19.6059L10 21L10.5158 19.6059C11.1923 17.778 11.5305 16.864 12.1972 16.1972C12.864 15.5305 13.778 15.1923 15.6059 14.5158L17 14L15.6059 13.4842C13.778 12.8077 12.864 12.4695 12.1972 11.8028C11.5305 11.136 11.1923 10.222 10.5158 8.39405L10 7Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                        <path
+                            d="M18 3L17.7789 3.59745C17.489 4.38087 17.3441 4.77259 17.0583 5.05833C16.7726 5.34408 16.3809 5.48903 15.5975 5.77892L15 6L15.5975 6.22108C16.3809 6.51097 16.7726 6.65592 17.0583 6.94167C17.3441 7.22741 17.489 7.61913 17.7789 8.40255L18 9L18.2211 8.40255C18.511 7.61913 18.6559 7.22741 18.9417 6.94166C19.2274 6.65592 19.6191 6.51097 20.4025 6.22108L21 6L20.4025 5.77892C19.6191 5.48903 19.2274 5.34408 18.9417 5.05833C18.6559 4.77259 18.511 4.38087 18.2211 3.59745L18 3Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                    </svg>
+                </div>
                 <div id="aiHint" class="text-sm text-gray-600 mt-1 px-7"></div>
                 <div class="px-8 overflow-y-auto overscroll-contain min-h-0">
                     <form id="formModal" class="mt-3 space-y-4" action="{{ route('waste-logs.store') }}" method="POST"
@@ -190,7 +192,8 @@
                                     <label class="block text-sm font-medium text-gray-700">Hình ảnh:</label>
                                     <input type="file" name="waste_image[]" accept="image/*"
                                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                                    <p class="waste_image_file_name text-sm"></p>
+                                    <p class="waste_image_file_name text-sm flex justify-center items-center"
+                                        title=""></p>
                                     @error('waste_image')
                                         <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                                     @enderror
@@ -376,6 +379,8 @@
         const wrapper = document.getElementById('wasteFieldsWrapper');
         const addWasteRowBtn = document.getElementById('addWasteRowBtn');
         let originalWasteFieldsHTML = wrapper.innerHTML;
+        const baseSelect = wrapper.querySelector('.waste-item select[name="waste_type[]"]');
+        const baseOptionsHtml = baseSelect.innerHTML;
 
         let t;
         const $name = document.getElementById('itemName');
@@ -451,8 +456,10 @@
     <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
     <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
 </svg></button>`;
+                            newRow.querySelector('.waste_image_file_name').title = fileName;
                         }
                         wrapper.appendChild(newRow);
+
                     });
                 } else {
                     wrapper.innerHTML = originalWasteFieldsHTML;
@@ -468,38 +475,38 @@
             });
         });
 
-        async function openEditWasteLogModal(scheduleId) {
-            resetForm(form);
-            clearValidationState(form);
-            document.querySelector('input#schedule_id').value = scheduleId;
-            titleModal.textContent = 'Chỉnh sửa lượng rác thu gom';
-            wrapper.innerHTML = '';
-            addWasteRowBtn.classList.add('hidden');
+        //         async function openEditWasteLogModal(scheduleId) {
+        //             resetForm(form);
+        //             clearValidationState(form);
+        //             document.querySelector('input#schedule_id').value = scheduleId;
+        //             titleModal.textContent = 'Chỉnh sửa lượng rác thu gom';
+        //             wrapper.innerHTML = '';
+        //             addWasteRowBtn.classList.add('hidden');
 
-            // lấy dữ liệu từ server
-            const res = await fetch(`/waste-logs/get-by-collection-schedules?schedule_id=${scheduleId}`);
-            const data = await res.json();
+        //             // lấy dữ liệu từ server
+        //             const res = await fetch(`/waste-logs/get-by-collection-schedules?schedule_id=${scheduleId}`);
+        //             const data = await res.json();
 
-            if (data.waste_logs?.length) {
-                data.waste_logs.forEach(waste_log => {
-                    const newRow = makeRow();
+        //             if (data.waste_logs?.length) {
+        //                 data.waste_logs.forEach(waste_log => {
+        //                     const newRow = makeRow();
 
-                    // gán giá trị
-                    newRow.querySelector('select[name="waste_type[]"]').value = waste_log.waste_type_id;
-                    newRow.querySelector('input[name="waste_weight[]"]').value = waste_log.waste_weight;
-                    // newRow.querySelector('.waste_image_path').textContent = waste_log.waste_image;
-                    const fileName = getFileNameFromPath(waste_log.waste_image);
-                    const shortFileName = shortenFileName(fileName);
-                    // console.log(shortFileName);
-                    newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
-    <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
-    <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
-</svg></button>`;
-                    wrapper.appendChild(newRow);
-                });
-            }
-            openModal(modal, modalBox);
-        }
+        //                     // gán giá trị
+        //                     newRow.querySelector('select[name="waste_type[]"]').value = waste_log.waste_type_id;
+        //                     newRow.querySelector('input[name="waste_weight[]"]').value = waste_log.waste_weight;
+        //                     // newRow.querySelector('.waste_image_path').textContent = waste_log.waste_image;
+        //                     const fileName = getFileNameFromPath(waste_log.waste_image);
+        //                     const shortFileName = shortenFileName(fileName);
+        //                     // console.log(shortFileName);
+        //                     newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
+    //     <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
+    //     <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
+    // </svg></button>`;
+        //                     wrapper.appendChild(newRow);
+        //                 });
+        //             }
+        //             openModal(modal, modalBox);
+        //         }
 
         closeBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
@@ -573,6 +580,7 @@
         addWasteRowBtn.addEventListener('click', function() {
             const newRow = makeRow(false);
             wrapper.appendChild(newRow);
+            refreshWasteTypeOptions();
         });
 
         function makeRow() {
@@ -594,15 +602,49 @@
             if (e.target.classList.contains('deleteRowBtn')) {
                 const row = e.target.closest('.waste-item');
                 row.remove();
+                refreshWasteTypeOptions();
             }
         });
 
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('deleteRowEditBtn')) {
-                const row = e.target.closest('.waste-item');
-                row.remove();
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('select[name="wasteType[]"]')) {
+                refreshWasteTypeOptions();
             }
         });
+
+        function getUsedWasteTypes() {
+            const used = new Set();
+            wrapper.querySelectorAll('select[name="waste_type[]"]').forEach(sel => {
+                const val = sel.value;
+                if (val) used.add(val);
+            });
+            return used;
+        }
+
+        function refreshWasteTypeOptions() {
+            const used = getUsedWasteTypes();
+            wrapper.querySelectorAll('select[name="waste_type[]"]').forEach(sel => {
+                const current = sel.value; // giữ lựa chọn hiện tại
+
+                // reset lại toàn bộ options về như ban đầu
+                sel.innerHTML = baseOptionsHtml;
+
+                // khôi phục lại option đang chọn (nếu có)
+                if (current) {
+                    sel.value = current;
+                } else {
+                    sel.selectedIndex = 0;
+                }
+
+                // Disable các option đã được dùng ở select khác
+                sel.querySelectorAll('option').forEach(opt => {
+                    if (!opt.value) return; // bỏ placeholder
+                    if (used.has(opt.value) && opt.value !== String(current)) {
+                        opt.disabled = true;
+                    }
+                });
+            });
+        }
 
         function getFileNameFromPath(path) {
             if (!path) return '';

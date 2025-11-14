@@ -7,6 +7,7 @@ use App\Models\CollectionSchedule;
 use App\Models\WasteType;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -65,7 +66,7 @@ class WasteLogController extends Controller
                     ->filter(fn($v) => !empty($v))
                     ->isNotEmpty();
 
-            
+
             if (!$hasNewData) {
                 DB::commit();
 
@@ -87,8 +88,20 @@ class WasteLogController extends Controller
                 $imagePath = $request->input('old_waste_image.' . $i);
 
                 if ($request->hasFile('waste_image') && isset($request->file('waste_image')[$i])) {
-                    $imagePath = $request->file('waste_image')[$i];
-                    $data['waste_image'] = $imagePath->store('waste_logs/' . (int) $request->input('schedule_id'), 'public');
+                    $file = $request->file('waste_image')[$i];
+                    $wasteTypeName = WasteType::find($wasteTypeId)?->name ?? 'unknown';
+                    
+                    // Sinh tên file: yyyy-mm-dd_HH-MM-SS_ten-rac.ext
+                    $timestamp = now()->format('Y-m-d_H-i-s');
+                    $slug = Str::slug($wasteTypeName, '-');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = "{$timestamp}_{$slug}.{$extension}";
+
+                    // Đường dẫn thư mục lưu
+                    $folder = 'waste_logs/' . (int) $request->input('schedule_id');
+
+                    // Lưu file vào disk public
+                    $data['waste_image'] = $file->storeAs($folder, $filename, 'public');
                 }
 
                 WasteLog::create($data);

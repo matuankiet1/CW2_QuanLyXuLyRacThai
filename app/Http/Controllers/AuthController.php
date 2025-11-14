@@ -224,14 +224,16 @@ class AuthController extends Controller
         $data = $request->validate([
             'email' => ['required', 'email'],
         ]);
-        $email = strtolower($data['email']);
 
-        // Chỉ gửi nếu user tồn tại, nhưng phản hồi chung (không lộ thông tin)
-        if (User::where('email', $email)->exists()) {
+        $email = strtolower($data['email']);
+        $user = User::where('email', $email)->first();
+
+        // Chỉ gửi nếu user tồn tại và auth provider là local, nhưng phản hồi chung (không lộ thông tin)
+        if ($user && $user->auth_provider == 'local') {
             $code = random_int(100000, 999999);
             $hash = Hash::make((string) $code);
 
-            // Mỗi email chỉ có 1 mã đang hiệu lực (theo logic của app)
+            // Mỗi email chỉ có 1 mã đang hiệu lực
             DB::table('password_reset_codes')->where('email', $email)->delete();
 
             DB::table('password_reset_codes')->insert([
@@ -241,7 +243,7 @@ class AuthController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // Gửi mail (dev: Mailtrap; prod: SMTP thật)
+            // Gửi mail
             Mail::to($email)->send(new SendCodeMail($code));
         }
 
@@ -324,7 +326,7 @@ class AuthController extends Controller
         $email = session('pw_reset_email');
 
         $user = User::where('email', $email)->first();
-        if ($user) {
+        if ($user && $user->auth_provider == 'local') {
             $user->forceFill([
                 'password' => Hash::make($request->password),
                 'remember_token' => Str::random(60),

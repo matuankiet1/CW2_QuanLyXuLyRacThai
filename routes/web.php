@@ -18,10 +18,10 @@ use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\EventParticipantController;
 
 // Route để đánh dấu báo cáo đã đọc
-Route::post('/reports/user-reports/{id}/mark-read', function($id) {
+Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
     $report = App\Models\UserReport::findOrFail($id);
     $report->markAsRead();
-    
+
     return response()->json(['success' => true]);
 });
 
@@ -115,7 +115,7 @@ Route::middleware('admin')->group(function () {
         Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
         Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
         Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
-        
+
         // User Reports
         Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
         Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
@@ -144,6 +144,9 @@ Route::middleware('admin')->group(function () {
     Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
         ->name('admin.collection-schedules.deleteMultiple');
 
+    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
+        ->name('admin.collection-schedules.export-excel');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -153,11 +156,11 @@ Route::middleware('admin')->group(function () {
     ]);
 
     // 🟢 Banners
-Route::prefix('banners')->name('admin.banners.')->group(function () {
-    Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
-        ->name('confirm-delete');
-    Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
-});
+    Route::prefix('banners')->name('admin.banners.')->group(function () {
+        Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
+            ->name('confirm-delete');
+        Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
+    });
 
 
     //Events
@@ -201,13 +204,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
     Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
     Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
-    
+
     // Simple Notifications
     Route::get('/simple-notifications', [SimpleNotificationController::class, 'index'])->name('user.simple-notifications.index');
     Route::get('/simple-notifications/{id}', [SimpleNotificationController::class, 'show'])->name('user.simple-notifications.show');
     Route::post('/simple-notifications/{id}/mark-read', [SimpleNotificationController::class, 'markAsRead'])->name('user.simple-notifications.mark-read');
     Route::post('/simple-notifications/mark-all-read', [SimpleNotificationController::class, 'markAllAsRead'])->name('user.simple-notifications.mark-all-read');
-    
+
     // Notification Preferences
     Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
     Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');
