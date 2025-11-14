@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\CollectionSchedule;
+use App\Models\WasteLog;
+use App\Exports\CollectionScheduleExport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CollectionScheduleController extends Controller
 {
@@ -49,15 +52,17 @@ class CollectionScheduleController extends Controller
             $query->where('status', 'Chưa thực hiện');
         }
 
+        if ($request->hasAny(['radioFilterStaff', 'radioFilterScheduledDate', 'radioFilterCompletedAt', 'radioFilterStatus'])) {
+            $isFilter = true;
+        } else {
+            $query->orderByDesc('schedule_id');
+        }
+
         $collectionSchedules = $query
             ->select('collection_schedules.*')
             ->paginate(7)
             // GIỮ LẠI TẤT CẢ THAM SỐ QUERY HIỆN CÓ (trừ page)
             ->appends($request->except('page'));
-            
-        if ($request->hasAny(['radioFilterStaff', 'radioFilterScheduledDate', 'radioFilterCompletedAt', 'radioFilterStatus'])) {
-            $isFilter = true;
-        }
 
         return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'isFilter'));
     }
@@ -105,7 +110,10 @@ class CollectionScheduleController extends Controller
     public function show($id)
     {
         $collectionSchedule = CollectionSchedule::with('staff')->findOrFail($id);
-        return response()->json($collectionSchedule);
+        $wasteLogs = WasteLog::where('schedule_id', $id)
+            ->with('wasteType') //
+            ->get();
+        return response()->json([$collectionSchedule, $wasteLogs]);
     }
 
     /**
@@ -137,7 +145,7 @@ class CollectionScheduleController extends Controller
         try {
             $validated = $request->validate([
                 'staff_id' => 'required|exists:users,user_id',
-                'scheduled_date' => 'required|date|after_or_equal:now',
+                'scheduled_date' => 'required|date',
                 'completed_at' => 'nullable|date|after_or_equal:now',
                 'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
             ]);
@@ -211,6 +219,13 @@ class CollectionScheduleController extends Controller
             ->paginate(7);
         $isSearch = true;
         return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'q'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $q = $request->input('q');
+        $fileName = 'Tất cả lịch thu gom.xlsx';
+        return Excel::download(new CollectionScheduleExport($q), $fileName);
     }
 
 }
