@@ -16,6 +16,7 @@ use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\EventParticipantController;
+use App\Http\Controllers\FeedbackController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -131,11 +132,11 @@ Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
 
         // 🟢 Banners
-    Route::resource('banners', BannerController::class);
+        Route::resource('banners', BannerController::class);
 
-    Route::get('banners/{banner}/confirm-delete', 
-        [BannerController::class, 'confirmDelete']
-    )->name('banners.confirm-delete');
+        Route::get('banners/{banner}/confirm-delete', 
+            [BannerController::class, 'confirmDelete']
+        )->name('banners.confirm-delete');
 
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
@@ -216,4 +217,22 @@ Route::middleware('auth')->group(function () {
     // Notification Preferences
     Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
     Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');
+});
+
+
+// User Feedback
+Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+    Route::get('/feedback/create', [UserFeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/store', [UserFeedbackController::class, 'store'])->name('feedback.store');
+});
+
+
+
+/** --------------------------
+ *  ADMIN – Feedback
+ * -------------------------- */
+Route::prefix('admin/feedback')->name('admin.feedback.')->group(function () {
+    Route::get('/', [FeedbackController::class, 'index'])->name('index');           
+    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');   
+    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply'); 
 });
