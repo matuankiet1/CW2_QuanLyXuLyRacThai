@@ -28,7 +28,7 @@ class WasteLogController extends Controller
         $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
         // dd( $collectionSchedules);
         $isSearch = false;
-        return view('admin.waste_logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+        return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
     }
 
     /**
@@ -91,23 +91,20 @@ class WasteLogController extends Controller
                     $file = $request->file('waste_image')[$i];
                     $wasteTypeName = WasteType::find($wasteTypeId)?->name ?? 'unknown';
                     
-                    // Sinh tên file: yyyy-mm-dd_HH-MM-SS_ten-rac.ext
                     $timestamp = now()->format('Y-m-d_H-i-s');
                     $slug = Str::slug($wasteTypeName, '-');
                     $extension = $file->getClientOriginalExtension();
                     $filename = "{$timestamp}_{$slug}.{$extension}";
 
-                    // Đường dẫn thư mục lưu
                     $folder = 'waste_logs/' . (int) $request->input('schedule_id');
 
-                    // Lưu file vào disk public
-                    $data['waste_image'] = $file->storeAs($folder, $filename, 'public');
+                    $imagePath = $file->storeAs($folder, $filename, 'public');
                 }
+
+                $data['waste_image'] = $imagePath;
 
                 WasteLog::create($data);
             }
-            // dd('abc');
-
 
             DB::commit();
 
