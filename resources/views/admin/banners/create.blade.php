@@ -1,5 +1,7 @@
 @extends('layouts.admin-with-sidebar')
 
+@section('title', 'Thêm banner - Admin')
+
 @section('content')
 <div class="p-6">
     <!-- Header -->

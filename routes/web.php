@@ -130,6 +130,13 @@ Route::middleware('admin')->group(function () {
         Route::resource('posts', PostController::class);
         Route::resource('users', UserController::class);
 
+        // 🟢 Banners
+    Route::resource('banners', BannerController::class);
+
+    Route::get('banners/{banner}/confirm-delete', 
+        [BannerController::class, 'confirmDelete']
+    )->name('banners.confirm-delete');
+
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
@@ -155,12 +162,7 @@ Route::middleware('admin')->group(function () {
         'destroy' => 'admin.collection-schedules.destroy',
     ]);
 
-    // 🟢 Banners
-    Route::prefix('banners')->name('admin.banners.')->group(function () {
-        Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
-            ->name('confirm-delete');
-        Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
-    });
+    
 
 
     //Events
