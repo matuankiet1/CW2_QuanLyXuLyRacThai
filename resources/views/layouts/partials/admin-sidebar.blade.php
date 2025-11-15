@@ -63,12 +63,6 @@
             'section' => 'Báo cáo & Phân quyền',
             'items' => [
                 [
-                    'label' => 'Báo cáo thu gom rác',
-                    'icon' => 'fa-recycle',
-                    'route' => 'waste-logs.index',
-                    'active' => request()->routeIs('waste-logs.*'),
-                ],
-                [
                     'label' => 'Báo cáo người dùng',
                     'icon' => 'fa-flag',
                     'route' => 'admin.reports.user-reports',
