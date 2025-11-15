@@ -54,6 +54,9 @@ Route::post('register', [AuthController::class, 'register']);
 Route::get('auth/{provider}/redirect', [AuthController::class, 'redirectToProvider'])->name('login.social.redirect');
 Route::get('auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('login.social.callback');
 
+Route::get('login/add-mail', [AuthController::class, 'showAddMailForm'])->name('login.add-mail');
+Route::post('login/handleAddMailSubmit', [AuthController::class, 'handleAddMailSubmit'])->name('login.handle-add-mail-submit');
+
 // Quên mật khẩu
 Route::middleware('guest')->group(function () {
     // Nhập email, gửi mã, và xác thực mã

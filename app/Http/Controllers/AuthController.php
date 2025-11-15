@@ -127,9 +127,13 @@ class AuthController extends Controller
         abort_unless(in_array($provider, ['google', 'facebook']), 404);
 
         try {
-            $socialUser = Socialite::driver($provider)->user();
+            if ($provider === 'google') {
+                $socialUser = Socialite::driver($provider)->stateless()->user();
+            } else {
+                $socialUser = Socialite::driver($provider)->user();
+            }
         } catch (\Throwable $e) {
-            // dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
+            dd($e->getMessage(), $e);
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
             // ]);
@@ -175,9 +179,21 @@ class AuthController extends Controller
         // 3) Nếu chưa có ai => tạo mới
         if (!$user) {
             if (!$email) {
-                return redirect()->route('login')->with('status', [
-                    'type' => 'error',
-                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.'
+                // Lưu tạm social info vào session
+                session([
+                    'social_login' => [
+                        'provider' => $provider,
+                        'provider_id' => $providerId,
+                        'name' => $name ?: 'User ' . Str::random(6),
+                    ],
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không chia sẻ email. 
+                          Vui lòng nhập email để hoàn tất đăng ký.'
+                ]);
+
+                return redirect()->route('login.add-mail')->with('status', [
+                    'type' => 'warning',
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không chia sẻ email. 
+                          Vui lòng nhập email để hoàn tất đăng ký.'
                 ]);
             }
 
@@ -200,6 +216,55 @@ class AuthController extends Controller
             return redirect()->intended('/');
         }
     }
+
+    public function showAddMailForm()
+    {
+        $social = session('social_login');
+
+        if (!$social) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Phiên đăng nhập không hợp lệ.'
+            ]);
+        }
+        return view('auth.add_mail', ['social' => $social]);
+    }
+
+    public function handleAddMailSubmit(Request $request)
+    {
+        $social = session('social_login');
+
+        if (!$social) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Phiên đăng nhập không hợp lệ.'
+            ]);
+        }
+
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'unique:users,email'],
+        ]);
+
+        // Tạo user
+        $user = User::create([
+            'name' => $social['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make(Str::random(16)),
+            'role' => 'user',
+            'auth_provider' => $social['provider'],
+            'provider_id' => $social['provider_id'],
+            'email_verified_at' => now(),
+        ]);
+
+        // Xóa session tạm
+        session()->forget('social_login');
+
+        // Login
+        Auth::login($user, true);
+
+        return redirect()->intended('/');
+    }
+
 
     public function logout(Request $request)
     {
