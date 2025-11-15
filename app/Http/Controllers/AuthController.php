@@ -127,11 +127,7 @@ class AuthController extends Controller
         abort_unless(in_array($provider, ['google', 'facebook']), 404);
 
         try {
-            if ($provider === 'google') {
-                $socialUser = Socialite::driver($provider)->stateless()->user();
-            } else {
-                $socialUser = Socialite::driver($provider)->user();
-            }
+            $socialUser = Socialite::driver($provider)->user();
         } catch (\Throwable $e) {
             dd($e->getMessage(), $e);
             // return redirect()->route('login')->withErrors([
