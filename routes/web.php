@@ -14,12 +14,14 @@ use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\EventParticipantController;
 
 // Route để đánh dấu báo cáo đã đọc
-Route::post('/reports/user-reports/{id}/mark-read', function($id) {
+Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
     $report = App\Models\UserReport::findOrFail($id);
     $report->markAsRead();
-    
+
     return response()->json(['success' => true]);
 });
 
@@ -74,10 +76,21 @@ Route::middleware('guest')->group(function () {
 Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
 Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
 
+//--------------------------------------- EVENT ROUTES (Sinh viên xem và đăng ký sự kiện) -------------------------------------//
+Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
+Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
+
 //--------------------------------------- USER REPORTS -------------------------------------//
 Route::middleware('auth')->group(function () {
     Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
     Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
+    
+    // Đăng ký và hủy đăng ký sự kiện (yêu cầu đăng nhập)
+    Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
+    Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    
+    // Thống kê cá nhân
+    Route::get('/statistics', [App\Http\Controllers\UserStatisticsController::class, 'index'])->name('user.statistics.index');
 });
 
 // Waste Logs
@@ -102,7 +115,7 @@ Route::middleware('admin')->group(function () {
         Route::get('/posts', [App\Http\Controllers\ReportController::class, 'posts'])->name('posts');
         Route::get('/schedules', [App\Http\Controllers\ReportController::class, 'schedules'])->name('schedules');
         Route::get('/export', [App\Http\Controllers\ReportController::class, 'export'])->name('export');
-        
+
         // User Reports
         Route::get('/user-reports', [App\Http\Controllers\UserReportController::class, 'index'])->name('user-reports');
         Route::get('/user-reports/{id}', [App\Http\Controllers\UserReportController::class, 'show'])->name('user-reports.show');
@@ -131,6 +144,9 @@ Route::middleware('admin')->group(function () {
     Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
         ->name('admin.collection-schedules.deleteMultiple');
 
+    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
+        ->name('admin.collection-schedules.export-excel');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -140,16 +156,16 @@ Route::middleware('admin')->group(function () {
     ]);
 
     // 🟢 Banners
-Route::prefix('banners')->name('admin.banners.')->group(function () {
-    Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
-        ->name('confirm-delete');
-    Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
-});
+    Route::prefix('banners')->name('admin.banners.')->group(function () {
+        Route::get('/{banner}/confirm-delete', [BannerController::class, 'confirmDelete'])
+            ->name('confirm-delete');
+        Route::resource('/', BannerController::class)->parameters(['' => 'banner']);
+    });
 
 
     //Events
-    // Events
-    Route::prefix('events')->name('admin.events.')->group(function () {
+    // Events (Admin)
+    Route::prefix('admin/events')->name('admin.events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('/create', [EventController::class, 'create'])->name('create');
         Route::post('/', [EventController::class, 'store'])->name('store');
@@ -157,6 +173,19 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::put('/{event}', [EventController::class, 'update'])->name('update');
         Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
         Route::get('/export', [EventController::class, 'export'])->name('export');
+        
+        // Quản lý sinh viên tham gia sự kiện
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])->name('participants');
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])->name('participants.confirm');
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])->name('participants.attend');
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])->name('participants.bulk-confirm');
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])->name('participants.bulk-attend');
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])->name('participants.export');
+        
+        // Quản lý điểm thưởng cho sinh viên tham gia sự kiện
+        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
+        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
+        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
     });
 
 
@@ -175,13 +204,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-notifications', [NotificationController::class, 'userIndex'])->name('user.notifications.index');
     Route::get('/user-notifications/{id}', [NotificationController::class, 'userShow'])->name('user.notifications.show');
     Route::post('/user-notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('user.notifications.mark-all-read');
-    
+
     // Simple Notifications
     Route::get('/simple-notifications', [SimpleNotificationController::class, 'index'])->name('user.simple-notifications.index');
     Route::get('/simple-notifications/{id}', [SimpleNotificationController::class, 'show'])->name('user.simple-notifications.show');
     Route::post('/simple-notifications/{id}/mark-read', [SimpleNotificationController::class, 'markAsRead'])->name('user.simple-notifications.mark-read');
     Route::post('/simple-notifications/mark-all-read', [SimpleNotificationController::class, 'markAllAsRead'])->name('user.simple-notifications.mark-all-read');
-    
+
     // Notification Preferences
     Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
     Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');

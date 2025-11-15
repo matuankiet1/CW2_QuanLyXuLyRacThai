@@ -1,26 +1,16 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
-                <p>Không có báo cáo rác thải nào.</p>
+                <p>Không có lịch thu gom nào cần báo cáo.</p>
             </div>
         @else
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
-                        <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                                color="#ffffff" fill="none">
-                                <path
-                                    d="M8.85746 12.5061C6.36901 10.6456 4.59564 8.59915 3.62734 7.44867C3.3276 7.09253 3.22938 6.8319 3.17033 6.3728C2.96811 4.8008 2.86701 4.0148 3.32795 3.5074C3.7889 3 4.60404 3 6.23433 3H17.7657C19.396 3 20.2111 3 20.672 3.5074C21.133 4.0148 21.0319 4.8008 20.8297 6.37281C20.7706 6.83191 20.6724 7.09254 20.3726 7.44867C19.403 8.60062 17.6261 10.6507 15.1326 12.5135C14.907 12.6821 14.7583 12.9567 14.7307 13.2614C14.4837 15.992 14.2559 17.4876 14.1141 18.2442C13.8853 19.4657 12.1532 20.2006 11.226 20.8563C10.6741 21.2466 10.0043 20.782 9.93278 20.1778C9.79643 19.0261 9.53961 16.6864 9.25927 13.2614C9.23409 12.9539 9.08486 12.6761 8.85746 12.5061Z"
-                                    stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </button>
-
-                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
-                            class="relative w-full">
+                        <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full">
                             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,36 +20,12 @@
                                 class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                         </form>
                     </div>
-
-                    <div class="flex items-center gap-3 ml-auto">
-                        <button id="btnDeleteAll"
-                            class="hidden items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                                color="#ffffff" fill="none">
-                                <path
-                                    d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5"
-                                    stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
-                                <path
-                                    d="M3 5.5H21M16.0557 5.5L15.3731 4.09173C14.9196 3.15626 14.6928 2.68852 14.3017 2.39681C14.215 2.3321 14.1231 2.27454 14.027 2.2247C13.5939 2 13.0741 2 12.0345 2C10.9688 2 10.436 2 9.99568 2.23412C9.8981 2.28601 9.80498 2.3459 9.71729 2.41317C9.32164 2.7167 9.10063 3.20155 8.65861 4.17126L8.05292 5.5"
-                                    stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path>
-                                <path d="M9.5 16.5L9.5 10.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
-                                </path>
-                                <path d="M14.5 16.5L14.5 10.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
-                                </path>
-                            </svg>
-                            Xóa tất cả
-                        </button>
-                    </div>
                 </div>
 
                 <div class="overflow-x-auto" id="tableContainer">
                     <table class="min-w-full border-t border-gray-100">
                         <thead class="bg-green-50 text-gray-600 text-sm font-semibold">
                             <tr>
-                                <th class="py-3 px-4 text-left">
-                                    <input type="checkbox" id="selectAllCheckbox"
-                                        class="w-4 h-4 accent-green-600 cursor-pointer">
-                                </th>
                                 <th class="py-3 px-4 text-left">Mã lịch thu gom</th>
                                 <th class="py-3 px-4 text-left">Nhân viên thực hiện</th>
                                 <th class="py-3 px-4 text-left">Ngày thu gom</th>
@@ -71,9 +37,6 @@
                         <tbody class="text-sm divide-y divide-gray-100">
                             @forelse ($collectionSchedules as $collectionSchedule)
                                 <tr class="hover:bg-green-50">
-                                    <td class="py-3 px-4"><input type="checkbox" name="ids[]"
-                                            value="{{ $collectionSchedule->schedule_id }}"
-                                            class="checkbox w-4 h-4 accent-green-600 cursor-pointer"></td>
                                     <td class="py-3 px-4">{{ $collectionSchedule->schedule_id }}</td>
                                     <td class="py-3 px-4">{{ $collectionSchedule->staff->name }}</td>
                                     <td class="py-3 px-4">
@@ -99,26 +62,23 @@
                                             <button data-id="{{ $collectionSchedule->schedule_id }}"
                                                 class="addWasteLogBtn group inline-flex items-center justify-center hover:bg-green-300 rounded-xl mx-1 p-2 transition cursor-pointer"
                                                 data-modal="add" aria-label="Thêm">
-                                                {{-- Icon thêm --}}
-                                                <svg class="group-hover:text-green-700" xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 24 24" width="20" height="20" color="#000000"
-                                                    fill="none">
-                                                    <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                                <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
+                                                    color="#254434" fill="none" stroke="currentColor" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
                                                 </svg>
                                             </button>
 
-                                            <button data-id="{{ $collectionSchedule->schedule_id }}"
+                                            {{-- <button data-id="{{ $collectionSchedule->schedule_id }}"
                                                 class="editWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
                                                 data-modal="edit" aria-label="Chỉnh sửa">
-                                                {{-- Icon chỉnh sửa --}}
                                                 <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
                                                     color="#254434" fill="none" stroke="currentColor"
                                                     aria-hidden="true">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
                                                 </svg>
-                                            </button>
+                                            </button> --}}
                                         </div>
                                     </td>
                                 </tr>
@@ -169,7 +129,7 @@
                 class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-2xl w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300 flex flex-col max-h-[95vh]">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold px-7 titleModal">Thêm lượng rác thu gom</h2>
+                    <h2 class="text-lg font-semibold px-7 titleModal">Báo cáo lượng rác thu gom</h2>
                     <button id="closeModalBtn" class="px-7 text-gray-400 hover:text-gray-600 cursor-pointer">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -179,18 +139,32 @@
                 </div>
 
                 <label class="block text-sm font-medium mb-1 px-7">Không chắc loại rác? Nhập tên vật:</label>
-                <input id="itemName"
-                    class="border border-gray-300 rounded-lg mx-7 px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                    placeholder="Túi nilon, vỏ chuối, pin...">
+                <div class="relative mx-7">
+                    <input id="itemName"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
+                        placeholder="Túi nilon, vỏ chuối, pin...">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                        color="#000000" fill="none"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <path
+                            d="M10 7L9.48415 8.39405C8.80774 10.222 8.46953 11.136 7.80278 11.8028C7.13603 12.4695 6.22204 12.8077 4.39405 13.4842L3 14L4.39405 14.5158C6.22204 15.1923 7.13603 15.5305 7.80278 16.1972C8.46953 16.864 8.80774 17.778 9.48415 19.6059L10 21L10.5158 19.6059C11.1923 17.778 11.5305 16.864 12.1972 16.1972C12.864 15.5305 13.778 15.1923 15.6059 14.5158L17 14L15.6059 13.4842C13.778 12.8077 12.864 12.4695 12.1972 11.8028C11.5305 11.136 11.1923 10.222 10.5158 8.39405L10 7Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                        <path
+                            d="M18 3L17.7789 3.59745C17.489 4.38087 17.3441 4.77259 17.0583 5.05833C16.7726 5.34408 16.3809 5.48903 15.5975 5.77892L15 6L15.5975 6.22108C16.3809 6.51097 16.7726 6.65592 17.0583 6.94167C17.3441 7.22741 17.489 7.61913 17.7789 8.40255L18 9L18.2211 8.40255C18.511 7.61913 18.6559 7.22741 18.9417 6.94166C19.2274 6.65592 19.6191 6.51097 20.4025 6.22108L21 6L20.4025 5.77892C19.6191 5.48903 19.2274 5.34408 18.9417 5.05833C18.6559 4.77259 18.511 4.38087 18.2211 3.59745L18 3Z"
+                            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                    </svg>
+                </div>
                 <div id="aiHint" class="text-sm text-gray-600 mt-1 px-7"></div>
                 <div class="px-8 overflow-y-auto overscroll-contain min-h-0">
-                    <form class="mt-3 space-y-4" action="{{ route('waste-logs.store') }}" method="POST"
+                    <form id="formModal" class="mt-3 space-y-4" action="{{ route('waste-logs.store') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" value="" name="schedule_id" id="schedule_id">
                         <div id="wasteFieldsWrapper">
                             <div
                                 class="grid grid-cols-3 border border-gray-300 rounded-lg p-4 gap-4 mt-3 waste-item relative">
+                                {{-- Input ẩn dùng để lưu image_path cũ --}}
+                                <input type="hidden" value="" name="old_waste_image[]">
                                 <div class="flex flex-col items-start gap-1">
                                     <label class="block text-sm font-medium text-gray-700">Loại rác:</label>
                                     <select name="waste_type[]"
@@ -218,7 +192,8 @@
                                     <label class="block text-sm font-medium text-gray-700">Hình ảnh:</label>
                                     <input type="file" name="waste_image[]" accept="image/*"
                                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                                    <p class="waste_image_file_name text-sm"></p>
+                                    <p class="waste_image_file_name text-sm flex justify-center items-center"
+                                        title=""></p>
                                     @error('waste_image')
                                         <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                                     @enderror
@@ -245,7 +220,7 @@
                 <div class="flex justify-end gap-3 pt-3 px-7">
                     <button type="button" id="cancelModalBtn"
                         class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                    <button type="submit"
+                    <button type="submit" form="formModal"
                         class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
                 </div>
             </div>
@@ -385,8 +360,8 @@
             <img id="imgModalImg" src="" alt="Preview"
                 class="max-w-[90vw] max-h-[90vh] rounded shadow-lg object-contain">
             <button type="button" id="imgModalClose"
-                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow">
-                ×
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow cursor-pointer">
+                x
             </button>
         </div>
     </div>
@@ -404,6 +379,8 @@
         const wrapper = document.getElementById('wasteFieldsWrapper');
         const addWasteRowBtn = document.getElementById('addWasteRowBtn');
         let originalWasteFieldsHTML = wrapper.innerHTML;
+        const baseSelect = wrapper.querySelector('.waste-item select[name="waste_type[]"]');
+        const baseOptionsHtml = baseSelect.innerHTML;
 
         let t;
         const $name = document.getElementById('itemName');
@@ -447,14 +424,46 @@
         });
 
         addBtn.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', async function() {
                 resetForm(form);
 
                 const scheduleId = this.getAttribute('data-id');
                 document.querySelector('input#schedule_id').value = scheduleId;
 
-                titleModal.textContent = 'Thêm lượng rác thu gom';
-                wrapper.innerHTML = originalWasteFieldsHTML;
+                // lấy dữ liệu từ server
+                const res = await fetch(
+                    `/waste-logs/get-by-collection-schedules?schedule_id=${scheduleId}`);
+                const data = await res.json();
+
+                if (data.waste_logs?.length) {
+                    wrapper.innerHTML = '';
+                    data.waste_logs.forEach(waste_log => {
+                        const newRow = makeRow();
+                        // gán giá trị
+                        newRow.querySelector('select[name="waste_type[]"]').value = waste_log
+                            .waste_type_id;
+                        newRow.querySelector('input[name="waste_weight[]"]').value = waste_log
+                            .waste_weight;
+                        if (waste_log
+                            .waste_image) {
+                            newRow.querySelector('input[name="old_waste_image[]"]').value =
+                                waste_log
+                                .waste_image;
+                            const fileName = getFileNameFromPath(waste_log.waste_image);
+                            const shortFileName = shortenFileName(fileName);
+                            // console.log(shortFileName);
+                            newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn hover:bg-gray-200 p-1 rounded-xl transition cursor-pointer" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
+    <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
+    <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
+</svg></button>`;
+                            newRow.querySelector('.waste_image_file_name').title = fileName;
+                        }
+                        wrapper.appendChild(newRow);
+
+                    });
+                } else {
+                    wrapper.innerHTML = originalWasteFieldsHTML;
+                }
                 openModal(modal, modalBox);
             });
         });
@@ -466,38 +475,38 @@
             });
         });
 
-        async function openEditWasteLogModal(scheduleId) {
-            resetForm(form);
-            clearValidationState(form);
-            document.querySelector('input#schedule_id').value = scheduleId;
-            titleModal.textContent = 'Chỉnh sửa lượng rác thu gom';
-            wrapper.innerHTML = '';
-            console.log(wrapper);
+        //         async function openEditWasteLogModal(scheduleId) {
+        //             resetForm(form);
+        //             clearValidationState(form);
+        //             document.querySelector('input#schedule_id').value = scheduleId;
+        //             titleModal.textContent = 'Chỉnh sửa lượng rác thu gom';
+        //             wrapper.innerHTML = '';
+        //             addWasteRowBtn.classList.add('hidden');
 
+        //             // lấy dữ liệu từ server
+        //             const res = await fetch(`/waste-logs/get-by-collection-schedules?schedule_id=${scheduleId}`);
+        //             const data = await res.json();
 
-            // lấy dữ liệu từ server
-            const res = await fetch(`/waste-logs/get-by-collection-schedules?schedule_id=${scheduleId}`);
-            const data = await res.json();
+        //             if (data.waste_logs?.length) {
+        //                 data.waste_logs.forEach(waste_log => {
+        //                     const newRow = makeRow();
 
-            if (data.waste_logs?.length) {
-                data.waste_logs.forEach(waste_log => {
-                    const newRow = makeRow();
-                    // gán giá trị
-                    newRow.querySelector('select[name="waste_type[]"]').value = waste_log.waste_type_id;
-                    newRow.querySelector('input[name="waste_weight[]"]').value = waste_log.waste_weight;
-                    // newRow.querySelector('.waste_image_path').textContent = waste_log.waste_image;
-                    const fileName = getFileNameFromPath(waste_log.waste_image);
-                    const shortFileName = shortenFileName(fileName);
-                    // console.log(shortFileName);
-                    newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
-    <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
-    <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
-</svg></button>`;
-                    wrapper.appendChild(newRow);
-                });
-            }
-            openModal(modal, modalBox);
-        }
+        //                     // gán giá trị
+        //                     newRow.querySelector('select[name="waste_type[]"]').value = waste_log.waste_type_id;
+        //                     newRow.querySelector('input[name="waste_weight[]"]').value = waste_log.waste_weight;
+        //                     // newRow.querySelector('.waste_image_path').textContent = waste_log.waste_image;
+        //                     const fileName = getFileNameFromPath(waste_log.waste_image);
+        //                     const shortFileName = shortenFileName(fileName);
+        //                     // console.log(shortFileName);
+        //                     newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
+    //     <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
+    //     <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
+    // </svg></button>`;
+        //                     wrapper.appendChild(newRow);
+        //                 });
+        //             }
+        //             openModal(modal, modalBox);
+        //         }
 
         closeBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
@@ -569,8 +578,9 @@
         });
 
         addWasteRowBtn.addEventListener('click', function() {
-            const newRow = makeRow();
+            const newRow = makeRow(false);
             wrapper.appendChild(newRow);
+            refreshWasteTypeOptions();
         });
 
         function makeRow() {
@@ -583,6 +593,7 @@
             newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
 
             newRow.querySelector('.deleteRowBtn')?.classList.remove('hidden');
+
             return newRow;
         }
 
@@ -590,13 +601,50 @@
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('deleteRowBtn')) {
                 const row = e.target.closest('.waste-item');
-
-                // không cho xoá nếu chỉ còn 1 dòng
-                if (document.querySelectorAll('.waste-item').length > 1) {
-                    row.remove();
-                }
+                row.remove();
+                refreshWasteTypeOptions();
             }
         });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('select[name="wasteType[]"]')) {
+                refreshWasteTypeOptions();
+            }
+        });
+
+        function getUsedWasteTypes() {
+            const used = new Set();
+            wrapper.querySelectorAll('select[name="waste_type[]"]').forEach(sel => {
+                const val = sel.value;
+                if (val) used.add(val);
+            });
+            return used;
+        }
+
+        function refreshWasteTypeOptions() {
+            const used = getUsedWasteTypes();
+            wrapper.querySelectorAll('select[name="waste_type[]"]').forEach(sel => {
+                const current = sel.value; // giữ lựa chọn hiện tại
+
+                // reset lại toàn bộ options về như ban đầu
+                sel.innerHTML = baseOptionsHtml;
+
+                // khôi phục lại option đang chọn (nếu có)
+                if (current) {
+                    sel.value = current;
+                } else {
+                    sel.selectedIndex = 0;
+                }
+
+                // Disable các option đã được dùng ở select khác
+                sel.querySelectorAll('option').forEach(opt => {
+                    if (!opt.value) return; // bỏ placeholder
+                    if (used.has(opt.value) && opt.value !== String(current)) {
+                        opt.disabled = true;
+                    }
+                });
+            });
+        }
 
         function getFileNameFromPath(path) {
             if (!path) return '';
@@ -610,7 +658,7 @@
         }
 
         // Rút gọn tên file
-        function shortenFileName(name, head = 7, tail = 5) {
+        function shortenFileName(name, head = 5, tail = 5) {
             if (!name) return '';
             const max = head + tail + 3; // + '...'
             return name.length > max ?
