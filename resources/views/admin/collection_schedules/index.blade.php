@@ -1,6 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.admin-with-sidebar')
 
-@section('main-content')
+@section('content')
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
@@ -15,7 +15,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     {{-- Button open canvas to fillter --}}
-                    <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
+                    <div class="flex flex-row md:w-1/2 gap-3">
                         <button id="openOffCanvasBtn" class="p-3 rounded-xl hover:bg-gray-100 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
                                 color="#ffffff" fill="none">
@@ -27,13 +27,17 @@
 
                         <form action="{{ route('admin.collection-schedules.search') }}" method="GET"
                             class="relative w-full">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
-                            </svg>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
-                                class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                            <div class="relative w-full flex items-center">
+                                <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
+                                </svg>
+
+                                <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
+                                    class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
+               focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                            </div>
                         </form>
                     </div>
 
@@ -55,6 +59,11 @@
                             </svg>
                             Xóa tất cả
                         </button>
+
+                        <a href="{{ route('admin.collection-schedules.export-excel', ['q' => request('q')]) }}"
+                            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
+                            Xuất file excel
+                        </a>
 
                         <button
                             class="openModalBtn inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
@@ -237,7 +246,7 @@
                         <label class="block text-sm font-medium text-gray-700">Trạng thái:</label>
                         <select id="selectStatus" name="status"
                             class="block w-full mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                            <option value="Chưa thực hiện"
+                            <option value="Chưa thực hiện" selected
                                 {{ old('status', 'Chưa thực hiện') === 'Chưa thực hiện' ? 'selected' : '' }}>
                                 Chưa thực hiện</option>
                             <option value="Đã hoàn thành" {{ old('status') === 'Đã hoàn thành' ? 'selected' : '' }}>Đã
@@ -488,13 +497,13 @@
                 console.log(data);
 
                 if (data) {
-                    inputName.value = data.staff.name;
-                    inputScheduledDate.value = data.scheduled_date ? new Date(data
+                    inputName.value = data[0].staff.name;
+                    inputScheduledDate.value = data[0].scheduled_date ? new Date(data[0]
                         .scheduled_date).toISOString().split('T')[0] : '';
-                    inputCompletedAt.value = data.completed_at ? new Date(data.completed_at)
+                    inputCompletedAt.value = data[0].completed_at ? new Date(data[0].completed_at)
                         .toISOString().split('T')[0] : '';
-                    selectStatus.value = data.status;
-                    statusHidden.value = data.status;
+                    selectStatus.value = data[0].status;
+                    statusHidden.value = data[0].status;
                 }
                 titleModal.textContent = 'Chỉnh sửa lịch thu gom';
                 // displayCompletedAtField(true);
@@ -633,6 +642,7 @@
         }
     </script>
 
+    @vite(['resources/js/checkbox.js'])
     @vite(['resources/js/offcanvas.js'])
 
 @endsection
