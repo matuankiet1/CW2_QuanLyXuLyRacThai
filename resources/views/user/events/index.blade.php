@@ -106,7 +106,7 @@
                             </div>
                             <div class="flex items-center text-gray-600">
                                 <i class="fas fa-calendar mr-2 text-green-600 w-4"></i>
-                                <span class="text-sm">{{ $event->event_start_date->format('d/m/Y') }}</span>
+                                <span class="text-sm">{{ $event->event_start_date->format('d/m/Y') }} - {{ $event->event_end_date->format('d/m/Y') }}</span>
                             </div>
                             <div class="flex items-center text-gray-600">
                                 <i class="fas fa-clock mr-2 text-green-600 w-4"></i>
@@ -128,6 +128,9 @@
                                 if ($event->event_start_date > now()) {
                                     $statusColor = 'bg-blue-500';
                                     $statusText = 'Sắp tới';
+                                } elseif ($event->register_date < now() && $event->register_end_date > now()) {
+                                    $statusColor = 'bg-blue-500';
+                                    $statusText = 'Đang đăng ký';
                                 } elseif ($event->event_end_date < now()) {
                                     $statusColor = 'bg-gray-500';
                                     $statusText = 'Đã kết thúc';
