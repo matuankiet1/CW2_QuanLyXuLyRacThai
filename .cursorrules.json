@@ -1,0 +1,8 @@
+{
+    "defaultModels": {
+      "chat": "Sonnet 4.5",
+      "inlineEdit": "GPT-5 Codex Fast",
+      "command": "GPT-5 Codex High"
+    }
+  }
+  
