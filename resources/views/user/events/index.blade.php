@@ -62,6 +62,10 @@
                    class="px-4 py-2 rounded-lg transition {{ ($status ?? 'upcoming') === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Sắp tới
                 </a>
+                <a href="{{ route('user.events.index', ['status' => 'registering']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'registering') === 'registering' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    Đang đăng ký
+                </a>
                 <a href="{{ route('user.events.index', ['status' => 'ongoing']) }}" 
                    class="px-4 py-2 rounded-lg transition {{ ($status ?? '') === 'ongoing' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Đang diễn ra
@@ -106,11 +110,11 @@
                             </div>
                             <div class="flex items-center text-gray-600">
                                 <i class="fas fa-calendar mr-2 text-green-600 w-4"></i>
-                                <span class="text-sm">{{ $event->event_start_date->format('d/m/Y') }} - {{ $event->event_end_date->format('d/m/Y') }}</span>
+                                <span class="text-sm"> Ngày đăng ký: {{ $event->register_date->format('d/m/Y') }} - {{ $event->register_end_date->format('d/m/Y') }}</span>
                             </div>
                             <div class="flex items-center text-gray-600">
-                                <i class="fas fa-clock mr-2 text-green-600 w-4"></i>
-                                <span class="text-sm">{{ $event->event_start_date->format('H:i') }} - {{ $event->event_end_date->format('H:i') }}</span>
+                                <i class="fas fa-calendar mr-2 text-green-600 w-4"></i>
+                                <span class="text-sm"> Ngày diễn ra: {{ $event->event_start_date->format('d/m/Y') }} - {{ $event->event_end_date->format('d/m/Y') }}</span>
                             </div>
                             @if($event->capacity)
                                 <div class="flex items-center text-gray-600">
@@ -125,16 +129,16 @@
                             @php
                                 $statusColor = 'bg-gray-500';
                                 $statusText = 'Không xác định';
-                                if ($event->event_start_date > now()) {
+                                if ($event->register_date > now()) {
                                     $statusColor = 'bg-blue-500';
                                     $statusText = 'Sắp tới';
-                                } elseif ($event->register_date < now() && $event->register_end_date > now()) {
+                                } elseif ($event->register_date <= now() && $event->register_end_date >= now()){
                                     $statusColor = 'bg-blue-500';
                                     $statusText = 'Đang đăng ký';
                                 } elseif ($event->event_end_date < now()) {
                                     $statusColor = 'bg-gray-500';
                                     $statusText = 'Đã kết thúc';
-                                } else {
+                                } elseif  ($event->event_start_date <= now() && $event->event_end_date >= now() && $event->register_end_date < now()){
                                     $statusColor = 'bg-green-500';
                                     $statusText = 'Đang diễn ra';
                                 }

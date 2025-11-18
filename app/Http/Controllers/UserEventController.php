@@ -32,6 +32,10 @@ class UserEventController extends Controller
         if ($status === 'upcoming') {
             $query->where('event_start_date', '>', now())
                   ->where('status', 'upcoming');
+        } elseif ($status === 'registering') {
+            $query->where('register_date', '<=', now())
+                  ->where('register_end_date', '>=', now())
+                  ->where('status', '!=', 'completed');
         } elseif ($status === 'ongoing') {
             $query->where('event_start_date', '<=', now())
                   ->where('event_end_date', '>=', now())
