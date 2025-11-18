@@ -24,7 +24,7 @@ class EventRewardController extends Controller
      */
     public function index(Request $request, $id)
     {
-        $event = Event::with(['createdBy'])->findOrFail($id);
+        $event = Event::findOrFail($id);
         
         // Chỉ lấy sinh viên đã tham gia (status = 'attended')
         $query = EventUser::with(['user'])

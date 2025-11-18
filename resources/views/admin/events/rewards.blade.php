@@ -10,7 +10,7 @@
     - Cập nhật điểm thưởng hàng loạt
     - Sắp xếp theo điểm thưởng, ngày điểm danh, tên
 --}}
-@extends('layouts.admin')
+@extends('layouts.admin-with-sidebar')
 
 @section('title', 'Danh sách sinh viên nhận điểm thưởng - ' . $event->title)
 
@@ -21,7 +21,7 @@
         <p class="text-gray-600 mt-1">{{ $event->title }}</p>
     </div>
     <div class="flex gap-3">
-        <a href="{{ route('admin.events.participants', $event->id) }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+        <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
             <i class="fas fa-arrow-left mr-2"></i>Quay lại
         </a>
         <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
@@ -37,8 +37,6 @@
         <li><a href="{{ route('admin.home') }}" class="hover:text-green-600">Trang chủ</a></li>
         <li><i class="fas fa-chevron-right text-xs"></i></li>
         <li><a href="{{ route('admin.events.index') }}" class="hover:text-green-600">Sự kiện</a></li>
-        <li><i class="fas fa-chevron-right text-xs"></i></li>
-        <li><a href="{{ route('admin.events.participants', $event->id) }}" class="hover:text-green-600">Quản lý sinh viên</a></li>
         <li><i class="fas fa-chevron-right text-xs"></i></li>
         <li class="text-gray-900 font-medium">Điểm thưởng</li>
     </ol>
@@ -293,6 +291,25 @@
         checkbox.addEventListener('change', function() {
             const allChecked = Array.from(document.querySelectorAll('.participant-checkbox')).every(cb => cb.checked);
             document.getElementById('selectAll').checked = allChecked;
+        });
+    });
+
+    // Bulk update form submission
+    document.querySelector('form[action*="bulk-update"]')?.addEventListener('submit', function(e) {
+        const checkedBoxes = document.querySelectorAll('.participant-checkbox:checked');
+        if (checkedBoxes.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất một sinh viên để cập nhật điểm thưởng!');
+            return false;
+        }
+        
+        // Add hidden inputs for selected user IDs
+        checkedBoxes.forEach(checkbox => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'user_ids[]';
+            hiddenInput.value = checkbox.value;
+            this.appendChild(hiddenInput);
         });
     });
 </script>

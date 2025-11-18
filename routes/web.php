@@ -14,8 +14,6 @@ use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
-use App\Http\Controllers\UserEventController;
-use App\Http\Controllers\EventParticipantController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -79,21 +77,10 @@ Route::middleware('guest')->group(function () {
 Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
 Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
 
-//--------------------------------------- EVENT ROUTES (Sinh viên xem và đăng ký sự kiện) -------------------------------------//
-Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
-Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
-
 //--------------------------------------- USER REPORTS -------------------------------------//
 Route::middleware('auth')->group(function () {
     Route::get('/reports/create', [App\Http\Controllers\UserReportController::class, 'create'])->name('user.reports.create');
     Route::post('/reports', [App\Http\Controllers\UserReportController::class, 'store'])->name('user.reports.store');
-    
-    // Đăng ký và hủy đăng ký sự kiện (yêu cầu đăng nhập)
-    Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
-    Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
-    
-    // Thống kê cá nhân
-    Route::get('/statistics', [App\Http\Controllers\UserStatisticsController::class, 'index'])->name('user.statistics.index');
 });
 
 // Waste Logs
@@ -169,8 +156,8 @@ Route::middleware('admin')->group(function () {
 
 
     //Events
-    // Events (Admin)
-    Route::prefix('admin/events')->name('admin.events.')->group(function () {
+    // Events
+    Route::prefix('events')->name('admin.events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('/create', [EventController::class, 'create'])->name('create');
         Route::post('/', [EventController::class, 'store'])->name('store');
@@ -178,14 +165,6 @@ Route::middleware('admin')->group(function () {
         Route::put('/{event}', [EventController::class, 'update'])->name('update');
         Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
         Route::get('/export', [EventController::class, 'export'])->name('export');
-        
-        // Quản lý sinh viên tham gia sự kiện
-        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])->name('participants');
-        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])->name('participants.confirm');
-        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])->name('participants.attend');
-        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])->name('participants.bulk-confirm');
-        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])->name('participants.bulk-attend');
-        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])->name('participants.export');
         
         // Quản lý điểm thưởng cho sinh viên tham gia sự kiện
         Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
