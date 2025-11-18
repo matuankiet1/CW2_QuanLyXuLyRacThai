@@ -157,6 +157,11 @@ Route::prefix('banners')->name('admin.banners.')->group(function () {
         Route::put('/{event}', [EventController::class, 'update'])->name('update');
         Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
         Route::get('/export', [EventController::class, 'export'])->name('export');
+        
+        // Quản lý điểm thưởng cho sinh viên tham gia sự kiện
+        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
+        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
+        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
     });
 
 
