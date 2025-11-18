@@ -3,144 +3,146 @@
 @section('title', 'Dashboard - Admin')
 
 @section('content')
-<div class="container-fluid px-4 py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 fw-bold">Dashboard</h1>
-        <span class="badge bg-success">Bản thử nghiệm</span>
-    </div>
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p class="text-gray-500 mt-1">Tổng quan hệ thống quản lý xử lý rác thải</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">Bản thử nghiệm</span>
+        </div>
 
-    <!-- Metrics Cards -->
-    <div class="row g-4 mb-4">
-        <!-- Tổng rác thu gom tháng này -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 p-3">
-                            <i class="fas fa-trash-alt text-primary fs-4"></i>
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Tổng rác thu gom tháng này -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-green-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trash-alt text-green-600 text-xl"></i>
                         </div>
-                        <span class="badge bg-success-subtle text-success">↑ 8.3%</span>
+                        <span class="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">↑ 8.3%</span>
                     </div>
-                    <h6 class="text-muted mb-2 small text-uppercase">Tổng rác thu gom tháng này</h6>
-                    <h2 class="mb-0 fw-bold">534 <span class="fs-6 text-muted">kg</span></h2>
-                    <small class="text-muted d-block mt-2">↑ 8.3% so với tháng trước</small>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Tổng rác thu gom tháng này</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">534 <span class="text-lg text-gray-500">kg</span></h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 8.3% so với tháng trước</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Sinh viên tham gia -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
-                            <i class="fas fa-users text-info fs-4"></i>
+            <!-- Sinh viên tham gia -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-blue-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
                         </div>
-                        <span class="badge bg-success-subtle text-success">↑ 12.8%</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">↑ 12.8%</span>
                     </div>
-                    <h6 class="text-muted mb-2 small text-uppercase">Sinh viên tham gia</h6>
-                    <h2 class="mb-0 fw-bold">167</h2>
-                    <small class="text-muted d-block mt-2">↑ 12.8% so với tháng trước</small>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Sinh viên tham gia</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">167</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 12.8% so với tháng trước</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Sự kiện trong tháng -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
-                            <i class="fas fa-calendar-check text-warning fs-4"></i>
+            <!-- Sự kiện trong tháng -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-yellow-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-yellow-600 text-xl"></i>
                         </div>
-                        <span class="badge bg-success-subtle text-success">+2</span>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs font-semibold rounded-full">+2</span>
                     </div>
-                    <h6 class="text-muted mb-2 small text-uppercase">Sự kiện trong tháng</h6>
-                    <h2 class="mb-0 fw-bold">8</h2>
-                    <small class="text-muted d-block mt-2">↑ 2 sự kiện mới</small>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Sự kiện trong tháng</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $upcomingEventsCount }}</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 2 sự kiện mới</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Điểm thưởng phát ra -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="rounded-circle bg-success bg-opacity-10 p-3">
-                            <i class="fas fa-star text-success fs-4"></i>
+            <!-- Điểm thưởng phát ra -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border-l-4 border-purple-500">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-star text-purple-600 text-xl"></i>
                         </div>
-                        <span class="badge bg-success-subtle text-success">↑ 15.4%</span>
+                        <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">↑ 15.4%</span>
                     </div>
-                    <h6 class="text-muted mb-2 small text-uppercase">Điểm thưởng phát ra</h6>
-                    <h2 class="mb-0 fw-bold">2,850</h2>
-                    <small class="text-muted d-block mt-2">↑ 15.4% so với tháng trước</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="row g-4 mb-4">
-        <!-- Thống kê rác thải theo tháng -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="card-title mb-0 fw-semibold">
-                        <i class="fas fa-chart-line text-primary me-2"></i>
-                        Thống kê rác thải theo tháng
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="wasteChart" height="100"></canvas>
+                    <p class="text-gray-500 text-sm font-medium mb-1">Điểm thưởng phát ra</p>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">2,850</h3>
+                    <p class="text-green-600 text-xs font-medium mt-2">↑ 15.4% so với tháng trước</p>
                 </div>
             </div>
         </div>
 
-        <!-- Phân loại rác thải -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="card-title mb-0 fw-semibold">
-                        <i class="fas fa-chart-pie text-success me-2"></i>
-                        Phân loại rác thải
-                    </h5>
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Thống kê rác thải theo tháng -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Thống kê rác thải theo tháng</h5>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <canvas id="wasteTypeChart" height="300"></canvas>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="wasteChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phân loại rác thải -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-pie text-blue-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Phân loại rác thải</h5>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="wasteTypeChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Additional Charts Row -->
-    <div class="row g-4 mb-4">
-        <!-- Xu hướng tham gia sinh viên -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="card-title mb-0 fw-semibold">
-                        <i class="fas fa-chart-area text-info me-2"></i>
-                        Xu hướng tham gia sinh viên
-                    </h5>
+        <!-- Additional Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Xu hướng tham gia sinh viên -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-area text-purple-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Xu hướng tham gia sinh viên</h5>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <canvas id="studentTrendChart" height="100"></canvas>
+                <div class="p-6">
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="studentTrendChart"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Top 5 sinh viên tích cực -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="card-title mb-0 fw-semibold">
-                        <i class="fas fa-trophy text-warning me-2"></i>
-                        Top 5 sinh viên tích cực
-                    </h5>
+            <!-- Top 5 sinh viên tích cực -->
+            <div class="bg-white rounded-xl shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-trophy text-yellow-600"></i>
+                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900">Top 5 sinh viên tích cực</h5>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     @php
                         $topStudents = [
                             ['name' => 'Nguyễn Văn A', 'points' => 450, 'waste' => 89],
@@ -150,23 +152,21 @@
                             ['name' => 'Hoàng Văn E', 'points' => 365, 'waste' => 71],
                         ];
                     @endphp
-                    <div class="list-group list-group-flush">
+                    <div class="space-y-4">
                         @foreach($topStudents as $index => $student)
-                            <div class="list-group-item border-0 px-0 py-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
-                                            {{ $index + 1 }}
-                                        </div>
+                            <div class="flex items-center gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                                        {{ $index + 1 }}
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="mb-1 fw-semibold">{{ $student['name'] }}</h6>
-                                        <small class="text-muted">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</small>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <div class="progress" style="width: 80px; height: 8px;">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ ($student['points'] / 500) * 100 }}%" aria-valuenow="{{ $student['points'] }}" aria-valuemin="0" aria-valuemax="500"></div>
-                                        </div>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="font-semibold text-gray-900 truncate">{{ $student['name'] }}</div>
+                                    <div class="text-sm text-gray-500">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</div>
+                                </div>
+                                <div class="flex-shrink-0 w-24">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500" style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -176,18 +176,18 @@
             </div>
         </div>
     </div>
-</div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Chart colors
-    const primaryColor = '#0d6efd';
-    const successColor = '#198754';
-    const infoColor = '#0dcaf0';
-    const warningColor = '#ffc107';
-    const dangerColor = '#dc3545';
+    const primaryColor = '#10b981';
+    const successColor = '#059669';
+    const infoColor = '#34d399';
+    const warningColor = '#f59e0b';
+    const blueColor = '#3b82f6';
+    const purpleColor = '#8b5cf6';
 
     // Thống kê rác thải theo tháng
     const wasteCtx = document.getElementById('wasteChart');
@@ -200,22 +200,62 @@ document.addEventListener('DOMContentLoaded', function() {
                     label: 'Rác thu gom (kg)',
                     data: [420, 480, 510, 490, 520, 534],
                     borderColor: primaryColor,
-                    backgroundColor: primaryColor + '20',
+                    backgroundColor: primaryColor + '40',
+                    borderWidth: 3,
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    pointBackgroundColor: primaryColor,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: false
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 }
             }
@@ -231,15 +271,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: ['Rác tái chế', 'Rác hữu cơ', 'Rác vô cơ', 'Rác nguy hại'],
                 datasets: [{
                     data: [35, 30, 25, 10],
-                    backgroundColor: [primaryColor, successColor, infoColor, warningColor]
+                    backgroundColor: [
+                        primaryColor,
+                        successColor,
+                        blueColor,
+                        warningColor
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12
+                            },
+                            color: '#374151',
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
                     }
                 }
             }
@@ -256,21 +329,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Sinh viên tham gia',
                     data: [120, 135, 145, 150, 160, 167],
-                    backgroundColor: infoColor,
-                    borderRadius: 4
+                    backgroundColor: purpleColor,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 40
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: false
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            },
+                            stepSize: 20
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 }
             }
@@ -278,26 +388,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush
-
-@push('styles')
-<style>
-    .card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    .progress {
-        border-radius: 10px;
-    }
-    
-    .progress-bar {
-        border-radius: 10px;
-    }
-</style>
 @endpush
 @endsection
