@@ -128,7 +128,7 @@ class AuthController extends Controller
 
         try {
             $socialUser = Socialite::driver($provider)->user();
-        } catch (\Throwable $e) {
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
             dd($e->getMessage(), $e);
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',

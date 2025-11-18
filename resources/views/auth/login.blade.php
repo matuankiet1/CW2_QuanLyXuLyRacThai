@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 p-4">
-        <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-400">
+        <div class="w-full max-w-md px-8 py-6 bg-white rounded-xl shadow-lg border border-gray-400">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-green-600 text-white rounded-xl mb-4">
                     {{-- SVG Icon cho chiếc lá (Leaf) thay thế cho lucide-react --}}
@@ -82,12 +82,12 @@
                 </button>
             </form>
 
-            <p class="mt-4 my-2 text-center text-gray-600 text-sm">hoặc</p>
+            <p class="my-3 text-center text-gray-600 text-sm">hoặc</p>
 
             <a href="{{ route('login.social.redirect', 'google') }}" role="button"
                 class="flex items-center justify-center space-x-3 w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out no-underline"
                 aria-label="Đăng nhập bằng Google">
-                <img class="w-8 h-8" src="images/social-google.png" alt="Login with Google">
+                <img class="w-6 h-6" src="images/social-google.png" alt="Login with Google">
                 <span class="text-sm">
                     Đăng nhập bằng Google
                 </span>
@@ -96,15 +96,11 @@
             <a href="{{ route('login.social.redirect', 'facebook') }}" role="button"
                 class="mt-3 flex items-center justify-center space-x-3 w-full px-4 py-2 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out no-underline"
                 aria-label="Đăng nhập bằng Google" disabled>
-                <img class="w-8 h-8" src="images/social-facebook.png" alt="Login with Facebook">
+                <img class="w-6 h-6" src="images/social-facebook.png" alt="Login with Facebook">
                 <span class="text-sm">
                     Đăng nhập bằng Facebook
                 </span>
             </a>
-
-            <div class="mt-6 text-center text-sm text-gray-500">
-                <p>Demo: admin@school.edu / password</p>
-            </div>
 
             <div class="mt-4 text-center text-sm">
                 <span class="text-gray-600">Chưa có tài khoản? </span>
