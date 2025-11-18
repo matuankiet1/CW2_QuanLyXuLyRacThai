@@ -71,7 +71,7 @@ class FirebaseNotification extends Notification
         // Thêm data payload nếu có
         if (!empty($this->data)) {
             $message->setData($this->data);
-        }
+    }
 
         return $message;
     }

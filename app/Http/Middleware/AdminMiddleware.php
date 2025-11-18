@@ -22,7 +22,7 @@ class AdminMiddleware
 
         // Kiểm tra xem user có phải admin không
         if (auth()->user()->role !== 'admin') {
-            return redirect()->route('posts.home')->with('error', 'Bạn không có quyền truy cập trang này.');
+            return redirect()->route('user.posts.home')->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
         return $next($request);

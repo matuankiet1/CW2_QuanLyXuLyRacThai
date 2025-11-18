@@ -96,7 +96,8 @@
     ];
 @endphp
 
-<aside id="sidebar" class="sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-lg z-40 overflow-y-auto">
+<aside id="sidebar"
+    class="sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-lg z-40 overflow-y-auto">
     <!-- Sidebar Header -->
     <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4">
         <h5 class="font-semibold text-lg mb-1">
@@ -104,30 +105,31 @@
         </h5>
         <p class="text-sm text-white/90">Quản lý hệ thống</p>
     </div>
-    
+
     <!-- Sidebar Menu -->
     <nav class="p-2">
-        @foreach($menuItems as $section)
-            @if(isset($section['section']))
+        @foreach ($menuItems as $section)
+            @if (isset($section['section']))
                 <div class="px-4 py-2 mt-4 mb-2">
                     <h6 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         {{ $section['section'] }}
                     </h6>
                 </div>
             @endif
-            
-            @if(isset($section['items']) && is_array($section['items']))
-                @foreach($section['items'] as $item)
+
+            @if (isset($section['items']) && is_array($section['items']))
+                @foreach ($section['items'] as $item)
                     @php
                         $isActive = $item['active'] ?? request()->routeIs($item['route'] ?? '');
                         $route = $item['route'] ?? '#';
                     @endphp
-                    <a href="{{ route($route) }}" 
-                       class="flex items-center px-4 py-2.5 mb-1 rounded-lg transition-all duration-200 {{ $isActive ? 'bg-green-100 text-green-700 font-semibold border-l-4 border-green-500' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
+                    <a href="{{ route($route) }}"
+                        class="flex items-center px-4 py-2.5 mb-1 rounded-lg transition-all duration-200 {{ $isActive ? 'bg-green-100 text-green-700 font-semibold border-l-4 border-green-500' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900' }}">
                         <i class="fas {{ $item['icon'] ?? 'fa-circle' }} w-5 text-center mr-3"></i>
                         <span>{{ $item['label'] ?? 'Menu Item' }}</span>
-                        @if(isset($item['badge']))
-                            <span class="ml-auto px-2 py-1 text-xs font-semibold rounded {{ $item['badge']['class'] ?? 'bg-green-500 text-white' }}">
+                        @if (isset($item['badge']))
+                            <span
+                                class="ml-auto px-2 py-1 text-xs font-semibold rounded {{ $item['badge']['class'] ?? 'bg-green-500 text-white' }}">
                                 {{ $item['badge']['text'] ?? '' }}
                             </span>
                         @endif
