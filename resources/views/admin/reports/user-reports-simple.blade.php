@@ -279,25 +279,25 @@
                             </div>
 
                             <!-- Footer -->
-                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                <div class="text-muted small">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    <span class="fw-medium">{{ $report->created_at->format('d/m/Y') }}</span>
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between pt-4 border-t border-gray-200 gap-4">
+                                <div class="text-sm text-gray-600">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    <span class="font-medium">{{ $report->created_at->format('d/m/Y') }}</span>
                                     <span class="mx-2">•</span>
-                                    <i class="fas fa-clock me-1"></i>
+                                    <i class="fas fa-clock mr-1"></i>
                                     <span>{{ $report->created_at->format('H:i:s') }}</span>
                                     <span class="mx-2">•</span>
-                                    <span class="text-muted">{{ $report->created_at->diffForHumans() }}</span>
+                                    <span class="text-gray-500">{{ $report->created_at->diffForHumans() }}</span>
                                 </div>
-                                <div class="d-flex gap-2">
+                                <div class="flex flex-wrap gap-2">
                                     <a href="{{ route('admin.reports.user-reports.show', $report->id) }}" 
-                                       class="btn btn-primary btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                       class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-eye mr-1"></i>Xem chi tiết
                                     </a>
                                     
                                     <!-- Status Update Dropdown -->
-                                    <select onchange="updateStatus({{ $report->id }}, this.value)" 
-                                            class="form-select form-select-sm" style="width: auto;">
+                                    <select data-report-id="{{ $report->id }}" 
+                                            class="status-update-select px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm">
                                         <option value="">Cập nhật trạng thái</option>
                                         <option value="pending" {{ $report->status == 'pending' ? 'selected' : '' }}>Chưa xử lý</option>
                                         <option value="processing" {{ $report->status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
@@ -305,14 +305,14 @@
                                     </select>
                                     
                                     @if(!$report->isRead())
-                                        <button onclick="markAsRead({{ $report->id }})" 
-                                                class="btn btn-success btn-sm">
-                                            <i class="fas fa-check me-1"></i>Đánh dấu đã đọc
+                                        <button type="button" data-report-id="{{ $report->id }}" 
+                                                class="mark-read-btn inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-check mr-1"></i>Đánh dấu đã đọc
                                         </button>
                                     @else
-                                        <button onclick="markAsUnread({{ $report->id }})" 
-                                                class="btn btn-warning btn-sm">
-                                            <i class="fas fa-undo me-1"></i>Đánh dấu chưa đọc
+                                        <button type="button" data-report-id="{{ $report->id }}" 
+                                                class="mark-unread-btn inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-undo mr-1"></i>Đánh dấu chưa đọc
                                         </button>
                                     @endif
                                 </div>
@@ -320,10 +320,10 @@
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox text-muted mb-3" style="font-size: 4rem;"></i>
-                        <h4 class="text-muted mb-2">Không có báo cáo nào</h4>
-                        <p class="text-muted">Chưa có báo cáo nào từ người dùng.</p>
+                    <div class="text-center py-12">
+                        <i class="fas fa-inbox text-gray-400 mb-4" style="font-size: 4rem;"></i>
+                        <h4 class="text-xl font-semibold text-gray-600 mb-2">Không có báo cáo nào</h4>
+                        <p class="text-gray-500">Chưa có báo cáo nào từ người dùng.</p>
                     </div>
                 @endforelse
             </div>
@@ -340,13 +340,40 @@
         });
 
         // Show/hide status select based on action
-        document.querySelector('select[name="action"]').addEventListener('change', function() {
+        document.querySelector('select[name="action"]')?.addEventListener('change', function() {
             const statusSelect = document.getElementById('statusSelect');
             if (this.value === 'update_status') {
                 statusSelect.style.display = 'block';
             } else {
                 statusSelect.style.display = 'none';
             }
+        });
+
+        // Status update dropdown handlers
+        document.querySelectorAll('.status-update-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const reportId = this.getAttribute('data-report-id');
+                const status = this.value;
+                if (status) {
+                    updateStatus(reportId, status);
+                }
+            });
+        });
+
+        // Mark as read button handlers
+        document.querySelectorAll('.mark-read-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-report-id');
+                markAsRead(reportId);
+            });
+        });
+
+        // Mark as unread button handlers
+        document.querySelectorAll('.mark-unread-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-report-id');
+                markAsUnread(reportId);
+            });
         });
 
         // Mark as read

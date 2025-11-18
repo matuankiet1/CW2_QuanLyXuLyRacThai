@@ -14,6 +14,8 @@ use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\UserStatisticsController;
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -157,7 +159,7 @@ Route::middleware('admin')->group(function () {
 
     //Events
     // Events
-    Route::prefix('events')->name('admin.events.')->group(function () {
+    Route::prefix('admin/events')->name('admin.events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('/create', [EventController::class, 'create'])->name('create');
         Route::post('/', [EventController::class, 'store'])->name('store');
@@ -198,4 +200,13 @@ Route::middleware('auth')->group(function () {
     // Notification Preferences
     Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index'])->name('user.notification-preferences.index');
     Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('user.notification-preferences.update');
+
+    // User Events
+    Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
+    Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
+    Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
+    Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+
+    // User Statistics
+    Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
 });
