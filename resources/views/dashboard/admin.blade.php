@@ -264,11 +264,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Phân loại rác thải
     const wasteTypeCtx = document.getElementById('wasteTypeChart');
+
     if (wasteTypeCtx) {
         new Chart(wasteTypeCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Rác tái chế', 'Rác hữu cơ', 'Rác vô cơ', 'Rác nguy hại'],
+                labels: ['Rác hữu cơ', 'Rác tái chế', 'Rác thải nguy hại', 'Rác thải khác'],
                 datasets: [{
                     data: [35, 30, 25, 10],
                     backgroundColor: [
