@@ -134,4 +134,31 @@ class User extends Authenticatable
     public function isLocal(): bool     { return $this->auth_provider === 'local'; }
     public function isGoogle(): bool    { return $this->auth_provider === 'google'; }
     public function isFacebook(): bool  { return $this->auth_provider === 'facebook'; }
+
+    /**
+     * Relationship: Danh sách sự kiện đã tạo (Admin)
+     */
+    public function createdEvents()
+    {
+        return $this->hasMany(Event::class, 'created_by', 'user_id');
+    }
+
+    /**
+     * Relationship: Danh sách sự kiện đã đăng ký tham gia (Sinh viên)
+     */
+    public function registeredEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_user', 'user_id', 'event_id')
+                    ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
+                    ->withTimestamps()
+                    ->using(EventUser::class);
+    }
+
+    /**
+     * Relationship: Danh sách đăng ký sự kiện (EventUser)
+     */
+    public function eventRegistrations()
+    {
+        return $this->hasMany(EventUser::class, 'user_id', 'user_id');
+    }
 }
