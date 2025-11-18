@@ -62,6 +62,10 @@
                    class="px-4 py-2 rounded-lg transition {{ ($status ?? 'upcoming') === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Sắp tới
                 </a>
+                <a href="{{ route('user.events.index', ['status' => 'registering']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'registering') === 'registering' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    Đang đăng ký
+                </a>
                 <a href="{{ route('user.events.index', ['status' => 'ongoing']) }}" 
                    class="px-4 py-2 rounded-lg transition {{ ($status ?? '') === 'ongoing' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Đang diễn ra
