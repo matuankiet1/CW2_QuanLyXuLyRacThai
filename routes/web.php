@@ -153,6 +153,9 @@ Route::middleware('admin')->group(function () {
     Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
         ->name('admin.collection-schedules.export-excel');
 
+    Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
+        ->name('admin.collection-schedules.update-status');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
