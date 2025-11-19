@@ -17,9 +17,11 @@ class RoleController extends Controller
     {
         $users = User::orderBy('created_at', 'desc')->paginate(10);
         $adminCount = User::where('role', 'admin')->count();
-        $userCount = User::where('role', 'user')->count();
+        $managerCount = User::where('role', 'manager')->count();
+        $staffCount = User::where('role', 'staff')->count();
+        $studentCount = User::where('role', 'student')->count();
         
-        return view('admin.roles.index', compact('users', 'adminCount', 'userCount'));
+        return view('admin.roles.index', compact('users', 'adminCount', 'managerCount', 'staffCount', 'studentCount'));
     }
 
     /**

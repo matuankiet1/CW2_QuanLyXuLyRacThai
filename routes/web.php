@@ -134,6 +134,13 @@ Route::middleware('admin')->group(function () {
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
         Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
         Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
+        
+        // Permission Management
+        Route::get('permissions', [App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
+        Route::post('permissions', [App\Http\Controllers\PermissionController::class, 'store'])->name('permissions.store');
+        Route::put('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'update'])->name('permissions.update');
+        Route::delete('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'destroy'])->name('permissions.destroy');
+        Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
     });
 
     // Collection Schedule
