@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -33,7 +34,7 @@ class RoleController extends Controller
         ]);
         
         // Kiểm tra quyền: chỉ admin mới có thể thay đổi role
-        if (auth()->user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Bạn không có quyền thực hiện hành động này!'
@@ -41,7 +42,7 @@ class RoleController extends Controller
         }
 
         // Không cho phép admin tự thay đổi role của mình
-        if ($user->id === auth()->id()) {
+        if ($user->user_id === Auth::id()) {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Bạn không thể thay đổi quyền của chính mình!'
@@ -82,7 +83,7 @@ class RoleController extends Controller
         ]);
 
         // Kiểm tra quyền: chỉ admin mới có thể tạo admin
-        if (auth()->user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Bạn không có quyền tạo tài khoản admin!'
@@ -112,7 +113,7 @@ class RoleController extends Controller
     {
         
         // Kiểm tra quyền
-        if (auth()->user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Bạn không có quyền xóa tài khoản!'
@@ -120,7 +121,7 @@ class RoleController extends Controller
         }
 
         // Không cho phép xóa chính mình
-        if ($user->id === auth()->id()) {
+        if ($user->user_id === Auth::id()) {
             return back()->with('status', [
                 'type' => 'error',
                 'message' => 'Bạn không thể xóa tài khoản của chính mình!'
