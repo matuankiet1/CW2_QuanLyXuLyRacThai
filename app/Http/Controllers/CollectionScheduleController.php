@@ -228,4 +228,58 @@ class CollectionScheduleController extends Controller
         return Excel::download(new CollectionScheduleExport($q), $fileName);
     }
 
+    /**
+     * Update status of collection schedule
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
+            ]);
+
+            $collectionSchedule = CollectionSchedule::findOrFail($id);
+
+            if (!$collectionSchedule) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy lịch thu gom. Vui lòng thử lại sau!'
+                ], 404);
+            }
+
+            // Cập nhật trạng thái
+            $collectionSchedule->status = $validated['status'];
+            
+            // Nếu chuyển sang "Đã hoàn thành" và chưa có completed_at, tự động set
+            if ($validated['status'] === 'Đã hoàn thành' && !$collectionSchedule->completed_at) {
+                $collectionSchedule->completed_at = now();
+            }
+            
+            // Nếu chuyển về "Chưa thực hiện", có thể xóa completed_at (tùy chọn)
+            if ($validated['status'] === 'Chưa thực hiện') {
+                $collectionSchedule->completed_at = null;
+            }
+
+            $collectionSchedule->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái thành công!',
+                'status' => $collectionSchedule->status,
+                'completed_at' => $collectionSchedule->completed_at?->format('Y-m-d')
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ!',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
