@@ -415,8 +415,15 @@
         </div>
     </div>
 
+    <!-- Hidden element to pass PHP data to JavaScript -->
+    <div data-should-show-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" style="display: none;"></div>
+
     <script>
         // Modal logic
+        // Get shouldShowModal from data attribute
+        const shouldShowModalData = document.querySelector('[data-should-show-modal]');
+        const shouldShowModal = shouldShowModalData ? shouldShowModalData.dataset.shouldShowModal === 'true' : false;
+        
         const modal = document.getElementById('modal');
         const modalBox = document.getElementById('modalBox');
         const openBtn = document.querySelectorAll('.openModalBtn');
@@ -462,11 +469,12 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        @if (session('show_modal') || $errors->any())
-            document.addEventListener('DOMContentLoaded', () => {
+        // Auto-open modal if there are errors or show_modal session
+        if (shouldShowModal) {
+            document.addEventListener('DOMContentLoaded', function() {
                 openModal(modal, modalBox);
             });
-        @endif
+        }
 
         modal.addEventListener('click', e => {
             if (e.target === e.currentTarget) closeModal(modal, modalBox);
