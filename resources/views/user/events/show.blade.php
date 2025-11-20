@@ -225,7 +225,7 @@
                         @endif
                     @else
                         {{-- Đăng ký --}}
-                        @if($event->canRegister() && $event->status === "Đang đăng ký")
+                        @if($event->canRegister() || $event->status === "Đang đăng ký")
                             <form action="{{ route('user.events.register', $event->id) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
