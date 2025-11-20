@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\RoleRedirector;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,8 @@ class StudentMiddleware
 
         $user = auth()->user();
         if ($user->role !== 'student') {
-            return redirect()->route('dashboard.admin')->with('error', 'Bạn không có quyền truy cập trang này.');
+            return redirect()->route(RoleRedirector::homeRoute($user->role))
+                ->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
         return $next($request);

@@ -48,7 +48,7 @@ class AdminHomeController extends Controller
             'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
             'total_users' => User::count(),
             'admin_users' => User::where('role', 'admin')->count(),
-            'regular_users' => User::where('role', 'user')->count(),
+            'regular_users' => User::where('role', 'student')->count(),
             'new_users_today' => User::whereDate('created_at', today())->count(),
         ];
 

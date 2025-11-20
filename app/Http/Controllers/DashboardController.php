@@ -20,9 +20,32 @@ class DashboardController extends Controller
         return view('dashboard.admin', compact('upcomingEventsCount', 'wasteData'));
     }
 
-    public function app()
+    public function manager()
     {
-        return view('dashboard.app');
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.manager', compact('upcomingEvents'));
+    }
+
+    public function staff()
+    {
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.staff', compact('upcomingEvents'));
+    }
+
+    public function student()
+    {
+        $upcomingEvents = Event::where('status', 'upcoming')
+            ->orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.student', compact('upcomingEvents'));
     }
 
     
