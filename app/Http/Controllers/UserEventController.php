@@ -27,7 +27,7 @@ class UserEventController extends Controller
     {
         $query = Event::query();
 
-        $status = $request->input('status','all');
+        $status = $request->input('status', 'all');
         $today = now()->toDateString();
 
         // Filter theo status động dựa trên ngày
@@ -113,6 +113,22 @@ class UserEventController extends Controller
 
         return view('user.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
     }
+
+    public function showRegisterForm($id)
+    {
+        $event = Event::findOrFail($id);
+
+        // Nếu bạn chỉ cho user đăng ký sự kiện chưa bắt đầu hoặc còn chỗ
+        if (!$event->canRegister()) {
+            return redirect()->route('user.events.show', $id)
+                ->with('error', 'Sự kiện không thể đăng ký vào lúc này.');
+        }
+
+        return view('user.events.registerForm', [
+            'event' => $event
+        ]);
+    }
+    
 
     /**
      * Đăng ký tham gia sự kiện
