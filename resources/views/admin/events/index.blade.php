@@ -53,7 +53,7 @@
                 </div>
             </form>
         </div>
-    </div>
+            </div>
 
     <div class="bg-white rounded-lg shadow-md">
         <div class="overflow-x-auto">
@@ -70,10 +70,10 @@
                         <th class="px-4 py-3 text-left font-semibold">Người tham gia</th>
                         <th class="px-4 py-3 text-left font-semibold">Trạng thái</th>
                         <th class="px-4 py-3 text-right font-semibold">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($events as $index => $event)
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($events as $index => $event)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3 text-center">{{ $events->firstItem() + $index }}</td>
                             <td class="px-4 py-3">{{ $event->title }}</td>
@@ -84,12 +84,12 @@
                             <td class="px-4 py-3">{{ $event->location }}</td>
                             <td class="px-4 py-3">{{ $event->participants }} người</td>
                             <td class="px-4 py-3">
-                                @if ($event->status === 'completed')
+                            @if ($event->status === 'completed')
                                     <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Đã kết thúc</span>
-                                @else
+                            @else
                                     <span class="px-2 py-1 rounded text-xs font-medium bg-gray-500 text-white">Sắp diễn ra</span>
-                                @endif
-                            </td>
+                            @endif
+                        </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex gap-2 text-sm justify-end">
                                     <a href="{{ route('admin.events.rewards.index', $event->id) }}" class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" title="Xem điểm thưởng">
@@ -97,19 +97,19 @@
                                     </a>
                                     <a href="{{ route('admin.events.edit', $event) }}" class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Sửa</a>
                                     <form action="{{ route('admin.events.destroy', $event) }}" method="POST" onsubmit="return confirm('Xóa sự kiện này?');" class="inline">
-                                        @csrf @method('DELETE')
+                                @csrf @method('DELETE')
                                         <button type="submit" class="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600">Xóa</button>
-                                    </form>
+                            </form>
                                 </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
                             <td colspan="10" class="text-center text-gray-500 py-4">Không có sự kiện nào</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
         </div>
         <div class="border-t pt-4 bg-white px-4 pb-4">{{ $events->withQueryString()->links() }}</div>
     </div>

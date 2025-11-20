@@ -1,6 +1,9 @@
 @extends('layouts.admin-with-sidebar')
 
 @section('content')
+    @php
+        $canConfirmSchedule = auth()->check() && auth()->user()->hasRole(['manager', 'admin']);
+    @endphp
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
@@ -102,31 +105,61 @@
                                     <td class="py-3 px-4">{{ $collectionSchedule->completed_at?->format('Y-m-d') ?? '-' }}
                                     </td>
                                     <td class="py-3 px-4">
-                                        <div class="flex items-center gap-2">
-                                            @if ($collectionSchedule->status == 'Chưa thực hiện')
+                                        @php
+                                            $isConfirmed = !is_null($collectionSchedule->confirmed_at);
+                                        @endphp
+                                        <div class="flex flex-col gap-1">
+                                            <div class="flex items-center gap-2">
+                                                @if ($collectionSchedule->status == 'Chưa thực hiện')
+                                                    <span
+                                                        class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 status-badge"
+                                                        data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                        data-status="{{ $collectionSchedule->status }}"
+                                                        data-confirmed="{{ $isConfirmed ? 'true' : 'false' }}">
+                                                        {{ $collectionSchedule->status }}
+                                                    </span>
+                                                @elseif($collectionSchedule->status == 'Đã hoàn thành')
+                                                    <span
+                                                        class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge"
+                                                        data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                        data-status="{{ $collectionSchedule->status }}"
+                                                        data-confirmed="{{ $isConfirmed ? 'true' : 'false' }}">
+                                                        {{ $collectionSchedule->status }}
+                                                    </span>
+                                                @endif
+
+                                                @if ($canConfirmSchedule && !$isConfirmed)
+                                                    <button
+                                                        class="update-status-btn inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+                                                        data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                        title="Xác nhận đã thu gom lịch này">
+                                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                        </svg>
+                                                    </button>
+                                                @endif
+
                                                 <span
-                                                    class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 status-badge"
-                                                    data-schedule-id="{{ $collectionSchedule->schedule_id }}"
-                                                    data-status="{{ $collectionSchedule->status }}">
-                                                    {{ $collectionSchedule->status }}
+                                                    class="confirmation-chip {{ $isConfirmed ? 'flex' : 'hidden' }} items-center gap-1 text-xs font-medium text-green-600"
+                                                    data-schedule-id="{{ $collectionSchedule->schedule_id }}">
+                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="m5 13 4 4L19 7" />
+                                                    </svg>
+                                                    Đã xác nhận
                                                 </span>
-                                            @elseif($collectionSchedule->status == 'Đã hoàn thành')
-                                                <span
-                                                    class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge"
-                                                    data-schedule-id="{{ $collectionSchedule->schedule_id }}"
-                                                    data-status="{{ $collectionSchedule->status }}">
-                                                    {{ $collectionSchedule->status }}
-                                                </span>
-                                            @endif
-                                            <button
-                                                class="update-status-btn inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 transition cursor-pointer"
-                                                data-schedule-id="{{ $collectionSchedule->schedule_id }}"
-                                                data-current-status="{{ $collectionSchedule->status }}"
-                                                title="Cập nhật trạng thái">
-                                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                </svg>
-                                            </button>
+                                            </div>
+                                            <p class="text-xs confirmation-text {{ $isConfirmed ? 'text-green-600' : 'text-gray-500' }}"
+                                                data-schedule-id="{{ $collectionSchedule->schedule_id }}">
+                                                @if ($isConfirmed)
+                                                    Xác nhận bởi {{ $collectionSchedule->confirmedBy?->name ?? 'quản lý' }}
+                                                    lúc {{ $collectionSchedule->confirmed_at?->format('d/m/Y H:i') }}
+                                                @else
+                                                    Chờ quản lý xác nhận
+                                                @endif
+                                            </p>
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-center">
@@ -207,9 +240,10 @@
         @endif
 
         <div id="modal"
-            class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
-            <div id="modalBox"
-                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
+            class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
+            <div class="flex items-center justify-center w-full h-full">
+                <div id="modalBox"
+                    class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold titleModal">Thêm lịch thu gom mới</h2>
@@ -285,11 +319,13 @@
                 </form>
             </div>
         </div>
+        </div>
 
         <div id="confirmModal"
-            class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
-            <div id="confirmModalBox"
-                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
+            class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
+            <div class="flex items-center justify-center w-full h-full">
+                <div id="confirmModalBox"
+                    class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
@@ -315,6 +351,10 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <div id="collectionScheduleState"
+            data-open-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" class="hidden"></div>
 
         {{-- Offcanvas fillter --}}
         <div id="overlayOffCanvas"
@@ -462,11 +502,14 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        @if (session('show_modal') || $errors->any())
+        const stateElement = document.getElementById('collectionScheduleState');
+        const shouldOpenModal = stateElement?.dataset.openModal === 'true';
+
+        if (shouldOpenModal) {
             document.addEventListener('DOMContentLoaded', () => {
                 openModal(modal, modalBox);
             });
-        @endif
+        }
 
         modal.addEventListener('click', e => {
             if (e.target === e.currentTarget) closeModal(modal, modalBox);
@@ -658,14 +701,17 @@
 
         // Update status functionality
         const updateStatusButtons = document.querySelectorAll('.update-status-btn');
+        const FINAL_STATUS = 'Đã hoàn thành';
         
         updateStatusButtons.forEach(button => {
             button.addEventListener('click', async function() {
                 const scheduleId = this.dataset.scheduleId;
-                const currentStatus = this.dataset.currentStatus;
-                const newStatus = currentStatus === 'Chưa thực hiện' ? 'Đã hoàn thành' : 'Chưa thực hiện';
                 
-                // Disable button during request
+                const isConfirmed = confirm('Xác nhận đã hoàn thành lịch thu gom này? Sau khi xác nhận sẽ không thể hoàn tác.');
+                if (!isConfirmed) {
+                    return;
+                }
+                
                 this.disabled = true;
                 const originalHTML = this.innerHTML;
                 this.innerHTML = '<svg class="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
@@ -678,59 +724,64 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
-                            status: newStatus
+                            status: FINAL_STATUS
                         })
                     });
                     
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Update the status badge
                         const statusBadge = document.querySelector(`.status-badge[data-schedule-id="${scheduleId}"]`);
                         if (statusBadge) {
                             statusBadge.dataset.status = data.status;
+                            statusBadge.dataset.confirmed = 'true';
                             statusBadge.textContent = data.status;
-                            
-                            // Update badge styling
-                            if (data.status === 'Đã hoàn thành') {
-                                statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge';
-                            } else {
-                                statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 status-badge';
-                            }
+                            statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge';
                         }
                         
-                        // Update button data attribute
-                        this.dataset.currentStatus = data.status;
-                        
-                        // Update completed_at if shown
                         const row = this.closest('tr');
-                        const completedAtCell = row.querySelector('td:nth-child(5)');
-                        if (completedAtCell && data.completed_at) {
-                            completedAtCell.textContent = data.completed_at;
-                        } else if (completedAtCell && !data.completed_at) {
-                            completedAtCell.textContent = '-';
+                        const completedAtCell = row?.querySelector('td:nth-child(5)');
+                        if (completedAtCell) {
+                            completedAtCell.textContent = data.completed_at ?? '-';
                         }
                         
-                        // Show success message
-                        if (window.showToast) {
-                            showToast('success', data.message || 'Cập nhật trạng thái thành công!');
-                        } else {
-                            alert(data.message || 'Cập nhật trạng thái thành công!');
+                        const confirmationText = document.querySelector(`.confirmation-text[data-schedule-id="${scheduleId}"]`);
+                        if (confirmationText) {
+                            const confirmedLabel = data.confirmed_by ? `${data.confirmed_by}` : 'quản lý';
+                            confirmationText.textContent = data.confirmed_at
+                                ? `Xác nhận bởi ${confirmedLabel} lúc ${data.confirmed_at}`
+                                : `Xác nhận bởi ${confirmedLabel}`;
+                            confirmationText.classList.remove('text-gray-500');
+                            confirmationText.classList.add('text-green-600');
                         }
+                        
+                        const confirmationChip = document.querySelector(`.confirmation-chip[data-schedule-id="${scheduleId}"]`);
+                        if (confirmationChip) {
+                            confirmationChip.classList.remove('hidden');
+                        }
+                        
+                        if (window.showToast) {
+                            showToast('success', data.message || 'Đã xác nhận lịch thu gom.');
+                        } else {
+                            alert(data.message || 'Đã xác nhận lịch thu gom.');
+                        }
+
+                        this.remove();
                     } else {
                         throw new Error(data.message || 'Có lỗi xảy ra');
                     }
                 } catch (error) {
                     console.error('Error updating status:', error);
                     if (window.showToast) {
-                        showToast('error', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái!');
+                        showToast('error', error.message || 'Có lỗi xảy ra khi xác nhận!');
                     } else {
-                        alert(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái!');
+                        alert(error.message || 'Có lỗi xảy ra khi xác nhận!');
                     }
                 } finally {
-                    // Re-enable button
-                    this.disabled = false;
-                    this.innerHTML = originalHTML;
+                    if (document.body.contains(this)) {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                    }
                 }
             });
         });
