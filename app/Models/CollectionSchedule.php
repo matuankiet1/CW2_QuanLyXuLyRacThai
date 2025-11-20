@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
 class CollectionSchedule extends Model
 {
     use HasFactory;
@@ -37,5 +36,10 @@ class CollectionSchedule extends Model
     public function wasteLogs()
     {
         return $this->hasMany(WasteLog::class, 'schedule_id', 'schedule_id');
+    }
+
+    public function report()
+    {
+        return $this->hasOne(CollectionReport::class, 'schedule_id', 'schedule_id');
     }
 }

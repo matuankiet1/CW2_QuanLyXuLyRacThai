@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CollectionScheduleController;
+use App\Http\Controllers\CollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
@@ -218,10 +219,17 @@ Route::middleware('manager')->group(function () {
         Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
         Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
     });
+
+    Route::get('/manager/collection-reports', [CollectionReportController::class, 'managerIndex'])->name('manager.collection-reports.index');
+    Route::post('/manager/collection-reports/{report}/approve', [CollectionReportController::class, 'approve'])->name('manager.collection-reports.approve');
 });
 
 Route::middleware('staff')->group(function () {
     Route::get('/staff/dashboard', [DashboardController::class, 'staff'])->name('staff.dashboard');
+
+    Route::get('/staff/collection-reports', [CollectionReportController::class, 'staffIndex'])->name('staff.collection-reports.index');
+    Route::get('/staff/collection-reports/{schedule}/create', [CollectionReportController::class, 'staffCreate'])->name('staff.collection-reports.create');
+    Route::post('/staff/collection-reports/{schedule}', [CollectionReportController::class, 'staffStore'])->name('staff.collection-reports.store');
 });
 
 Route::middleware('student')->group(function () {
