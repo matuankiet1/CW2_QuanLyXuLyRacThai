@@ -224,23 +224,19 @@
                             </div>
                         @endif
                     @else
-                        {{-- Đăng ký --}}
-                        @if($event->canRegister() || $event->status === "Đang đăng ký")
-                            <form action="{{ route('user.events.register', $event->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
-                                    <i class="fas fa-user-plus mr-2"></i>Đăng ký tham gia
-                                </button>
-                            </form>
+                        @if($event->canRegister())
+                           <a href="{{ route('user.events.registerForm', $event->id) }}"
+                            class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-center">
+                                <i class="fas fa-user-plus mr-2"></i>Đăng ký tham gia
+                            </a>
                         @else
+                            @php
+                                $message = !$event->hasAvailableSlots() 
+                                    ? '<i class="fas fa-exclamation-triangle mr-2"></i>Sự kiện đã đầy.'
+                                    : '<i class="fas fa-times mr-2"></i>Đã hết thời gian đăng ký.';
+                            @endphp
                             <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg text-center">
-                                @if(!$event->hasAvailableSlots())
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>Sự kiện đã đầy.
-                                @elseif($event->status === "Sắp diễn ra")
-                                    <i class="fas fa-clock mr-2"></i>Chưa đến thời gian đăng ký.
-                                @else
-                                    <i class="fas fa-times mr-2"></i>Đã hết thời gian đăng ký.
-                                @endif
+                                {!! $message !!}
                             </div>
                         @endif
                     @endif

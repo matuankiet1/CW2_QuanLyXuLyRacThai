@@ -120,14 +120,15 @@ class UserEventController extends Controller
 
         // Nếu bạn chỉ cho user đăng ký sự kiện chưa bắt đầu hoặc còn chỗ
         if (!$event->canRegister()) {
-            return redirect()->route('events.show', $id)
+            return redirect()->route('user.events.show', $id)
                 ->with('error', 'Sự kiện không thể đăng ký vào lúc này.');
         }
 
-        return view('events.registerForm', [
+        return view('user.events.registerForm', [
             'event' => $event
         ]);
     }
+    
 
     /**
      * Đăng ký tham gia sự kiện

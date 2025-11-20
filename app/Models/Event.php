@@ -122,11 +122,13 @@ class Event extends Model
      */
     public function canRegister(): bool
     {
-        $now = now();
-        return $now >= $this->register_date &&
-            $now <= $this->register_end_date &&
-            $this->status === 'upcoming' &&
-            $this->hasAvailableSlots();
+        $now = now()->startOfDay();
+        $registerStart = optional($this->register_date)->startOfDay();
+        $registerEnd = optional($this->register_end_date)->startOfDay();
+
+        return $registerStart && $registerEnd
+            && $now->between($registerStart, $registerEnd)
+            && $this->hasAvailableSlots();
     }
 
     /**
