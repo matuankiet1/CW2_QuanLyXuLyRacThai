@@ -40,10 +40,10 @@ class Event extends Model
      * Cast các trường dữ liệu
      */
     protected $casts = [
-        'register_date' => 'datetime',
-        'register_end_date' => 'datetime',
-        'event_start_date' => 'datetime',
-        'event_end_date' => 'datetime',
+        'register_date' => 'date',
+        'register_end_date' => 'date',
+        'event_start_date' => 'date',
+        'event_end_date' => 'date',
     ];
 
     /**
@@ -73,33 +73,6 @@ class Event extends Model
         return $this->hasMany(EventUser::class, 'event_id');
     }
 
-    /**
-     * Scope: Lấy sự kiện sắp tới
-     */
-    public function scopeUpcoming($query)
-    {
-        return $query->where('event_start_date', '>', now())
-            ->where('status', 'upcoming');
-    }
-
-    /**
-     * Scope: Lấy sự kiện đang diễn ra
-     */
-    public function scopeOngoing($query)
-    {
-        return $query->where('event_start_date', '<=', now())
-            ->where('event_end_date', '>=', now())
-            ->where('status', '!=', 'completed');
-    }
-
-    /**
-     * Scope: Lấy sự kiện đã kết thúc
-     */
-    public function scopeEnded($query)
-    {
-        return $query->where('event_end_date', '<', now())
-            ->orWhere('status', 'completed');
-    }
 
     /**
      * Kiểm tra sự kiện có còn chỗ không
@@ -169,39 +142,33 @@ class Event extends Model
      */
     public function getStatusAttribute()
     {
-        $today = Carbon::today();
+        $today = now()->toDateString();
 
-        $register_start = Carbon::parse($this->register_date);
-        $register_end = Carbon::parse($this->register_end_date);
-        $event_start = Carbon::parse($this->event_start_date);
-        $event_end = Carbon::parse($this->event_end_date);
+        $register_start = $this->register_date->toDateString();
+        $register_end = $this->register_end_date->toDateString();
+        $event_start = $this->event_start_date->toDateString();
+        $event_end = $this->event_end_date->toDateString();
 
-        // 1️⃣ Kết thúc
-        if ($event_end->lt($today)) {
-            return 'Kết thúc'; // ended
+        if ($today >= $event_start && $today <= $event_end) {
+            return 'Đang diễn ra';
         }
 
-        // 2️⃣ Đang diễn ra
-        if ($event_start->lte($today) && $event_end->gte($today)) {
-            return 'Đang diễn ra'; // on_going
+        if ($today > $event_end) {
+            return 'Kết thúc';
         }
 
-        // 3️⃣ Đang đăng ký
-        if ($register_start->lte($today) && $register_end->gte($today)) {
-            return 'Đang đăng ký'; // registering
+        if ($today >= $register_start && $today <= $register_end) {
+            return 'Đang đăng ký';
         }
 
-        // 4️⃣ Hết đăng ký
-        if ($register_end->lt($today) && $event_start->gt($today)) {
-            return 'Hết đăng ký'; // register_ended
+        if ($today > $register_end && $today < $event_start) {
+            return 'Hết đăng ký';
         }
 
-        // 5️⃣ Sắp diễn ra
-        if ($register_start->gt($today)) {
-            return 'Sắp diễn ra'; // up_coming
+        if ($today < $register_start) {
+            return 'Sắp diễn ra';
         }
 
-        // 6️⃣ Trường hợp khác
         return 'Đang xử lý';
     }
 
