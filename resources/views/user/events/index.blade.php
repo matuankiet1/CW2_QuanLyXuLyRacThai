@@ -131,7 +131,6 @@
                         {{-- Status badge --}}
                         <div class="mb-4 flex flex-wrap gap-2">
                             @php
-    // Gán màu theo status đã có trong Model
                             $statusColors = [
                                 'Sắp diễn ra'   => 'bg-purple-500',
                                 'Đang đăng ký'  => 'bg-blue-500',

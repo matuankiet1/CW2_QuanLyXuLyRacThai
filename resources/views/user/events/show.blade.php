@@ -58,22 +58,21 @@
                 {{-- Status Badge --}}
                 <div class="mb-6 flex flex-wrap gap-2">
                     @php
-                        $statusColor = 'bg-gray-500';
-                        $statusText = 'Không xác định';
-                        if ($event->event_start_date > now()) {
-                            $statusColor = 'bg-blue-500';
-                            $statusText = 'Sắp tới';
-                        } elseif ($event->event_end_date < now()) {
-                            $statusColor = 'bg-gray-500';
-                            $statusText = 'Đã kết thúc';
-                        } else {
-                            $statusColor = 'bg-green-500';
-                            $statusText = 'Đang diễn ra';
-                        }
-                    @endphp
-                    <span class="px-4 py-2 rounded-full text-sm font-semibold text-white {{ $statusColor }}">
-                        {{ $statusText }}
-                    </span>
+                            $statusColors = [
+                                'Sắp diễn ra'   => 'bg-purple-500',
+                                'Đang đăng ký'  => 'bg-blue-500',
+                                'Hết đăng ký'  => 'bg-red-500',
+                                'Đang diễn ra'  => 'bg-green-500',
+                                'Kết thúc'      => 'bg-gray-500',
+                                'Đang xử lý'   => 'bg-gray-500',
+                            ];
+
+                            $statusText = $event->status; // Sử dụng getter status
+                            $statusColor = $statusColors[$statusText] ?? 'bg-gray-500';
+                            @endphp
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold text-white {{ $statusColor }}">
+                                {{ $statusText }}
+                            </span>
                     
                     {{-- Registration Status --}}
                     @if($isRegistered && $userRegistration)
@@ -226,7 +225,7 @@
                         @endif
                     @else
                         {{-- Đăng ký --}}
-                        @if($event->canRegister())
+                        @if($event->canRegister() && $event->status === "Đang đăng ký")
                             <form action="{{ route('user.events.register', $event->id) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
@@ -237,12 +236,10 @@
                             <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg text-center">
                                 @if(!$event->hasAvailableSlots())
                                     <i class="fas fa-exclamation-triangle mr-2"></i>Sự kiện đã đầy.
-                                @elseif(now() < $event->register_date)
+                                @elseif($event->status === "Sắp diễn ra")
                                     <i class="fas fa-clock mr-2"></i>Chưa đến thời gian đăng ký.
-                                @elseif(now() > $event->register_end_date)
-                                    <i class="fas fa-times mr-2"></i>Đã hết thời gian đăng ký.
                                 @else
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>Không thể đăng ký vào lúc này.
+                                    <i class="fas fa-times mr-2"></i>Đã hết thời gian đăng ký.
                                 @endif
                             </div>
                         @endif
