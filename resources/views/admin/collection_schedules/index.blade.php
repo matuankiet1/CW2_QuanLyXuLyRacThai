@@ -102,17 +102,32 @@
                                     <td class="py-3 px-4">{{ $collectionSchedule->completed_at?->format('Y-m-d') ?? '-' }}
                                     </td>
                                     <td class="py-3 px-4">
-                                        @if ($collectionSchedule->status == 'Chưa thực hiện')
-                                            <span
-                                                class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
-                                                {{ $collectionSchedule->status }}
-                                            </span>
-                                        @elseif($collectionSchedule->status == 'Đã hoàn thành')
-                                            <span
-                                                class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                                                {{ $collectionSchedule->status }}
-                                            </span>
-                                        @endif
+                                        <div class="flex items-center gap-2">
+                                            @if ($collectionSchedule->status == 'Chưa thực hiện')
+                                                <span
+                                                    class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 status-badge"
+                                                    data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                    data-status="{{ $collectionSchedule->status }}">
+                                                    {{ $collectionSchedule->status }}
+                                                </span>
+                                            @elseif($collectionSchedule->status == 'Đã hoàn thành')
+                                                <span
+                                                    class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge"
+                                                    data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                    data-status="{{ $collectionSchedule->status }}">
+                                                    {{ $collectionSchedule->status }}
+                                                </span>
+                                            @endif
+                                            <button
+                                                class="update-status-btn inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+                                                data-schedule-id="{{ $collectionSchedule->schedule_id }}"
+                                                data-current-status="{{ $collectionSchedule->status }}"
+                                                title="Cập nhật trạng thái">
+                                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         <div class="flex items-center justify-center">
@@ -400,8 +415,15 @@
         </div>
     </div>
 
+    <!-- Hidden element to pass PHP data to JavaScript -->
+    <div data-should-show-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" style="display: none;"></div>
+
     <script>
         // Modal logic
+        // Get shouldShowModal from data attribute
+        const shouldShowModalData = document.querySelector('[data-should-show-modal]');
+        const shouldShowModal = shouldShowModalData ? shouldShowModalData.dataset.shouldShowModal === 'true' : false;
+        
         const modal = document.getElementById('modal');
         const modalBox = document.getElementById('modalBox');
         const openBtn = document.querySelectorAll('.openModalBtn');
@@ -447,11 +469,12 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        @if (session('show_modal') || $errors->any())
-            document.addEventListener('DOMContentLoaded', () => {
+        // Auto-open modal if there are errors or show_modal session
+        if (shouldShowModal) {
+            document.addEventListener('DOMContentLoaded', function() {
                 openModal(modal, modalBox);
             });
-        @endif
+        }
 
         modal.addEventListener('click', e => {
             if (e.target === e.currentTarget) closeModal(modal, modalBox);
@@ -640,6 +663,85 @@
             form.reset();
             form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => el.value = '');
         }
+
+        // Update status functionality
+        const updateStatusButtons = document.querySelectorAll('.update-status-btn');
+        
+        updateStatusButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const scheduleId = this.dataset.scheduleId;
+                const currentStatus = this.dataset.currentStatus;
+                const newStatus = currentStatus === 'Chưa thực hiện' ? 'Đã hoàn thành' : 'Chưa thực hiện';
+                
+                // Disable button during request
+                this.disabled = true;
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<svg class="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                
+                try {
+                    const response = await fetch(`/collection-schedules/${scheduleId}/update-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            status: newStatus
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Update the status badge
+                        const statusBadge = document.querySelector(`.status-badge[data-schedule-id="${scheduleId}"]`);
+                        if (statusBadge) {
+                            statusBadge.dataset.status = data.status;
+                            statusBadge.textContent = data.status;
+                            
+                            // Update badge styling
+                            if (data.status === 'Đã hoàn thành') {
+                                statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge';
+                            } else {
+                                statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 status-badge';
+                            }
+                        }
+                        
+                        // Update button data attribute
+                        this.dataset.currentStatus = data.status;
+                        
+                        // Update completed_at if shown
+                        const row = this.closest('tr');
+                        const completedAtCell = row.querySelector('td:nth-child(5)');
+                        if (completedAtCell && data.completed_at) {
+                            completedAtCell.textContent = data.completed_at;
+                        } else if (completedAtCell && !data.completed_at) {
+                            completedAtCell.textContent = '-';
+                        }
+                        
+                        // Show success message
+                        if (window.showToast) {
+                            showToast('success', data.message || 'Cập nhật trạng thái thành công!');
+                        } else {
+                            alert(data.message || 'Cập nhật trạng thái thành công!');
+                        }
+                    } else {
+                        throw new Error(data.message || 'Có lỗi xảy ra');
+                    }
+                } catch (error) {
+                    console.error('Error updating status:', error);
+                    if (window.showToast) {
+                        showToast('error', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái!');
+                    } else {
+                        alert(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái!');
+                    }
+                } finally {
+                    // Re-enable button
+                    this.disabled = false;
+                    this.innerHTML = originalHTML;
+                }
+            });
+        });
     </script>
 
     @vite(['resources/js/checkbox.js'])
