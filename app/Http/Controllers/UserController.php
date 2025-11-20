@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -26,8 +27,11 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // Lấy từ khóa tìm kiếm từ request (nếu có)
+        // Lấy từ khóa tìm kiếm, role filter và tham số sắp xếp từ request
         $keyword = $request->input('keyword');
+        $roleFilter = $request->input('role', 'all');
+        $sortBy = $request->input('sort_by', 'created_at'); // Cột sắp xếp mặc định
+        $sortOrder = $request->input('sort_order', 'desc'); // Thứ tự sắp xếp mặc định (giảm dần)
         
         // Bắt đầu query để lấy danh sách người dùng
         $query = User::query();
@@ -42,17 +46,42 @@ class UserController extends Controller
             });
         }
         
-        // Sắp xếp theo ngày tạo giảm dần (mới nhất trước)
-        // Phân trang 10 người dùng mỗi trang
-        $users = $query->orderBy('created_at', 'desc')->paginate(10);
-        
-        // Nếu có từ khóa tìm kiếm, thêm vào link phân trang để giữ lại khi chuyển trang
-        if ($keyword) {
-            $users->appends(['keyword' => $keyword]);
+        // Lọc theo role nếu được chọn
+        if ($roleFilter && $roleFilter !== 'all') {
+            $query->where('role', $roleFilter);
         }
         
-        // Trả về view với dữ liệu người dùng và từ khóa tìm kiếm
-        return view('admin.users.index', compact('users', 'keyword'));
+        // Xác định cột sắp xếp hợp lệ để tránh SQL injection
+        $allowedSortColumns = ['user_id', 'name', 'email', 'role', 'created_at'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+        
+        // Xác định thứ tự sắp xếp hợp lệ (chỉ cho phép 'asc' hoặc 'desc')
+        $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? strtolower($sortOrder) : 'desc';
+        
+        // Sắp xếp theo cột và thứ tự đã chọn
+        $users = $query->orderBy($sortBy, $sortOrder)->paginate(10);
+        
+        // Thêm các tham số vào link phân trang để giữ lại khi chuyển trang
+        $appends = [];
+        if ($keyword) {
+            $appends['keyword'] = $keyword;
+        }
+        if ($roleFilter && $roleFilter !== 'all') {
+            $appends['role'] = $roleFilter;
+        }
+        if ($sortBy !== 'created_at' || $sortOrder !== 'desc') {
+            $appends['sort_by'] = $sortBy;
+            $appends['sort_order'] = $sortOrder;
+        }
+        
+        if (!empty($appends)) {
+            $users->appends($appends);
+        }
+        
+        // Trả về view với dữ liệu người dùng, từ khóa tìm kiếm, role filter và tham số sắp xếp
+        return view('admin.users.index', compact('users', 'keyword', 'roleFilter', 'sortBy', 'sortOrder'));
     }
 
     /**
@@ -147,7 +176,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         
         // Không cho phép xóa chính mình
-        if ($user->user_id === auth()->id()) {
+        if ($user->user_id === Auth::user()->user_id) {
             return redirect()->route('admin.users.index')
                 ->with('status', [
                     'type' => 'error',

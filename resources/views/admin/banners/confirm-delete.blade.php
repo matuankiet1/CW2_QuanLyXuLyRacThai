@@ -1,5 +1,7 @@
 @extends('layouts.admin-with-sidebar')
 
+@section('title', 'Xác nhận xóa banner - Admin')
+
 @section('content')
 <div class="flex items-center justify-center h-[70vh]">
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center border border-gray-200">

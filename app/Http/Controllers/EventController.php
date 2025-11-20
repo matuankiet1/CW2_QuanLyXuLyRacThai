@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EventsExport;
 use Carbon\Carbon;
@@ -22,7 +25,7 @@ class EventController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%$search%")
-                    ->orWhere('location', 'like', "%$search%");
+                  ->orWhere('location', 'like', "%$search%");
             });
         }
 
@@ -73,7 +76,7 @@ class EventController extends Controller
     // ✅ Tạo sự kiện mới
     public function store(Request $request)
     {
-        \Log::info('Dữ liệu gửi lên:', $request->all());
+        Log::info('Dữ liệu gửi lên:', $request->all());
 
         // 1️⃣ Validate dữ liệu
         $data = $request->validate([
@@ -90,6 +93,7 @@ class EventController extends Controller
 
             // 👥 Số người tham gia
             'participants' => 'nullable|integer|min:0',
+            'capacity' => 'nullable|integer|min:1',
 
             // 📝 Mô tả
             'description' => 'nullable|string|max:5000',
@@ -122,11 +126,14 @@ class EventController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+            $fileName = time() . '-' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
             $file->move(public_path('images/events'), $fileName);
 
             $data['image'] = 'images/events/' . $fileName;
         }
+
+        // Thêm created_by (người tạo sự kiện)
+        $data['created_by'] = Auth::user()->user_id;
 
         // 3️⃣ Lưu dữ liệu cơ bản (không lưu status)
         Event::create($data);
@@ -138,11 +145,11 @@ class EventController extends Controller
     // ✅ Cập nhật sự kiện
     public function update(Request $request, Event $event)
     {
-        \Log::info('Cập nhật sự kiện ID: ' . $event->id, $request->all());
+        Log::info('Cập nhật sự kiện ID: ' . $event->id, $request->all());
 
         $data = $request->validate(
             [
-                'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
 
                 // 📅 Các ngày phải hợp lệ và theo thứ tự logic
                 'register_date' => 'required|date|before_or_equal:register_end_date|after_or_equal:today',
@@ -151,13 +158,14 @@ class EventController extends Controller
                 'event_end_date' => 'required|date|after_or_equal:event_start_date',
 
                 // 🏠 Địa điểm
-                'location' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
 
                 // 👥 Số người tham gia
-                'participants' => 'nullable|integer|min:0',
+            'participants' => 'nullable|integer|min:0',
+                'capacity' => 'nullable|integer|min:1',
 
                 // 🔖 Trạng thái
-                'status' => 'required|in:upcoming,completed',
+            'status' => 'required|in:upcoming,completed',
 
                 // 📝 Mô tả
                 'description' => 'nullable|string|max:5000',
@@ -199,7 +207,7 @@ class EventController extends Controller
 
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+            $fileName = time() . '-' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
 
             $file->move(public_path('images/events'), $fileName);
             $data['image'] = 'images/events/' . $fileName;
@@ -209,8 +217,8 @@ class EventController extends Controller
         $event->update($data);
 
         return redirect()
-            ->route('admin.events.index')
-            ->with('success', 'Sửa sự kiện thành công!');
+                ->route('admin.events.index')
+                ->with('success', 'Sửa sự kiện thành công!');
     }
 
 
