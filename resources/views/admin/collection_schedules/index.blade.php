@@ -150,6 +150,11 @@
                                                     </svg>
                                                     Đã xác nhận
                                                 </span>
+                                                @if($collectionSchedule->report)
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                                        Báo cáo: {{ ucfirst($collectionSchedule->report->status) }}
+                                                    </span>
+                                                @endif
                                             </div>
                                             <p class="text-xs confirmation-text {{ $isConfirmed ? 'text-green-600' : 'text-gray-500' }}"
                                                 data-schedule-id="{{ $collectionSchedule->schedule_id }}">

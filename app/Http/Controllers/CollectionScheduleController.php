@@ -18,7 +18,7 @@ class CollectionScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy']);
+        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
         $isSearch = false;
         $isFilter = false;
 
@@ -212,7 +212,7 @@ class CollectionScheduleController extends Controller
     public function search(Request $request)
     {
         $q = $request->input('q');
-        $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy'])
+        $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy', 'report'])
             ->whereHas('staff', function ($query) use ($q) {
             $query->where('name', 'like', '%' . $q . '%');
             })

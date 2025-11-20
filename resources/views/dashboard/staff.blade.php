@@ -12,7 +12,7 @@
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-900">Sự kiện được phân công</h2>
-            <button class="text-sm text-blue-600 hover:underline" disabled>Đồng bộ từ phân công</button>
+            <a href="{{ route('staff.collection-reports.index') }}" class="text-sm text-blue-600 hover:underline">Báo cáo thu gom</a>
         </div>
         <div class="p-6 space-y-4">
             @forelse($upcomingEvents as $event)
