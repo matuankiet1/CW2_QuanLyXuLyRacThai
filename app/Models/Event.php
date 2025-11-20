@@ -60,9 +60,9 @@ class Event extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
-                    ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
-                    ->withTimestamps()
-                    ->using(EventUser::class);
+            ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
+            ->withTimestamps()
+            ->using(EventUser::class);
     }
 
     /**
@@ -79,7 +79,7 @@ class Event extends Model
     public function scopeUpcoming($query)
     {
         return $query->where('event_start_date', '>', now())
-                     ->where('status', 'upcoming');
+            ->where('status', 'upcoming');
     }
 
     /**
@@ -88,8 +88,8 @@ class Event extends Model
     public function scopeOngoing($query)
     {
         return $query->where('event_start_date', '<=', now())
-                     ->where('event_end_date', '>=', now())
-                     ->where('status', '!=', 'completed');
+            ->where('event_end_date', '>=', now())
+            ->where('status', '!=', 'completed');
     }
 
     /**
@@ -98,7 +98,7 @@ class Event extends Model
     public function scopeEnded($query)
     {
         return $query->where('event_end_date', '<', now())
-                     ->orWhere('status', 'completed');
+            ->orWhere('status', 'completed');
     }
 
     /**
@@ -109,11 +109,11 @@ class Event extends Model
         if (!$this->capacity) {
             return true; // Không giới hạn
         }
-        
+
         $registeredCount = $this->registrations()
             ->whereIn('status', ['pending', 'confirmed', 'attended'])
             ->count();
-        
+
         return $registeredCount < $this->capacity;
     }
 
@@ -125,11 +125,11 @@ class Event extends Model
         if (!$this->capacity) {
             return 999999; // Không giới hạn
         }
-        
+
         $registeredCount = $this->registrations()
             ->whereIn('status', ['pending', 'confirmed', 'attended'])
             ->count();
-        
+
         return max(0, $this->capacity - $registeredCount);
     }
 
@@ -150,10 +150,10 @@ class Event extends Model
     public function canRegister(): bool
     {
         $now = now();
-        return $now >= $this->register_date && 
-               $now <= $this->register_end_date &&
-               $this->status === 'upcoming' &&
-               $this->hasAvailableSlots();
+        return $now >= $this->register_date &&
+            $now <= $this->register_end_date &&
+            $this->status === 'upcoming' &&
+            $this->hasAvailableSlots();
     }
 
     /**
@@ -170,22 +170,39 @@ class Event extends Model
     public function getStatusAttribute()
     {
         $today = Carbon::today();
+
+        $register_start = Carbon::parse($this->register_date);
         $register_end = Carbon::parse($this->register_end_date);
         $event_start = Carbon::parse($this->event_start_date);
         $event_end = Carbon::parse($this->event_end_date);
 
+        // 1️⃣ Kết thúc
         if ($event_end->lt($today)) {
-            return 'Kết thúc';
-        } elseif ($event_start->lte($today) && $event_end->gte($today)) {
-            return 'Đang diễn ra';
-        } elseif ($register_end->gte($today) && $event_start->gt($today)) {
-            return 'Đang đăng ký';
-        } elseif ($register_end->lt($today) && $event_start->gt($today)) {
-            return 'Hết đăng ký';
-        } elseif ($event_start->gt($today)) {
-            return 'Sắp diễn ra';
-        } else {
-            return 'Đang xử lý';
+            return 'Kết thúc'; // ended
         }
+
+        // 2️⃣ Đang diễn ra
+        if ($event_start->lte($today) && $event_end->gte($today)) {
+            return 'Đang diễn ra'; // on_going
+        }
+
+        // 3️⃣ Đang đăng ký
+        if ($register_start->lte($today) && $register_end->gte($today)) {
+            return 'Đang đăng ký'; // registering
+        }
+
+        // 4️⃣ Hết đăng ký
+        if ($register_end->lt($today) && $event_start->gt($today)) {
+            return 'Hết đăng ký'; // register_ended
+        }
+
+        // 5️⃣ Sắp diễn ra
+        if ($register_start->gt($today)) {
+            return 'Sắp diễn ra'; // up_coming
+        }
+
+        // 6️⃣ Trường hợp khác
+        return 'Đang xử lý';
     }
+
 }

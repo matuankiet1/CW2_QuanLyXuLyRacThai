@@ -97,11 +97,11 @@
                                 <td class="px-4 py-3">
                                     @php
                                         $color = match ($event->status) {
-                                            'Kết thúc' => 'bg-red-500',
+                                            'Kết thúc' => 'bg-gray-500',
                                             'Đang diễn ra' => 'bg-green-500',
                                             'Đang đăng ký' => 'bg-blue-500',
-                                            'Hết đăng ký' => 'bg-yellow-500',
-                                            'Sắp diễn ra' => 'bg-gray-500',
+                                            'Hết đăng ký' => 'bg-red-500',
+                                            'Sắp diễn ra' => 'bg-purple-500',
                                             default => 'bg-gray-400',
                                         };
                                     @endphp
