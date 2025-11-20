@@ -353,9 +353,6 @@
         </div>
         </div>
 
-        <div id="collectionScheduleState"
-            data-open-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" class="hidden"></div>
-
         {{-- Offcanvas fillter --}}
         <div id="overlayOffCanvas"
             class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 transition-opacity duration-300"></div>
@@ -455,8 +452,14 @@
         </div>
     </div>
 
+    <div id="collectionScheduleState"
+        data-open-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" class="hidden"></div>
+
     <script>
         // Modal logic
+        const stateElement = document.getElementById('collectionScheduleState');
+        const shouldShowModal = stateElement ? stateElement.dataset.openModal === 'true' : false;
+        
         const modal = document.getElementById('modal');
         const modalBox = document.getElementById('modalBox');
         const openBtn = document.querySelectorAll('.openModalBtn');
@@ -502,11 +505,9 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        const stateElement = document.getElementById('collectionScheduleState');
-        const shouldOpenModal = stateElement?.dataset.openModal === 'true';
-
-        if (shouldOpenModal) {
-            document.addEventListener('DOMContentLoaded', () => {
+        // Auto-open modal if there are errors or show_modal session
+        if (shouldShowModal) {
+            document.addEventListener('DOMContentLoaded', function() {
                 openModal(modal, modalBox);
             });
         }

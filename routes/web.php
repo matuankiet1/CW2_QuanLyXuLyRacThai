@@ -174,6 +174,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
     Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
+    ->name('user.events.registerForm');
 
     // User Statistics
     Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
