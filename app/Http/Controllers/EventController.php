@@ -35,23 +35,23 @@ class EventController extends Controller
         if ($statusFilter && $statusFilter !== 'all') {
             $query->where(function ($q) use ($statusFilter, $today) {
                 switch ($statusFilter) {
-                    case 'Kết thúc':
+                    case 'ended':
                         $q->whereDate('event_end_date', '<', $today);
                         break;
-                    case 'Đang diễn ra':
+                    case 'on_going':
                         $q->whereDate('event_start_date', '<=', $today)
                             ->whereDate('event_end_date', '>=', $today);
                         break;
-                    case 'Đang đăng ký':
+                    case 'registering':
                         $q->whereDate('register_end_date', '>=', $today)
-                            ->whereDate('event_start_date', '>', $today);
+                            ->whereDate('register_date', '<=', $today);
                         break;
-                    case 'Hết đăng ký':
+                    case 'register_ended':
                         $q->whereDate('register_end_date', '<', $today)
                             ->whereDate('event_start_date', '>', $today);
                         break;
-                    case 'Sắp diễn ra':
-                        $q->whereDate('event_start_date', '>', $today);
+                    case 'up_coming':
+                        $q->whereDate('register_date', '>', $today);
                         break;
                 }
             });
