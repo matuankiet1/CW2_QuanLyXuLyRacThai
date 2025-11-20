@@ -128,8 +128,8 @@ class AuthController extends Controller
 
         try {
             $socialUser = Socialite::driver($provider)->user();
-        } catch (\Throwable $e) {
-            // dd('Không thể xác thực bằng ' . $provider . '. ' . $e->getMessage());
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            dd($e->getMessage(), $e);
             // return redirect()->route('login')->withErrors([
             //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
             // ]);
@@ -175,9 +175,21 @@ class AuthController extends Controller
         // 3) Nếu chưa có ai => tạo mới
         if (!$user) {
             if (!$email) {
-                return redirect()->route('login')->with('status', [
-                    'type' => 'error',
-                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không cung cấp email. Vui lòng dùng tài khoản khác.'
+                // Lưu tạm social info vào session
+                session([
+                    'social_login' => [
+                        'provider' => $provider,
+                        'provider_id' => $providerId,
+                        'name' => $name ?: 'User ' . Str::random(6),
+                    ],
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không chia sẻ email. 
+                          Vui lòng nhập email để hoàn tất đăng ký.'
+                ]);
+
+                return redirect()->route('login.add-mail')->with('status', [
+                    'type' => 'warning',
+                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không chia sẻ email. 
+                          Vui lòng nhập email để hoàn tất đăng ký.'
                 ]);
             }
 
@@ -200,6 +212,55 @@ class AuthController extends Controller
             return redirect()->intended('/');
         }
     }
+
+    public function showAddMailForm()
+    {
+        $social = session('social_login');
+
+        if (!$social) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Phiên đăng nhập không hợp lệ.'
+            ]);
+        }
+        return view('auth.add_mail', ['social' => $social]);
+    }
+
+    public function handleAddMailSubmit(Request $request)
+    {
+        $social = session('social_login');
+
+        if (!$social) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Phiên đăng nhập không hợp lệ.'
+            ]);
+        }
+
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'unique:users,email'],
+        ]);
+
+        // Tạo user
+        $user = User::create([
+            'name' => $social['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make(Str::random(16)),
+            'role' => 'user',
+            'auth_provider' => $social['provider'],
+            'provider_id' => $social['provider_id'],
+            'email_verified_at' => now(),
+        ]);
+
+        // Xóa session tạm
+        session()->forget('social_login');
+
+        // Login
+        Auth::login($user, true);
+
+        return redirect()->intended('/');
+    }
+
 
     public function logout(Request $request)
     {
@@ -224,14 +285,16 @@ class AuthController extends Controller
         $data = $request->validate([
             'email' => ['required', 'email'],
         ]);
-        $email = strtolower($data['email']);
 
-        // Chỉ gửi nếu user tồn tại, nhưng phản hồi chung (không lộ thông tin)
-        if (User::where('email', $email)->exists()) {
+        $email = strtolower($data['email']);
+        $user = User::where('email', $email)->first();
+
+        // Chỉ gửi nếu user tồn tại và auth provider là local, nhưng phản hồi chung (không lộ thông tin)
+        if ($user && $user->auth_provider == 'local') {
             $code = random_int(100000, 999999);
             $hash = Hash::make((string) $code);
 
-            // Mỗi email chỉ có 1 mã đang hiệu lực (theo logic của app)
+            // Mỗi email chỉ có 1 mã đang hiệu lực
             DB::table('password_reset_codes')->where('email', $email)->delete();
 
             DB::table('password_reset_codes')->insert([
@@ -241,7 +304,7 @@ class AuthController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // Gửi mail (dev: Mailtrap; prod: SMTP thật)
+            // Gửi mail
             Mail::to($email)->send(new SendCodeMail($code));
         }
 
@@ -324,7 +387,7 @@ class AuthController extends Controller
         $email = session('pw_reset_email');
 
         $user = User::where('email', $email)->first();
-        if ($user) {
+        if ($user && $user->auth_provider == 'local') {
             $user->forceFill([
                 'password' => Hash::make($request->password),
                 'remember_token' => Str::random(60),

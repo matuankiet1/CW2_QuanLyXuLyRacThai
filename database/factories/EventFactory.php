@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Event;
 
 class EventFactory extends Factory
@@ -18,16 +17,22 @@ class EventFactory extends Factory
         $eventStart    = (clone $registerEnd)->modify('+3 days');
         $eventEnd      = (clone $eventStart)->modify('+2 days');
 
+        // Một số ảnh mẫu
+        $images = [
+            'images/events/Event1.png',
+            'images/events/Event2.png',
+        ];
+
         return [
             'title' => ucfirst($this->faker->words(3, true)), // Tên sự kiện
-            'register_date' => $registerStart,
-            'register_end_date' => $registerEnd,
-            'event_start_date' => $eventStart,
-            'event_end_date' => $eventEnd,
+            'register_date' => $registerStart->format('Y-m-d'),
+            'register_end_date' => $registerEnd->format('Y-m-d'),
+            'event_start_date' => $eventStart->format('Y-m-d'),
+            'event_end_date' => $eventEnd->format('Y-m-d'),
             'location' => $this->faker->city(),
             'participants' => $this->faker->numberBetween(50, 500),
-            'status' => $this->faker->randomElement(['upcoming', 'completed']),
             'description' => $this->faker->paragraphs(3, true),
+            'image' => $this->faker->randomElement($images),
         ];
     }
 }
