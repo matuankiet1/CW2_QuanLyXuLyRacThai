@@ -69,16 +69,6 @@
                                 @error('description') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label class="block text-sm font-medium mb-1">Trạng thái</label>
-                                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                    <option value="upcoming" {{ old('status') == 'upcoming' ? 'selected' : '' }}>Sắp diễn ra
-                                    </option>
-                                    <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Đã kết thúc
-                                    </option>
-                                </select>
-                            </div>
-
                             <div class="mb-4">
                                 <label class="block font-medium mb-1">Ảnh đại diện</label>
                                 <input type="file" name="image" id="imageInput" accept="image/*"
