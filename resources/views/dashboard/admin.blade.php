@@ -264,13 +264,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Phân loại rác thải
     const wasteTypeCtx = document.getElementById('wasteTypeChart');
+    const labels = @json($wasteData['labels']);
+    const weights  = @json($wasteData['weights']);
+
     if (wasteTypeCtx) {
         new Chart(wasteTypeCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Rác tái chế', 'Rác hữu cơ', 'Rác vô cơ', 'Rác nguy hại'],
+                labels: labels,
                 datasets: [{
-                    data: [35, 30, 25, 10],
+                    data: weights,
                     backgroundColor: [
                         primaryColor,
                         successColor,
@@ -310,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cornerRadius: 8,
                         callbacks: {
                             label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
+                                return `${context.label}: ${context.raw}%`;
                             }
                         }
                     }

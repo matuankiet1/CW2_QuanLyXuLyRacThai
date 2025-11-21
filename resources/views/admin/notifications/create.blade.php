@@ -49,7 +49,7 @@
                             <option value="">-- Chọn đối tượng --</option>
                             <option value="all" {{ old('send_to_type') == 'all' ? 'selected' : '' }}>👥 Tất cả sinh viên</option>
                             <option value="role" {{ old('send_to_type') == 'role' ? 'selected' : '' }}>🏷️ Theo vai trò</option>
-                            <option value="user" {{ old('send_to_type') == 'user' ? 'selected' : '' }}>👤 Sinh viên cụ thể</option>
+                            <option value="user" {{ old('send_to_type') == 'user' ? 'selected' : '' }}>👤 Người dùng cụ thể</option>
                         </select>
                         @error('send_to_type') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
                     </div>
@@ -59,13 +59,15 @@
                         <select name="target_role" id="target_role" class="form-control">
                             <option value="">-- Chọn vai trò --</option>
                             <option value="admin" {{ old('target_role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="user" {{ old('target_role') == 'user' ? 'selected' : '' }}>Sinh viên</option>
+                            <option value="manager" {{ old('target_role') == 'manager' ? 'selected' : '' }}>Quản lý</option>
+                            <option value="staff" {{ old('target_role') == 'staff' ? 'selected' : '' }}>Nhân viên</option>
+                            <option value="student" {{ old('target_role') == 'student' ? 'selected' : '' }}>Sinh viên</option>
                         </select>
                         @error('target_role') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="mb-4 hidden" id="user_ids_div">
-                        <label class="form-label">Chọn sinh viên <span class="text-red-500">*</span></label>
+                        <label class="form-label">Chọn người nhận <span class="text-red-500">*</span></label>
                         <div class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3 bg-gray-50">
                             @foreach($users as $user)
                                 <div class="flex items-center mb-2">
