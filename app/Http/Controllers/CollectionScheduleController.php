@@ -18,7 +18,7 @@ class CollectionScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CollectionSchedule::query()->with('staff');
+        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
         $isSearch = false;
         $isFilter = false;
 
@@ -212,9 +212,11 @@ class CollectionScheduleController extends Controller
     public function search(Request $request)
     {
         $q = $request->input('q');
-        $collectionSchedules = CollectionSchedule::whereHas('staff', function ($query) use ($q) {
+        $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy', 'report'])
+            ->whereHas('staff', function ($query) use ($q) {
             $query->where('name', 'like', '%' . $q . '%');
-        })->orWhere('scheduled_date', 'like', '%' . $q . '%')
+            })
+            ->orWhere('scheduled_date', 'like', '%' . $q . '%')
             ->orderBy('schedule_id', 'desc')
             ->paginate(7);
         $isSearch = true;
@@ -234,39 +236,45 @@ class CollectionScheduleController extends Controller
     public function updateStatus(Request $request, $id)
     {
         try {
-            $validated = $request->validate([
-                'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
-            ]);
+            $user = $request->user();
 
-            $collectionSchedule = CollectionSchedule::findOrFail($id);
-
-            if (!$collectionSchedule) {
+            if (!$user || !$user->hasRole(['manager', 'admin'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Không tìm thấy lịch thu gom. Vui lòng thử lại sau!'
-                ], 404);
+                    'message' => 'Bạn không có quyền xác nhận lịch thu gom này.'
+                ], 403);
             }
 
-            // Cập nhật trạng thái
+            $validated = $request->validate([
+                'status' => ['required', Rule::in(['Đã hoàn thành'])],
+            ]);
+
+            $collectionSchedule = CollectionSchedule::with('confirmedBy')->findOrFail($id);
+
+            if ($collectionSchedule->confirmed_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lịch thu gom này đã được xác nhận vào ' . $collectionSchedule->confirmed_at->format('d/m/Y H:i') . '.'
+                ], 422);
+            }
+
             $collectionSchedule->status = $validated['status'];
-            
-            // Nếu chuyển sang "Đã hoàn thành" và chưa có completed_at, tự động set
-            if ($validated['status'] === 'Đã hoàn thành' && !$collectionSchedule->completed_at) {
+
+            if (!$collectionSchedule->completed_at) {
                 $collectionSchedule->completed_at = now();
             }
-            
-            // Nếu chuyển về "Chưa thực hiện", có thể xóa completed_at (tùy chọn)
-            if ($validated['status'] === 'Chưa thực hiện') {
-                $collectionSchedule->completed_at = null;
-            }
 
+            $collectionSchedule->confirmed_by = $user->user_id;
+            $collectionSchedule->confirmed_at = now();
             $collectionSchedule->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cập nhật trạng thái thành công!',
+                'message' => 'Đã xác nhận lịch thu gom.',
                 'status' => $collectionSchedule->status,
-                'completed_at' => $collectionSchedule->completed_at?->format('Y-m-d')
+                'completed_at' => $collectionSchedule->completed_at?->format('Y-m-d'),
+                'confirmed_at' => $collectionSchedule->confirmed_at?->format('Y-m-d H:i'),
+                'confirmed_by' => $user->name,
             ]);
         } catch (ValidationException $e) {
             return response()->json([
