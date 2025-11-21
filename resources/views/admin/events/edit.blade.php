@@ -22,14 +22,14 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Ngày bắt đầu đăng ký tham gia</label>
                                     <input type="date" name="register_date"
-                                        value="{{ old('register_date', $event->register_date) }}" required
+                                        value="{{ old('register_date', $event->register_date ? $event->register_date->format('Y-m-d') : '') }}" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                     @error('register_date') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Ngày kết thúc đăng ký tham gia</label>
                                     <input type="date" name="register_end_date"
-                                        value="{{ old('register_end_date', $event->register_end_date) }}" required
+                                        value="{{ old('register_end_date', $event->register_end_date ? $event->register_end_date->format('Y-m-d') : '') }}" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                     @error('register_end_date') <div class="text-red-500 text-sm">{{ $message }}</div>
                                     @enderror
@@ -37,7 +37,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Ngày bắt đầu sự kiện</label>
                                     <input type="date" name="event_start_date"
-                                        value="{{ old('event_start_date', $event->event_start_date) }}" required
+                                        value="{{ old('event_start_date', $event->event_start_date ? $event->event_start_date->format('Y-m-d') : '') }}" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                     @error('event_start_date') <div class="text-red-500 text-sm">{{ $message }}</div>
                                     @enderror
@@ -45,7 +45,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Ngày kết thúc sự kiện</label>
                                     <input type="date" name="event_end_date"
-                                        value="{{ old('event_end_date', $event->event_end_date) }}" required
+                                        value="{{ old('event_end_date', $event->event_end_date ? $event->event_end_date->format('Y-m-d') : '') }}" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                     @error('event_end_date') <div class="text-red-500 text-sm">{{ $message }}</div>
                                     @enderror
