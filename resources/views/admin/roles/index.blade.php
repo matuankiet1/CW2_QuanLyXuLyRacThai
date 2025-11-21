@@ -9,12 +9,17 @@
             <h1 class="text-2xl font-semibold mb-1">Quản lý phân quyền</h1>
             <p class="text-gray-500">Quản lý quyền hạn của người dùng trong hệ thống</p>
         </div>
-        <button class="btn btn-admin" onclick="document.getElementById('createAdminModal').classList.remove('hidden')">
-            <i class="fas fa-user-shield mr-2"></i>Tạo tài khoản admin mới
-        </button>
+        <div class="flex gap-2">
+            <a href="{{ route('admin.permissions.index') }}" class="btn btn-admin">
+                <i class="fas fa-key mr-2"></i>Quản lý Permissions
+            </a>
+            <button class="btn btn-admin" onclick="document.getElementById('createAdminModal').classList.remove('hidden')">
+                <i class="fas fa-user-shield mr-2"></i>Tạo tài khoản mới
+            </button>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3">
         <div class="bg-white rounded-lg shadow-md h-full">
             <div class="p-4 flex items-center gap-3">
                 <div class="rounded-full bg-blue-100 text-blue-600 flex items-center justify-center" style="width:40px;height:40px;">
@@ -29,22 +34,44 @@
         <div class="bg-white rounded-lg shadow-md h-full">
             <div class="p-4 flex items-center gap-3">
                 <div class="rounded-full bg-red-100 text-red-600 flex items-center justify-center" style="width:40px;height:40px;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <div class="text-gray-500 text-sm">Admin</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $adminCount ?? 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="p-4 flex items-center gap-3">
+                <div class="rounded-full bg-purple-100 text-purple-600 flex items-center justify-center" style="width:40px;height:40px;">
                     <i class="fas fa-user-tie"></i>
                 </div>
                 <div>
-                    <div class="text-gray-500 text-sm">Quản trị viên</div>
-                    <div class="text-2xl font-semibold mb-0">{{ $adminCount }}</div>
+                    <div class="text-gray-500 text-sm">Quản lý</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $managerCount ?? 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md h-full">
+            <div class="p-4 flex items-center gap-3">
+                <div class="rounded-full bg-orange-100 text-orange-600 flex items-center justify-center" style="width:40px;height:40px;">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div>
+                    <div class="text-gray-500 text-sm">Nhân viên</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $staffCount ?? 0 }}</div>
                 </div>
             </div>
         </div>
         <div class="bg-white rounded-lg shadow-md h-full">
             <div class="p-4 flex items-center gap-3">
                 <div class="rounded-full bg-green-100 text-green-600 flex items-center justify-center" style="width:40px;height:40px;">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user-graduate"></i>
                 </div>
                 <div>
-                    <div class="text-gray-500 text-sm">Người dùng</div>
-                    <div class="text-2xl font-semibold mb-0">{{ $userCount }}</div>
+                    <div class="text-gray-500 text-sm">Sinh viên</div>
+                    <div class="text-2xl font-semibold mb-0">{{ $studentCount ?? 0 }}</div>
                 </div>
             </div>
         </div>
@@ -87,8 +114,12 @@
                         <td class="px-4 py-3">
                             @if($user->role === 'admin')
                                 <span class="px-2 py-1 rounded text-xs font-medium bg-red-500 text-white">Admin</span>
+                            @elseif($user->role === 'manager')
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-purple-500 text-white">Quản lý</span>
+                            @elseif($user->role === 'staff')
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-orange-500 text-white">Nhân viên</span>
                             @else
-                                <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">User</span>
+                                <span class="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white">Sinh viên</span>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-gray-500">{{ $user->created_at->format('d/m/Y H:i') }}</td>
@@ -98,12 +129,14 @@
                                     <form action="{{ route('admin.roles.update', $user) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
-                                        <select name="role" onchange="this.form.submit()" class="px-2 py-1 text-sm border border-gray-300 rounded {{ $user->role === 'admin' ? 'border-red-500' : 'border-green-500' }}">
-                                            <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
+                                        <select name="role" onchange="this.form.submit()" class="px-2 py-1 text-sm border border-gray-300 rounded">
                                             <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                            <option value="manager" {{ $user->role === 'manager' ? 'selected' : '' }}>Quản lý</option>
+                                            <option value="staff" {{ $user->role === 'staff' ? 'selected' : '' }}>Nhân viên</option>
+                                            <option value="student" {{ $user->role === 'student' ? 'selected' : '' }}>Sinh viên</option>
                                         </select>
                                     </form>
-                                    @if($user->role === 'user')
+                                    @if(in_array($user->role, ['student', 'staff']))
                                         <form action="{{ route('admin.roles.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
                                             @csrf
                                             @method('DELETE')

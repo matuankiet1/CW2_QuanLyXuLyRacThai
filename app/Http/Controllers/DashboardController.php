@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\WasteLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class DashboardController extends Controller
@@ -13,14 +15,40 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $upcomingEventsCount = Event::where('status', 'upcoming') -> whereDate('event_start_date', '>=', $today) -> count();
-
-        return view('dashboard.admin', compact('upcomingEventsCount'));
+        $upcomingEventsCount = Event::where('status', 'upcoming')->whereDate('event_start_date', '>=', $today)->count();
+        //$wasteData = $this->getWasteData();
+        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteData'));
     }
 
-    public function app(){
-        return view('dashboard.app');
+    public function manager()
+    {
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.manager', compact('upcomingEvents'));
+    }
+
+    public function staff()
+    {
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.staff', compact('upcomingEvents'));
+    }
+
+    public function student()
+    {
+        $upcomingEvents = Event::where('status', 'upcoming')
+            ->orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.student', compact('upcomingEvents'));
     }
 
     
+
+
 }
