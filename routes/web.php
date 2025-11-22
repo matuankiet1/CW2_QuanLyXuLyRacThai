@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
@@ -124,18 +125,19 @@ Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
 
         // 🟢 Banners
-    Route::resource('banners', BannerController::class);
+        Route::resource('banners', BannerController::class);
 
-    Route::get('banners/{banner}/confirm-delete', 
-        [BannerController::class, 'confirmDelete']
-    )->name('banners.confirm-delete');
+        Route::get(
+            'banners/{banner}/confirm-delete',
+            [BannerController::class, 'confirmDelete']
+        )->name('banners.confirm-delete');
 
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
         Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
         Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
-        
+
         // Permission Management
         Route::get('permissions', [App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
         Route::post('permissions', [App\Http\Controllers\PermissionController::class, 'store'])->name('permissions.store');
@@ -176,7 +178,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
     Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
     Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
-    ->name('user.events.registerForm');
+        ->name('user.events.registerForm');
 
     // User Statistics
     Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
@@ -218,6 +220,28 @@ Route::middleware('manager')->group(function () {
         Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
         Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
         Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
+
+
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
+            ->name('participants'); // ✅ Thêm route index cho view quản lý
+
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
+            ->name('participants.confirm');
+
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
+            ->name('participants.attend');
+
+        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
+            ->name('participants.pending');
+
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
+            ->name('participants.bulk-confirm');
+
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
+            ->name('participants.bulk-attend');
+
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
+            ->name('participants.export');
     });
 
     Route::get('/manager/collection-reports', [CollectionReportController::class, 'managerIndex'])->name('manager.collection-reports.index');

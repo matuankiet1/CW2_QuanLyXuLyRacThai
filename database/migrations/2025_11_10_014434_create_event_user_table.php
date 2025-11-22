@@ -22,9 +22,11 @@ return new class extends Migration {
         Schema::create('event_user', function (Blueprint $table) {
             $table->id();
 
-            // FK tới users.id
-            $table->foreignId('user_id')
-                ->constrained('users')
+            // FK tới users.user_id (custom primary key)
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('user_id')
+                ->on('users')
                 ->onDelete('cascade');
 
             // FK tới events.id
@@ -32,7 +34,7 @@ return new class extends Migration {
                 ->constrained('events')
                 ->onDelete('cascade');
 
-            // Thông tin sinh viên (nếu cần)
+            // Thông tin sinh viên
             $table->string('name');
             $table->string('mssv');
             $table->string('class');
@@ -48,14 +50,15 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            // Một user chỉ đăng ký một lần / event
+            // Một user chỉ đăng ký 1 lần / 1 event
             $table->unique(['user_id', 'event_id']);
 
-            // Indexes
+            // Index
             $table->index('status');
             $table->index('event_id');
             $table->index(['event_id', 'status']);
         });
+
 
     }
 

@@ -136,6 +136,7 @@ class EventParticipantController extends Controller
             DB::beginTransaction();
             
             $count = EventUser::where('event_id', $event->id)
+                             ->where('event_id', $event->id)
                              ->whereIn('user_id', $userIds)
                              ->where('status', 'pending')
                              ->update([
@@ -173,6 +174,7 @@ class EventParticipantController extends Controller
             DB::beginTransaction();
             
             $count = EventUser::where('event_id', $event->id)
+                             ->where('event_id', $event->id)
                              ->whereIn('user_id', $userIds)
                              ->where('status', 'confirmed')
                              ->update([
@@ -191,6 +193,7 @@ class EventParticipantController extends Controller
                             ->with('error', 'Có lỗi xảy ra khi điểm danh hàng loạt. Vui lòng thử lại.');
         }
     }
+
 
     /**
      * Xuất báo cáo Excel
@@ -231,8 +234,10 @@ class EventParticipantController extends Controller
             foreach ($participants as $participant) {
                 fputcsv($file, [
                     $index++,
-                    $participant->user->name,
-                    $participant->user->email,
+                    $participant->name,
+                    $participant->email,
+                    $participant->mssv,
+                    $participant->class,
                     $this->getStatusLabel($participant->status),
                     $participant->registered_at ? $participant->registered_at->format('d/m/Y H:i') : '',
                     $participant->confirmed_at ? $participant->confirmed_at->format('d/m/Y H:i') : '',
