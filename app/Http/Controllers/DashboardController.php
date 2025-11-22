@@ -15,9 +15,9 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $upcomingEventsCount = Event::where('status', 'upcoming')->whereDate('event_start_date', '>=', $today)->count();
+        $upcomingEventsCount = Event::whereDate('event_start_date', '>=', $today)->count();
         //$wasteData = $this->getWasteData();
-        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteData'));
+        return view('dashboard.admin', compact('upcomingEventsCount'));
     }
 
     public function manager()
