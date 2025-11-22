@@ -245,6 +245,10 @@ Route::middleware('manager')->group(function () {
 
         Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
             ->name('participants.export');
+
+        Route::post('/events/{event}/register', [EventParticipantController::class, 'register'])
+            ->name('user.events.register')
+            ->middleware('auth'); // Chỉ cho user đã đăng nhập
     });
 
     Route::get('/manager/collection-reports', [CollectionReportController::class, 'managerIndex'])->name('manager.collection-reports.index');

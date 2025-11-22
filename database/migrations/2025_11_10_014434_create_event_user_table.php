@@ -36,8 +36,8 @@ return new class extends Migration {
 
             // Thông tin sinh viên
             $table->string('name');
-            $table->string('mssv');
-            $table->string('class');
+            $table->string('student_id');
+            $table->string('student_class');
             $table->string('email');
 
             // Trạng thái tham gia

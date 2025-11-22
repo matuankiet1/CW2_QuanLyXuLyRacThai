@@ -128,7 +128,7 @@ class UserEventController extends Controller
             'event' => $event
         ]);
     }
-    
+
 
     /**
      * Đăng ký tham gia sự kiện
@@ -170,6 +170,8 @@ class UserEventController extends Controller
             EventUser::create([
                 'user_id' => $userId,
                 'event_id' => $event->id,
+                'student_id' => $request->input('mssv'),
+                'student_class' => $request->input('class'),
                 'status' => 'pending',
                 'registered_at' => now(),
             ]);
