@@ -25,7 +25,7 @@
         <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
             <i class="fas fa-arrow-left mr-2"></i>Quay lại
         </a>
-        <a href="{{ route('admin.events.participants.pending', $event->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <a href="{{ route('admin.events.pending', $event->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             <i class="fas fa-user-clock mr-2"></i>Xác nhận đăng ký
         </a>
         <a href="{{ route('admin.events.rewards.index', $event->id) }}" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
@@ -134,7 +134,9 @@
                         <input type="checkbox" id="selectAllTable" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                     </th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">STT</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Họ và tên</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Họ tên</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">MSSV</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lớp</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạng thái</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ngày đăng ký</th>
@@ -154,6 +156,12 @@
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
                             {{ $participant->user->name }}
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                            {{ $participant->mssv }}
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                            {{ $participant->class }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">
                             {{ $participant->user->email }}
