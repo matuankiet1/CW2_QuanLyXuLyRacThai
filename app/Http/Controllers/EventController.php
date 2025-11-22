@@ -59,11 +59,14 @@ class EventController extends Controller
 
         $events = $query
             ->withCount([
-                'participants as confirmed_participants_count' => function ($q) {
+                'participants as attended_participants_count' => function ($q) {
                     $q->where('status', 'attended');
                 },
                 'participants as pending_participants_count' => function ($q) {
                     $q->where('status', 'pending');
+                },
+                'participants as attending_participants_count' => function ($q) {
+                    $q->where('status', 'confirmed');
                 },
             ])
             ->orderBy('id', 'asc')
