@@ -117,7 +117,7 @@
                                                 class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-yellow-100 text-yellow-800 font-medium">
                                                 ⚠️ {{ $event->pending_participants_count }} người đang chờ xác nhận 
                                             </div>
-                                        @endif
+                                    @endif
                                     <div class="flex gap-2 text-sm justify-end">
                                        
                                         <a href="{{ route('admin.events.participants', $event->id) }}"

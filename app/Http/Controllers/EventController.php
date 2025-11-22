@@ -57,17 +57,18 @@ class EventController extends Controller
             });
         }
 
-        $query->withCount([
-            'participants as confirmed_participants_count' => function ($q) {
-                $q->where('status', 'attended');
-            }
-        ]);
+        $events = $query
+            ->withCount([
+                'participants as confirmed_participants_count' => function ($q) {
+                    $q->where('status', 'attended');
+                },
+                'participants as pending_participants_count' => function ($q) {
+                    $q->where('status', 'pending');
+                },
+            ])
+            ->orderBy('id', 'asc')
+            ->paginate(10);
 
-        $events = Event::withCount([
-            'participants as pending_participants_count' => function ($query) {
-                $query->where('status', 'pending');
-            },
-        ])->orderBy('id', 'asc')->paginate(10);
 
 
         return view('admin.events.index', compact('events', 'search', 'statusFilter'));

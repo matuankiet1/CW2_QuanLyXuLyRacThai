@@ -174,4 +174,9 @@ class Event extends Model
         return 'Đang xử lý';
     }
 
+    public function getAttendParticipantsCountAttribute()
+    {
+        return $this->participants()->where('status', 'attended')->count();
+    }
+
 }
