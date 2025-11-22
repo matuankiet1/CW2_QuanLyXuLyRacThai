@@ -170,8 +170,8 @@ class UserEventController extends Controller
             EventUser::create([
                 'user_id' => $userId,
                 'event_id' => $event->id,
-                'student_id' => $request->input('mssv'),
-                'student_class' => $request->input('class'),
+                'student_id' => $request->input('student_id'),
+                'student_class' => $request->input('student_class'),
                 'status' => 'pending',
                 'registered_at' => now(),
             ]);
