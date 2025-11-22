@@ -5,10 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CollectionScheduleController;
+use App\Http\Controllers\CollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
@@ -123,18 +125,19 @@ Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
 
         // 🟢 Banners
-    Route::resource('banners', BannerController::class);
+        Route::resource('banners', BannerController::class);
 
-    Route::get('banners/{banner}/confirm-delete', 
-        [BannerController::class, 'confirmDelete']
-    )->name('banners.confirm-delete');
+        Route::get(
+            'banners/{banner}/confirm-delete',
+            [BannerController::class, 'confirmDelete']
+        )->name('banners.confirm-delete');
 
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
         Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
         Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
-        
+
         // Permission Management
         Route::get('permissions', [App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
         Route::post('permissions', [App\Http\Controllers\PermissionController::class, 'store'])->name('permissions.store');
@@ -142,48 +145,6 @@ Route::middleware('admin')->group(function () {
         Route::delete('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'destroy'])->name('permissions.destroy');
         Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
     });
-
-    // Collection Schedule
-    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
-        ->name('admin.collection-schedules.search');
-
-    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
-        ->name('admin.collection-schedules.deleteMultiple');
-
-    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
-        ->name('admin.collection-schedules.export-excel');
-
-    Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
-        ->name('admin.collection-schedules.update-status');
-
-    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
-        'index' => 'admin.collection-schedules.index',
-        'store' => 'admin.collection-schedules.store',
-        'edit' => 'admin.collection-schedules.edit',
-        'update' => 'admin.collection-schedules.update',
-        'destroy' => 'admin.collection-schedules.destroy',
-    ]);
-
-    
-
-
-    //Events
-    // Events
-    Route::prefix('admin/events')->name('admin.events.')->group(function () {
-        Route::get('/', [EventController::class, 'index'])->name('index');
-        Route::get('/create', [EventController::class, 'create'])->name('create');
-        Route::post('/', [EventController::class, 'store'])->name('store');
-        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
-        Route::put('/{event}', [EventController::class, 'update'])->name('update');
-        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
-        Route::get('/export', [EventController::class, 'export'])->name('export');
-        
-        // Quản lý điểm thưởng cho sinh viên tham gia sự kiện
-        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
-        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
-        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
-    });
-
 
     // Notifications (Admin)
     Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
@@ -216,7 +177,92 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
     Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
+        ->name('user.events.registerForm');
 
     // User Statistics
     Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
+});
+
+//--------------------------------------- MANAGER ROUTES (Quản lý + Admin) -------------------------------------//
+Route::middleware('manager')->group(function () {
+    Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
+
+    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
+        ->name('admin.collection-schedules.search');
+
+    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
+        ->name('admin.collection-schedules.deleteMultiple');
+
+    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
+        ->name('admin.collection-schedules.export-excel');
+
+    Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
+        ->name('admin.collection-schedules.update-status');
+
+    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+        'index' => 'admin.collection-schedules.index',
+        'store' => 'admin.collection-schedules.store',
+        'edit' => 'admin.collection-schedules.edit',
+        'update' => 'admin.collection-schedules.update',
+        'destroy' => 'admin.collection-schedules.destroy',
+    ]);
+
+    Route::prefix('admin/events')->name('admin.events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/', [EventController::class, 'store'])->name('store');
+        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [EventController::class, 'update'])->name('update');
+        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [EventController::class, 'export'])->name('export');
+
+        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
+        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
+        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
+
+
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
+            ->name('participants'); // ✅ Thêm route index cho view quản lý
+
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
+            ->name('participants.confirm');
+
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
+            ->name('participants.attend');
+
+        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
+            ->name('participants.pending');
+
+        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
+            ->name('pending'); // ✅ Thêm route index cho view quản lý
+
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
+            ->name('participants.bulk-confirm');
+
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
+            ->name('participants.bulk-attend');
+
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
+            ->name('participants.export');
+
+        Route::post('/events/{event}/register', [EventParticipantController::class, 'register'])
+            ->name('user.events.register')
+            ->middleware('auth'); // Chỉ cho user đã đăng nhập
+    });
+
+    Route::get('/manager/collection-reports', [CollectionReportController::class, 'managerIndex'])->name('manager.collection-reports.index');
+    Route::post('/manager/collection-reports/{report}/approve', [CollectionReportController::class, 'approve'])->name('manager.collection-reports.approve');
+});
+
+Route::middleware('staff')->group(function () {
+    Route::get('/staff/dashboard', [DashboardController::class, 'staff'])->name('staff.dashboard');
+
+    Route::get('/staff/collection-reports', [CollectionReportController::class, 'staffIndex'])->name('staff.collection-reports.index');
+    Route::get('/staff/collection-reports/{schedule}/create', [CollectionReportController::class, 'staffCreate'])->name('staff.collection-reports.create');
+    Route::post('/staff/collection-reports/{schedule}', [CollectionReportController::class, 'staffStore'])->name('staff.collection-reports.store');
+});
+
+Route::middleware('student')->group(function () {
+    Route::get('/student/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
 });

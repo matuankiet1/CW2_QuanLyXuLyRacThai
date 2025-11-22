@@ -60,7 +60,7 @@ class Event extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
-            ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
+            ->withPivot('status', 'student_id', 'student_class', 'registered_at', 'confirmed_at', 'attended_at')
             ->withTimestamps()
             ->using(EventUser::class);
     }
@@ -122,11 +122,13 @@ class Event extends Model
      */
     public function canRegister(): bool
     {
-        $now = now();
-        return $now >= $this->register_date &&
-            $now <= $this->register_end_date &&
-            $this->status === 'upcoming' &&
-            $this->hasAvailableSlots();
+        $now = now()->startOfDay();
+        $registerStart = optional($this->register_date)->startOfDay();
+        $registerEnd = optional($this->register_end_date)->startOfDay();
+
+        return $registerStart && $registerEnd
+            && $now->between($registerStart, $registerEnd)
+            && $this->hasAvailableSlots();
     }
 
     /**
