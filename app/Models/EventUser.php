@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EventUser extends Pivot
+class EventUser extends Model
 {
     protected $table = 'event_user';
 
     protected $fillable = [
         'user_id',
         'event_id',
+        'name',
+        'email',
         'student_id',
         'student_class',
         'status',

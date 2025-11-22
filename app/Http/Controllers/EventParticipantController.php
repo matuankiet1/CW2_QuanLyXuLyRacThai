@@ -47,7 +47,9 @@ class EventParticipantController extends Controller
         }
 
         // Sắp xếp
-        $participants = $query->orderBy('registered_at', 'desc')
+        $participants = EventUser::with('user')
+            ->where('event_id', $event->id)
+            ->orderBy('registered_at', 'desc')
             ->paginate(20);
 
         // Thống kê

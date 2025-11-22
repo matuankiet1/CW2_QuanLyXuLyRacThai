@@ -25,9 +25,6 @@
         <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
             <i class="fas fa-arrow-left mr-2"></i>Quay lại
         </a>
-        <a href="{{ route('admin.events.pending', $event->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            <i class="fas fa-user-clock mr-2"></i>Xác nhận đăng ký
-        </a>
         <a href="{{ route('admin.events.rewards.index', $event->id) }}" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
             <i class="fas fa-trophy mr-2"></i>Điểm thưởng
         </a>
@@ -158,10 +155,10 @@
                             {{ $participant->user->name }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
-                            {{ $participant->mssv }}
+                            {{ $participant->student_id }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
-                            {{ $participant->class }}
+                            {{ $participant->student_class }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">
                             {{ $participant->user->email }}
