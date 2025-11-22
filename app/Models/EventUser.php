@@ -13,6 +13,8 @@ class EventUser extends Pivot
     protected $fillable = [
         'user_id',
         'event_id',
+        'student_id',
+        'student_class',
         'status',
         'registered_at',
         'confirmed_at',

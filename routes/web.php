@@ -234,6 +234,9 @@ Route::middleware('manager')->group(function () {
         Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
             ->name('participants.pending');
 
+        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
+            ->name('pending'); // ✅ Thêm route index cho view quản lý
+
         Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
             ->name('participants.bulk-confirm');
 
