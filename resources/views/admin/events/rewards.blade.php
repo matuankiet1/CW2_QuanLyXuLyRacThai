@@ -21,7 +21,7 @@
         <p class="text-gray-600 mt-1">{{ $event->title }}</p>
     </div>
     <div class="flex gap-3">
-        <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+        <a href="{{ route('admin.events.participants', $event->id) }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
             <i class="fas fa-arrow-left mr-2"></i>Quay lại
         </a>
         <a href="{{ route('admin.events.index') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
@@ -160,6 +160,8 @@
                             @endif
                         </a>
                     </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b">MSSV</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b">Lớp</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b">Email</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b">
                         <a href="{{ route('admin.events.rewards.index', array_merge([$event->id], request()->except(['sort_by', 'sort_order']), [
@@ -218,6 +220,12 @@
                                     {{ $participant->user->name }}
                                 </div>
                             </div>
+                        </td>
+                         <td class="px-4 py-3 text-sm text-gray-600">
+                            {{ $participant->student_id }}
+                        </td>
+                         <td class="px-4 py-3 text-sm text-gray-600">
+                            {{ $participant->student_class }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">
                             {{ $participant->user->email }}

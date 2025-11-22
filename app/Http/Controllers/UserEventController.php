@@ -128,7 +128,7 @@ class UserEventController extends Controller
             'event' => $event
         ]);
     }
-    
+
 
     /**
      * Đăng ký tham gia sự kiện
@@ -136,6 +136,7 @@ class UserEventController extends Controller
      */
     public function register(Request $request, $id)
     {
+
         // Kiểm tra đăng nhập
         if (!Auth::check()) {
             return redirect()->route('login')
@@ -170,9 +171,14 @@ class UserEventController extends Controller
             EventUser::create([
                 'user_id' => $userId,
                 'event_id' => $event->id,
+                'name' => $request->input('name'),
+                'student_id' => $request->input('student_id'),
+                'student_class' => $request->input('student_class'),
+                'email' => $request->input('email'),
                 'status' => 'pending',
                 'registered_at' => now(),
             ]);
+
 
             // Cập nhật số lượng tham gia
             $event->increment('participants');
@@ -184,8 +190,14 @@ class UserEventController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()
-                ->with('error', 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
+            // Log ra laravel.log để biết nguyên nhân
+            \Log::error('Đăng ký sự kiện thất bại: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'event_id' => $event->id,
+                'request' => $request->all()
+            ]);
+
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại. Chi tiết trong log.');
         }
     }
 
