@@ -82,6 +82,69 @@ class UserEventController extends Controller
     }
 
 
+    /**
+     * Hiển thị danh sách sự kiện (cho nhân viên)
+     * Route: GET /events
+     */
+    public function indexforStaff(Request $request)
+    {
+        $query = Event::query();
+
+        $status = $request->input('status', 'all');
+        $today = now()->toDateString();
+
+        // Filter theo status động dựa trên ngày
+        if ($status && $status !== 'all') {
+            $query->where(function ($q) use ($status, $today) {
+                switch ($status) {
+                    case 'ended':
+                        $q->whereDate('event_end_date', '<', $today);
+                        break;
+                    case 'on_going':
+                        $q->whereDate('event_start_date', '<=', $today)
+                            ->whereDate('event_end_date', '>=', $today);
+                        break;
+                    case 'registering':
+                        $q->whereDate('register_date', '<=', $today)
+                            ->whereDate('register_end_date', '>=', $today);
+                        break;
+                    case 'register_ended':
+                        $q->whereDate('register_end_date', '<', $today)
+                            ->whereDate('event_start_date', '>', $today);
+                        break;
+                    case 'up_coming':
+                        $q->whereDate('register_date', '>', $today);
+                        break;
+                }
+            });
+        }
+
+        // Tìm kiếm
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('location', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Sắp xếp và phân trang
+        $events = $query->orderBy('event_start_date', 'asc')->paginate(12);
+
+        // Lấy trạng thái đăng ký của user hiện tại
+        $userRegistrations = [];
+        if (Auth::check()) {
+            $userRegistrations = EventUser::where('user_id', Auth::id())
+                ->whereIn('event_id', $events->pluck('id'))
+                ->pluck('status', 'event_id')
+                ->toArray();
+        }
+
+        return view('staff.events.index', compact('events', 'status', 'search', 'userRegistrations'));
+    }
+
+
 
     /**
      * Hiển thị chi tiết sự kiện
@@ -112,6 +175,33 @@ class UserEventController extends Controller
         ];
 
         return view('user.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
+    }
+
+    public function showforStaff($id)
+    {
+        $event = Event::with(['createdBy', 'registrations.user'])
+            ->findOrFail($id);
+
+        // Kiểm tra sinh viên đã đăng ký chưa
+        $userRegistration = null;
+        $isRegistered = false;
+
+        if (Auth::check()) {
+            $userRegistration = EventUser::where('user_id', Auth::id())
+                ->where('event_id', $event->id)
+                ->first();
+            $isRegistered = $event->isRegisteredBy(Auth::id());
+        }
+
+        // Đếm số lượng đăng ký theo trạng thái
+        $registrationStats = [
+            'pending' => $event->getRegistrationCountByStatus('pending'),
+            'confirmed' => $event->getRegistrationCountByStatus('confirmed'),
+            'attended' => $event->getRegistrationCountByStatus('attended'),
+            'total' => $event->registrations()->count(),
+        ];
+
+        return view('staff.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
     }
 
     public function showRegisterForm($id)
