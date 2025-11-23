@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
@@ -33,11 +34,14 @@ Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
 //------------------------------------ STAFF HOME -------------------------------------//
-Route::prefix('staff')->name('staff.')->group(function () {
-    Route::get('/home', [App\Http\Controllers\StaffHomeController::class, 'index'])->name('home.index');
-    Route::get('/home/about', [App\Http\Controllers\StaffHomeController::class, 'about'])->name('home.about');
-    Route::get('/home/contact', [App\Http\Controllers\StaffHomeController::class, 'contact'])->name('home.contact');
-    Route::get('/collection_schedules', [App\Http\Controllers\StaffHomeController::class, 'collection_schedules'])->name('collection_schedules.index');
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
+    Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
+    Route::get('/events', [UserEventController::class, 'indexforStaff'])->name('events.index');
+    Route::get('/events', [UserEventController::class, 'showForStaff'])->name('events.show');
+    Route::get('/posts', [PostHomeController::class, 'indexForStaff'])->name('posts.home');
+    Route::get('/posts', [PostHomeController::class, 'showForStaff'])->name('posts.show');
+    Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedules'])->name('collection_schedules.index');
+    //Route::get('/reports/waste', [StaffReportController::class, 'waste'])->name('reports.waste');
 });
 
 //------------------------------------ ADMIN HOME -------------------------------------//
