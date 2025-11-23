@@ -85,6 +85,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
+Route::post('/change-password', [AuthController::class, 'changePassword'])
+    ->middleware('auth')
+    ->name('change_password');
+
 //--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
 Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
 Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
@@ -275,3 +279,9 @@ Route::middleware('staff')->group(function () {
 Route::middleware('student')->group(function () {
     Route::get('/student/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
 });
+
+// --------------------------------------- USER PROFILE -------------------------------------//
+Route::get('profile', [AuthController::class, 'getProfile'])->name('profile.show');
+Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+Route::post('update-avatar', [AuthController::class, 'updateAvatar'])->name('profile.update-avatar');
+Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('profile.delete-avatar');

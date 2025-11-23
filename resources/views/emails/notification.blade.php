@@ -19,12 +19,12 @@
         
         <!-- Content -->
         <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #007bff; border-radius: 4px; margin-bottom: 20px;">
-            <p style="margin: 0; white-space: pre-wrap; color: #333;">{{ $message }}</p>
+            <p style="margin: 0; white-space: pre-wrap; color: #333;">{{ $content }}</p>
         </div>
         
         <!-- Footer -->
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center; color: #6c757d; font-size: 12px;">
-            <p style="margin: 5px 0;">Đây là thông báo tự động từ hệ thống quản lý xử lý rác thải.</p>
+            <p style="margin: 5px 0;">Đây là thông báo tự động từ Hệ thống quản lý xử lý rác thải.</p>
             <p style="margin: 5px 0;">Vui lòng không trả lời email này.</p>
             <p style="margin: 5px 0;">© {{ date('Y') }} Hệ thống quản lý xử lý rác thải. Tất cả các quyền được bảo lưu.</p>
         </div>
