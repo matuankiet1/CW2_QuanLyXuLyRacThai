@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\CollectionSchedule;
 use App\Models\WasteLog;
 use App\Exports\CollectionScheduleExport;
+use App\Mail\NotificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CollectionScheduleController extends Controller
@@ -98,10 +100,18 @@ class CollectionScheduleController extends Controller
         } catch (ValidationException $e) {
             return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
         }
-        return back()->with('status', [
-            'type' => 'success',
-            'message' => 'Thêm lịch thu gom thành công!'
-        ]);
+
+        $user = User::where('user_id', $validated['staff_id'])->first();
+
+        if ($user && $user->email) {
+            Mail::to($user->email)->queue(new NotificationMail(
+                'Thông báo về lịch thu gom rác mới',
+                'Bạn có một lịch thu gom rác mới được lên lịch vào ngày ' . $validated['scheduled_date'] . '. Vui lòng kiểm tra và chuẩn bị thực hiện nhiệm vụ đúng hạn.',
+                $user->name
+            ));
+        }
+
+        return back()->with('success', 'Thêm lịch thu gom thành công!');
     }
 
     /**

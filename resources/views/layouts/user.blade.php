@@ -302,7 +302,7 @@
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
                         <a href="{{ route('waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
-                            <i class="fas fa-calendar-alt me-1"></i>Báo cáo thu gom rác
+                            <i class="fa-solid fa-recycle me-1"></i>Báo cáo thu gom rác
                         </a>
                         <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
                             <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
@@ -383,6 +383,14 @@
                                         </a>
                                         <hr class="my-1 border-gray-200">
                                     @endif
+
+                                    <a href="{{ route('profile.show') }}"
+                                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                        <i class="fa-regular fa-address-card mr-2"></i>Hồ sơ
+                                    </a>
+
+                                    <hr class="my-1 border-gray-400">
+
                                     <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                                         @csrf
                                         <button type="submit"
@@ -421,6 +429,9 @@
                     </a>
                     <a href="{{ route('user.events.index') }}" class="nav-link-item">
                         <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
+                    </a>
+                    <a href="{{ route('waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                        <i class="fa-solid fa-recycle mr-2"></i>Báo cáo thu gom rác
                     </a>
                     <a href="{{ route('home.about') }}" class="nav-link-item">
                         <i class="fas fa-info-circle mr-2"></i>Giới thiệu
@@ -475,6 +486,9 @@
     <main style="margin-top: 80px;">
         @yield('content')
     </main>
+
+    {{-- <x-chatbot /> --}}
+
 
     <!-- Footer -->
     <footer class="footer">

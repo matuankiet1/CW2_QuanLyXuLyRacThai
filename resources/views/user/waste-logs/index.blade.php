@@ -1,13 +1,41 @@
 @extends('layouts.user')
 
 @section('content')
-    <div class="max-w-7xl mx-auto">
+    <style>
+        .ai-hint .ai-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 100%;
+            margin-left: 6px;
+            min-width: 14rem;
+
+            padding: 6px 10px;
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            font-size: 0.75rem;
+            color: #374151;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s ease-out, transform .15s ease-out;
+            z-index: 1050;
+        }
+
+        .ai-hint:hover .ai-tooltip {
+            opacity: 1;
+            transition: all .15s ease-out;
+        }
+    </style>
+
+    <div class="container max-w-7xl mx-auto pt-5">
         @if ($collectionSchedules->isEmpty() && $isSearch == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
                 <p>Không có lịch thu gom nào cần báo cáo.</p>
             </div>
         @else
-            <div class="bg-white p-6 mt-10 rounded-xl shadow-sm border border-gray-200">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
                         <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full">
@@ -130,7 +158,7 @@
         <div id="modal"
             class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0 overflow-y-auto p-4">
             <div id="modalBox"
-                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-2xl w-full
+                class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-3xl w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300 flex flex-col max-h-[95vh]">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold px-7 titleModal">Báo cáo thu gom rác</h2>
@@ -544,7 +572,7 @@
             clearTimeout(t);
             const q = $name.value.trim();
             $hint.textContent = 'Vui lòng chờ...';
-            if (!q) {
+            if (q == '') {
                 $hint.textContent = '';
                 return;
             }
@@ -556,25 +584,18 @@
                     const pct = Math.round((j.confidence || 0) * 100);
                     const alt = (j.alternatives || []).slice(0, 2).join(' / ');
                     $hint.innerHTML = `Gợi ý: <b>${j.label}</b> (${pct}%)
-                        <span class="relative group inline-flex items-center">
-                            <!-- Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 14a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1Zm1-8h-2V6h2Z"/>
-                            </svg>
+                            <span class="ai-hint position-relative d-inline-flex align-items-center">
+                                <!-- Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 14a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1Zm1-8h-2V6h2Z"/>
+                                </svg>
 
-                            <!-- Tooltip content -->
-                            <div class="pointer-events-none absolute left-1/2 top-full z-20 w-56 -translate-x-1/2 translate-y-2
-                                        rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 shadow-xl
-                                        opacity-0 scale-95 transition duration-150 ease-out
-                                        group-hover:opacity-100 group-hover:scale-100">
-                                ${j.reason}
-                            </div>
-                        </span>` +
+                                <!-- Tooltip content -->
+                                <div class="ai-tooltip">
+                                    ${j.reason}
+                                </div>
+                            </span>` +
                         (alt ? ` <br> <span class="text-gray-500"> Có thể: ${alt}</span>` : '');
-                    document.getElementById('applyType')?.addEventListener('click', () => {
-                        const sel = document.querySelector('select[name="waste_type"]');
-                        if (sel) sel.value = j.label;
-                    });
                 } else {
                     $hint.textContent = `${j.reason}`;
                 }

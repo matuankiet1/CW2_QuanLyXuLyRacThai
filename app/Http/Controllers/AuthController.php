@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -156,9 +157,13 @@ class AuthController extends Controller
             if ($byEmail) {
                 // Tài khoản đã được tạo từ provider khác => Chặn (1 user = 1 provider)
                 if ($byEmail->auth_provider !== $provider) {
+                    $usedProvider = $byEmail->auth_provider
+                        ? strtoupper($byEmail->auth_provider)
+                        : 'EMAIL / PASSWORD';
+
                     return redirect()->route('login')->with('status', [
                         'type' => 'error',
-                        'message' => 'Email này đã đăng ký bằng ' . strtoupper($byEmail->auth_provider) .
+                        'message' => 'Email này đã đăng ký bằng ' . strtoupper($$usedProvider) .
                             '. Vui lòng đăng nhập bằng cách đó.'
                     ]);
                 }
@@ -186,11 +191,7 @@ class AuthController extends Controller
                           Vui lòng nhập email để hoàn tất đăng ký.'
                 ]);
 
-                return redirect()->route('login.add-mail')->with('status', [
-                    'type' => 'warning',
-                    'message' => 'Tài khoản ' . ucfirst($provider) . ' không chia sẻ email. 
-                          Vui lòng nhập email để hoàn tất đăng ký.'
-                ]);
+                return redirect()->route('login.add-mail');
             }
 
             $user = User::create([
@@ -403,9 +404,118 @@ class AuthController extends Controller
         ]);
     }
 
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate([
+            'current_password' => ['required'],
+            'new_password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+        ], [
+            'new_password.mixed_case' => 'Mật khẩu phải chứa ít nhất 1 chữ hoa và 1 chữ thường.',
+            'new_password.numbers' => 'Mật khẩu phải chứa ít nhất 1 chữ số.',
+            'new_password.symbols' => 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Đổi mật khẩu thành công!'
+        ]);
+    }
+
     public function searchUsers(Request $request)
     {
         $keyword = $request->get('q', '');
         return response()->json(User::where('name', 'like', "%{$keyword}%")->pluck('name'));
+    }
+
+    public function getProfile()
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $role = auth()->user()->role;
+            if ($role == 'admin') {
+                return view('admin.profiles.index', compact('user'));
+            } else if ($role == 'user') {
+                return view('user.profiles.index', compact('user'));
+            }
+        }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+\-\s()]+$/'],
+        ], [
+            'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
+            'phone.regex' => 'Số điện thoại không đúng định dạng.',
+        ]);
+
+        if ($user) {
+            $user->name = trim($request->name);
+            $user->email = strtolower(trim($request->email));
+            $user->phone = $request->phone ? trim($request->phone) : null;
+            $user->save();
+        } else {
+            return view('login');
+        }
+
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Cập nhật thông tin cá nhân thành công!'
+        ]);
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // Tối đa 2MB
+        ]);
+
+        if ($user && $request->hasFile('avatar')) {
+            // Nếu có avatar cũ -> Xóa file cũ trong storage
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            // Lưu file mới
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $avatarPath;
+            $user->save();
+        } else {
+            return view('login');
+        }
+
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Cập nhật ảnh đại diện thành công!'
+        ]);
+    }
+
+    public function deleteAvatar(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user && $user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+            $user->save();
+        } else {
+            return view('login');
+        }
+
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Xóa ảnh đại diện thành công!'
+        ]);
     }
 }
