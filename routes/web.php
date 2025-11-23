@@ -18,7 +18,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
+
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -149,8 +151,12 @@ Route::middleware('admin')->group(function () {
         // 🟢 Banners
         Route::resource('banners', BannerController::class);
 
+
+        //Route::get('banners/{banner}/confirm-delete', 
+
         Route::get(
             'banners/{banner}/confirm-delete',
+
             [BannerController::class, 'confirmDelete']
         )->name('banners.confirm-delete');
 
@@ -289,8 +295,27 @@ Route::middleware('student')->group(function () {
     Route::get('/student/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
 });
 
+
+
+// USER FEEDBACK ROUTES
+Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/feedback', [FeedbackController::class, 'userIndex'])->name('feedback.index'); // Danh sách feedback của user
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'userShow'])->name('feedback.show'); // Chi tiết feedback
+});
+
+// ADMIN FEEDBACK ROUTES
+Route::middleware('admin')->prefix('admin/feedback')->name('admin.feedback.')->group(function () {
+    Route::get('/', [FeedbackController::class, 'index'])->name('index');
+    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
+    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply');
+});
+
+
 // --------------------------------------- USER PROFILE -------------------------------------//
 Route::get('profile', [AuthController::class, 'getProfile'])->name('profile.show');
 Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('profile.update');
 Route::post('update-avatar', [AuthController::class, 'updateAvatar'])->name('profile.update-avatar');
 Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('profile.delete-avatar');
+

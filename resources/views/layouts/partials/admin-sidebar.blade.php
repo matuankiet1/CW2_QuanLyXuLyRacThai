@@ -57,6 +57,12 @@
                     'route' => 'admin.banners.index',
                     'active' => request()->routeIs('admin.banners.*'),
                 ],
+                [
+                    'label' => 'Phản hồi',
+                    'icon' => 'fa-comment-dots',
+                    'route' => 'admin.feedback.index',
+                    'active' => request()->routeIs('admin.feedback.*'),
+                ],
             ],
         ],
         [
