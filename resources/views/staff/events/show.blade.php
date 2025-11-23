@@ -8,7 +8,7 @@
     - Hiển thị trạng thái đăng ký
     - Nút đăng ký / hủy đăng ký
 --}}
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('title', $event->title)
 

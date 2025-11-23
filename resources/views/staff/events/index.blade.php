@@ -9,7 +9,7 @@
     - Tìm kiếm sự kiện
     - Hiển thị trạng thái đăng ký (nếu đã đăng nhập)
 --}}
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('title', 'Danh sách sự kiện')
 
