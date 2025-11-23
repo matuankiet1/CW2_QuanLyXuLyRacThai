@@ -1,4 +1,4 @@
-@extends('layouts.staff')
+@extends('layouts.user')
 
 @section('content')
     <div class="max-w-7xl mx-auto">
@@ -11,7 +11,7 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
                         {{-- Thanh tìm kiếm --}}
-                        <form action="{{ route('staff.collection_schedules.index') }}" method="GET" class="flex-1 relative">
+                        <form action="{{ route('user.collection_schedules.index') }}" method="GET" class="flex-1 relative">
                             <input type="hidden" name="status" value="{{ request('status') }}">
                             <input type="hidden" name="sort" value="{{ request('sort') }}">
                             <div class="relative w-full flex items-center">
@@ -86,6 +86,7 @@
                                             </span>
                                         @endif
                                     </td>
+                                   
                                 </tr>
                             @empty
                                 <tr>

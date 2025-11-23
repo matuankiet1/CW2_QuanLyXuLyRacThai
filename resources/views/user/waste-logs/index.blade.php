@@ -90,7 +90,6 @@
                                 <th class="py-3 px-4 text-left">Ngày thu gom</th>
                                 <th class="py-3 px-4 text-left">Ngày hoàn thành</th>
                                 <th class="py-3 px-4 text-left">Trạng thái</th>
-
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-gray-100">
