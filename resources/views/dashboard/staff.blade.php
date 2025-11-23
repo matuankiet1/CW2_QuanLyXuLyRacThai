@@ -12,7 +12,7 @@
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Sự kiện được phân công</h2>
-                <a href="{{ route('user.waste-logs.index') }}" class="text-sm text-blue-600 hover:underline">Báo cáo thu gom</a>
+                <a href="{{ route('staff.collection_schedules.index') }}" class="text-sm text-blue-600 hover:underline">Báo cáo thu gom</a>
             </div>
 
             <div class="overflow-x-auto" id="tableContainer">
