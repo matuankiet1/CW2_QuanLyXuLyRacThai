@@ -47,11 +47,16 @@ class DashboardController extends Controller
 
     public function staff()
     {
-        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
-            ->limit(5)
+        $user = auth()->user();
+
+        $collectionSchedules = CollectionSchedule::with('staff')
+            ->where('staff_id', $user->user_id) // chỉ lấy lịch của nhân viên hiện tại
+            ->orderBy('scheduled_date', 'asc')
             ->get();
 
-        return view('dashboard.staff', compact('upcomingEvents'));
+        $isSearching = false; // để tránh lỗi Undefined variable
+
+        return view('dashboard.staff', compact('collectionSchedules', 'isSearching'));
     }
 
     public function student()
@@ -138,6 +143,7 @@ class DashboardController extends Controller
 
         return $wasteClassification;
     }
+
 
 
 }
