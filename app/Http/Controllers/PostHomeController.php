@@ -7,15 +7,28 @@ use Illuminate\Http\Request;
 
 class PostHomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lấy danh sách bài viết đã publish (trạng thái = published)
-        $posts = Post::where('status', 'published')
-            ->orderBy('published_at', 'desc')
-            ->paginate(6); // chia trang 6 bài mỗi trang
+        $search = $request->input('search');
 
-        return view('user.posts.home', compact('posts'));
+        // Query chính
+        $posts = Post::where('status', 'published');
+
+        // Tìm kiếm
+        if ($search) {
+            $posts->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('author', 'like', "%$search%")
+                    ->orWhere('excerpt', 'like', "%$search%");
+            });
+        }
+
+        // Sắp xếp + phân trang
+        $posts = $posts->orderBy('published_at', 'desc')->paginate(6);
+
+        return view('user.posts.home', compact('posts', 'search'));
     }
+
     public function show($slug)
     {
         // Lấy bài viết theo slug
@@ -27,6 +40,6 @@ class PostHomeController extends Controller
         return view('user.posts.show', compact('post'));
     }
 
-    
+
 
 }
