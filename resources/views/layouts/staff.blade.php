@@ -299,7 +299,7 @@
                                 class="fas fa-newspaper mr-1"></i>Bài viết</a>
                         <a href="{{ route('staff.events.index') }}" class="nav-link-item"><i
                                 class="fas fa-calendar-alt mr-1"></i>Sự kiện</a>
-                        <a href="{{ route('staff.collection_schedules.index') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.collection-reports.index') }}" class="nav-link-item"><i
                                 class="fas fa-trash-alt mr-1"></i>Thu gom rác</a>
                         <a href="{{ route('staff.home.about') }}" class="nav-link-item"><i
                                 class="fas fa-info-circle mr-1"></i>Giới thiệu</a>
