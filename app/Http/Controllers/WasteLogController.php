@@ -71,7 +71,7 @@ class WasteLogController extends Controller
         }
 
         // Lấy kết quả
-        $collectionSchedules = $collectionSchedules->get();
+        $collectionSchedules = $collectionSchedules->paginate(10)->appends(request()->query());
 
         return view('user.waste-logs.index', compact(
             'wasteTypes',

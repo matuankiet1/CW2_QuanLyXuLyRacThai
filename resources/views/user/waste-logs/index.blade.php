@@ -50,7 +50,7 @@
                                 </svg>
                                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm..."
                                     class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
-                        focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                                focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                             </div>
                         </form>
 
@@ -131,22 +131,51 @@
                 </div>
 
                 <!-- Phân trang -->
-                {{-- <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
-                    <p>Hiển thị 1 - 5 trong tổng số 6 sự kiện</p>
-                    <div class="flex items-center gap-2 mt-3 md:mt-0">
-                        <button class="p-2 border rounded-lg hover:bg-green-50" aria-label="Trang trước">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <span>Trang 1 / 2</span>
-                        <button class="p-2 border rounded-lg hover:bg-green-50" aria-label="Trang sau">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div> --}}
+                <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
+                    <p class="mb-2 text-gray-600 text-sm">
+                        Hiển thị {{ $collectionSchedules->firstItem() ?? 0 }} - {{ $collectionSchedules->lastItem() ?? 0 }}
+                        trong tổng số {{ $collectionSchedules->total() }} sự kiện
+                    </p>
+                    {{-- Phân trang --}}
+                    @if ($collectionSchedules->hasPages())
+                        <div class="flex items-center gap-2 mt-3 md:mt-0">
+                            {{-- Trang trước --}}
+                            @if ($collectionSchedules->onFirstPage())
+                                <span class="p-2 border rounded-lg text-gray-400 cursor-not-allowed" aria-label="Trang trước">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
+                                    </svg>
+                                </span>
+                            @else
+                                <a href="{{ $collectionSchedules->previousPageUrl() }}" class="p-2 border rounded-lg hover:bg-green-50"
+                                    aria-label="Trang trước">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
+                                    </svg>
+                                </a>
+                            @endif
+
+                            {{-- Số trang hiện tại --}}
+                            <span>Trang {{ $collectionSchedules->currentPage() }} / {{ $collectionSchedules->lastPage() }}</span>
+
+                            {{-- Trang sau --}}
+                            @if ($collectionSchedules->hasMorePages())
+                                <a href="{{ $collectionSchedules->nextPageUrl() }}" class="p-2 border rounded-lg hover:bg-green-50"
+                                    aria-label="Trang sau">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
+                                    </svg>
+                                </a>
+                            @else
+                                <span class="p-2 border rounded-lg text-gray-400 cursor-not-allowed" aria-label="Trang sau">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
+                                    </svg>
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+                </div>
                 @if ($wasteLogs->hasPages())
                     <div class="mt-3">
                         {{ $wasteLogs->links() }}
@@ -158,7 +187,7 @@
                 class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0 overflow-y-auto p-4">
                 <div id="modalBox"
                     class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-3xl w-full
-                              transform opacity-0 translate-y-5 scale-95 transition-all duration-300 flex flex-col max-h-[95vh]">
+                                  transform opacity-0 translate-y-5 scale-95 transition-all duration-300 flex flex-col max-h-[95vh]">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold px-7 titleModal">Báo cáo thu gom rác</h2>
                         <button id="closeModalBtn" class="px-7 text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -231,11 +260,11 @@
 
                                     <!-- Nút xoá -->
                                     <button type="button" class="deleteRowBtn absolute -right-8 top-1/2 -translate-y-1/2 
-                                                        text-red-600 hover:text-white 
-                                                        bg-gray-200 hover:bg-red-500 
-                                                        font-bold text-lg 
-                                                        w-6 h-6 flex items-center justify-center 
-                                                        rounded-full shadow hidden transition cursor-pointer">
+                                                            text-red-600 hover:text-white 
+                                                            bg-gray-200 hover:bg-red-500 
+                                                            font-bold text-lg 
+                                                            w-6 h-6 flex items-center justify-center 
+                                                            rounded-full shadow hidden transition cursor-pointer">
                                         ×
                                     </button>
                                 </div>
@@ -258,7 +287,7 @@
             {{-- <div id="confirmModal"
                 class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0">
                 <div id="confirmModalBox" class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
-                              transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
+                                  transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
                         <button id="closeConfirmModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -480,9 +509,9 @@
                                 const shortFileName = shortenFileName(fileName);
                                 // console.log(shortFileName);
                                 newRow.querySelector('.waste_image_file_name').innerHTML = `Curent: ${shortFileName} <button type="button" class="preview-btn hover:bg-gray-200 p-1 rounded-xl transition cursor-pointer" onclick="openImageModal('${waste_log.waste_image}')" data-url="${waste_log.waste_image}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000" fill="none">
-                    <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
-                    <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
-                </svg></button>`;
+                        <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" stroke-width="1.5"></path>
+                        <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="currentColor" stroke-width="1.5"></path>
+                    </svg></button>`;
                                 newRow.querySelector('.waste_image_file_name').title = fileName;
                             }
                             wrapper.appendChild(newRow);
@@ -579,17 +608,17 @@
                         const pct = Math.round((j.confidence || 0) * 100);
                         const alt = (j.alternatives || []).slice(0, 2).join(' / ');
                         $hint.innerHTML = `Gợi ý: <b>${j.label}</b> (${pct}%)
-                                            <span class="ai-hint position-relative d-inline-flex align-items-center">
-                                                <!-- Icon -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 14a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1Zm1-8h-2V6h2Z"/>
-                                                </svg>
+                                                <span class="ai-hint position-relative d-inline-flex align-items-center">
+                                                    <!-- Icon -->
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 hover:text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 14a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1Zm1-8h-2V6h2Z"/>
+                                                    </svg>
 
-                                                <!-- Tooltip content -->
-                                                <div class="ai-tooltip">
-                                                    ${j.reason}
-                                                </div>
-                                            </span>` +
+                                                    <!-- Tooltip content -->
+                                                    <div class="ai-tooltip">
+                                                        ${j.reason}
+                                                    </div>
+                                                </span>` +
                             (alt ? ` <br> <span class="text-gray-500"> Có thể: ${alt}</span>` : '');
                     } else {
                         $hint.textContent = `${j.reason}`;
