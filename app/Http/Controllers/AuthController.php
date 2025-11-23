@@ -399,6 +399,9 @@ class AuthController extends Controller
     public function searchUsers(Request $request)
     {
         $keyword = $request->get('q', '');
-        return response()->json(User::where('name', 'like', "%{$keyword}%")->pluck('name'));
+        // Chỉ tìm kiếm user có role là staff để phân công thu gom
+        return response()->json(User::where('role', 'staff')
+            ->where('name', 'like', "%{$keyword}%")
+            ->pluck('name'));
     }
 }
