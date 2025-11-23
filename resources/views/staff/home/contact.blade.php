@@ -1,4 +1,4 @@
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('title', 'Liên hệ - EcoWaste')
 

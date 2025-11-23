@@ -1,4 +1,4 @@
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('content')
 <div class="container py-5">

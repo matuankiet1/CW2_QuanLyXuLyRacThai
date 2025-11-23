@@ -1,4 +1,4 @@
-@extends('layouts.user') {{-- Giống layout admin nhưng dành cho user --}}
+@extends('layouts.staff') {{-- Giống layout admin nhưng dành cho user --}}
 
 @section('content')
 <div class="container mx-auto px-4">
