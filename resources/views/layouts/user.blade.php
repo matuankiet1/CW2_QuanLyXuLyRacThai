@@ -311,6 +311,9 @@
                         <a href="{{ route('user.reports.create') }}" class="nav-link-item" title="Báo cáo">
                             <i class="fas fa-flag mr-1"></i><span>Báo cáo</span>
                         </a>
+                        <a href="{{ route('user.feedback.create') }}" class="nav-link-item" title="Gửi phản hồi">
+                            <i class="fas fa-comment-dots mr-1"></i><span>Gửi phản hồi</span>
+                        </a>
                         <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative" title="Thông báo">
                             <i class="fas fa-bell mr-1"></i><span>Thông báo</span>
                             @php
