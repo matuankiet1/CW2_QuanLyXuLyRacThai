@@ -22,7 +22,7 @@ class WasteLogController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->user()->user_id;
+        $user_id = auth()->id();
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
         $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();

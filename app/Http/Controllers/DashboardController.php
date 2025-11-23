@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CollectionSchedule;
 use App\Models\Event;
 use App\Models\WasteLog;
 use Carbon\Carbon;

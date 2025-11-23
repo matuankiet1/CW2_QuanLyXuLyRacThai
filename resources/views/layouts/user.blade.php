@@ -301,7 +301,7 @@
                         <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
-                        <a href="{{ route('waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                        <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
                             <i class="fas fa-trash-alt me-1"></i>Thu gom rác
                         </a>
                         <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
