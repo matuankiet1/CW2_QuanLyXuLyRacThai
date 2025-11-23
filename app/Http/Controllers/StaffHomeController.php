@@ -56,9 +56,9 @@ class StaffHomeController extends Controller
         return view('staff.home.contact');
     }
 
-    public function collection_schedules(Request $request)
+    public function collection_schedule(Request $request)
     {
-       if (!auth()->check()) {
+        if (!auth()->check()) {
             return redirect()->route('login');
         }
 
@@ -121,6 +121,9 @@ class StaffHomeController extends Controller
             'sort'
         ));
     }
+
+   
+
 
     public function postHome()
     {
@@ -231,18 +234,65 @@ class StaffHomeController extends Controller
         return view('staff.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
     }
 
-     public function wasteLog()
+    public function wasteLog(Request $request)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
+
+        $userId = auth()->id(); // nhân viên hiện tại
+
         $wasteTypes = WasteType::pluck('name', 'id');
-        $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
-        // dd( $collectionSchedules);
-        $isSearch = false;
-        return view('staff.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+
+        $search = $request->input('search');
+        $sort = $request->input('sort');
+        $statusFilter = $request->input('status');
+
+        // Lấy lịch thu gom của nhân viên hiện tại
+        $collectionSchedules = CollectionSchedule::with('staff')
+            ->where('staff_id', $userId);
+
+        // Lọc theo trạng thái nếu có
+        if ($statusFilter && $statusFilter !== 'all') {
+            $collectionSchedules = $collectionSchedules->where('status', $statusFilter);
+        }
+
+        // Tìm kiếm
+        if ($search) {
+            $collectionSchedules = $collectionSchedules->where(function ($query) use ($search) {
+                $query->where('schedule_id', 'like', "%$search%")
+                    ->orWhereHas('staff', fn($q) => $q->where('name', 'like', "%$search%"));
+            });
+        }
+
+        // Sắp xếp
+        switch ($sort) {
+            case 'id_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+                break;
+            case 'id_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'desc');
+                break;
+            case 'date_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'asc');
+                break;
+            case 'date_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'desc');
+                break;
+            default:
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+        }
+
+        // Phân trang 7 lịch mỗi trang
+        $collectionSchedules = $collectionSchedules->paginate(7)->withQueryString();
+
+        return view('staff.waste-logs.index', compact(
+            'wasteTypes',
+            'collectionSchedules',
+            'search',
+            'sort',
+            'statusFilter'
+        ));
     }
 
     public function statistic()
@@ -261,17 +311,17 @@ class StaffHomeController extends Controller
         // 2. Tính lượng rác đã phân loại
         // Lấy các collection schedules mà user là staff
         $schedules = CollectionSchedule::where('staff_id', $userId)->pluck('schedule_id');
-        
+
         // Khởi tạo giá trị mặc định
-        $wasteLogsStats = (object)[
+        $wasteLogsStats = (object) [
             'total_logs' => 0,
             'total_weight' => 0,
             'waste_types_count' => 0
         ];
-        
+
         $wasteByType = collect();
         $monthlyStats = collect();
-        
+
         // Chỉ tính toán nếu user có schedules
         if ($schedules->count() > 0) {
             // Đếm số lượng waste logs và tổng trọng lượng
@@ -318,7 +368,7 @@ class StaffHomeController extends Controller
         ));
     }
 
-     public function createReport()
+    public function createReport()
     {
         return view('staff.reports.create');
     }

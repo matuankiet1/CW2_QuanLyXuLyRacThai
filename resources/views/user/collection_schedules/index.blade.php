@@ -63,7 +63,6 @@
                                 <th class="py-3 px-4 text-left">Ngày thu gom</th>
                                 <th class="py-3 px-4 text-left">Ngày hoàn thành</th>
                                 <th class="py-3 px-4 text-left">Trạng thái</th>
-                                <th class="py-3 px-4 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-gray-100">
@@ -87,29 +86,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="py-3 px-4 text-center">
-                                        <div class="flex items-center justify-center">
-                                            <button data-id="{{ $collectionSchedule->schedule_id }}"
-                                                class="addWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
-                                                data-modal="add" aria-label="Thêm">
-                                                <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24" color="#254434"
-                                                    fill="none" stroke="currentColor" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
-                                                </svg>
-                                            </button>
-
-                                            {{-- <button data-id="{{ $collectionSchedule->schedule_id }}"
-                                                class="editWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
-                                                data-modal="edit" aria-label="Chỉnh sửa">
-                                                <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24" color="#254434"
-                                                    fill="none" stroke="currentColor" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
-                                                </svg>
-                                            </button> --}}
-                                        </div>
-                                    </td>
+                                   
                                 </tr>
                             @empty
                                 <tr>
