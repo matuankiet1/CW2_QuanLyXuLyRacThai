@@ -1,18 +1,35 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Hệ thống quản lý xử lý rác thải')</title>
-    
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10b981',
+                        secondary: '#059669',
+                        accent: '#34d399',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         :root {
             --primary-color: #10b981;
@@ -39,7 +56,7 @@
 
         .navbar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 1rem 0;
         }
 
@@ -50,7 +67,7 @@
         }
 
         .nav-link {
-            color: rgba(255,255,255,0.9) !important;
+            color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
             transition: all 0.3s ease;
             padding: 0.5rem 1rem !important;
@@ -60,7 +77,7 @@
 
         .nav-link:hover {
             color: white !important;
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             transform: translateY(-1px);
         }
 
@@ -81,14 +98,14 @@
         .card {
             border: none;
             border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             overflow: hidden;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .hero-section {
@@ -146,13 +163,13 @@
             border-radius: 1rem;
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .stats-number {
@@ -175,7 +192,7 @@
         }
 
         .footer a {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             transition: color 0.3s ease;
         }
@@ -219,7 +236,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
+            background: linear-gradient(45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,130 +244,282 @@
             text-align: center;
         }
 
+        .nav-link-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link-item:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             .section-title {
                 font-size: 2rem;
             }
-            
+
             .hero-section {
                 padding: 2rem 0;
             }
         }
     </style>
-    
+
     @stack('styles')
 </head>
+
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-recycle me-2"></i>
-                EcoWaste
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">
-                            <i class="fas fa-home me-1"></i>Trang chủ
+    <nav class="navbar fixed top-0 left-0 right-0 z-50">
+        <div class="w-full mx-auto px-3">
+            <div class="flex items-center justify-between h-16 gap-2">
+                <!-- Logo - Left Side -->
+                <div class="shrink-0">
+                    <a href="{{ route('home') }}"
+                        class="flex items-center text-white font-bold text-base hover:text-white/90 transition whitespace-nowrap">
+                        <i class="fas fa-recycle mr-1.5"></i>
+                        <span class="hidden sm:inline">EcoWaste</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Links - Center -->
+                <div class="hidden lg:flex items-center justify-center flex-1 min-w-0 px-1">
+                    <nav class="flex items-center gap-0.5 justify-center w-full">
+                        <a href="{{ route('home') }}" class="nav-link-item" title="Trang chủ">
+                            <i class="fas fa-home mr-1"></i><span>Trang chủ</span>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.posts.home') }}">
-                            <i class="fas fa-newspaper me-1"></i>Bài viết
+                        <a href="{{ route('user.posts.home') }}" class="nav-link-item" title="Bài viết">
+                            <i class="fas fa-newspaper mr-1"></i><span>Bài viết</span>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home.about') }}">
-                            <i class="fas fa-info-circle me-1"></i>Giới thiệu
+                        <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
+                            <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home.contact') }}">
-                            <i class="fas fa-envelope me-1"></i>Liên hệ
+                        <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                            <i class="fas fa-trash-alt me-1"></i>Thu gom rác
                         </a>
-                    </li>
+                        <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
+                            <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
+                        </a>
+                        <a href="{{ route('home.contact') }}" class="nav-link-item" title="Liên hệ">
+                            <i class="fas fa-envelope mr-1"></i><span>Liên hệ</span>
+                        </a>
+                        @auth
+                            <!-- Cá nhân Dropdown -->
+                            <div class="relative">
+                                <button id="personalMenuToggle"
+                                    class="nav-link-item flex items-center">
+                                    <i class="fas fa-user mr-1"></i><span>Cá nhân</span>
+                                    <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                                </button>
+                                <div id="personalMenuDropdown"
+                                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
+                                    <div class="py-2">
+                                        <a href="{{ route('user.reports.create') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-flag mr-2"></i>Báo cáo
+                                        </a>
+                                        <a href="{{ route('user.statistics.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-chart-line mr-2"></i>Thống kê
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông báo Dropdown -->
+                            <div class="relative">
+                                <button id="notificationMenuToggle"
+                                    class="nav-link-item relative flex items-center">
+                                    <i class="fas fa-bell mr-1"></i><span>Thông báo</span>
+                                    @php
+                                        $unreadCount = App\Models\NotificationUser::where(
+                                            'user_id',
+                                            auth()->user()->user_id,
+                                        )
+                                            ->whereNull('read_at')
+                                            ->count();
+                                        $simpleUnreadCount = App\Models\SimpleNotification::where(
+                                            'user_id',
+                                            auth()->user()->user_id,
+                                        )
+                                            ->where('is_read', false)
+                                            ->count();
+                                        $totalUnread = $unreadCount + $simpleUnreadCount;
+                                    @endphp
+                                    @if ($totalUnread > 0)
+                                        <span
+                                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $totalUnread > 9 ? '9+' : $totalUnread }}</span>
+                                    @endif
+                                    <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                                </button>
+                                <div id="notificationMenuDropdown"
+                                    class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
+                                    <div class="py-2">
+                                        <a href="{{ route('user.notifications.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1 relative">
+                                            <i class="fas fa-bell mr-2"></i>Thông báo
+                                            @if ($unreadCount > 0)
+                                                <span
+                                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                            @endif
+                                        </a>
+                                        <a href="{{ route('user.simple-notifications.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1 relative">
+                                            <i class="fas fa-envelope mr-2"></i>Thông báo mới
+                                            @if ($simpleUnreadCount > 0)
+                                                <span
+                                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
+                                            @endif
+                                        </a>
+                                        <hr class="my-1 border-gray-200">
+                                        <a href="{{ route('user.notification-preferences.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endauth
+                    </nav>
+                </div>
+
+                <!-- User Profile - Right Side -->
+                <div class="flex items-center gap-2 shrink-0">
                     @auth
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.reports.create') }}">
-                            <i class="fas fa-flag me-1"></i>Báo cáo
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.notifications.index') }}">
-                            <i class="fas fa-bell me-1"></i>Thông báo
-                            @php
-                                $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
-                                    ->whereNull('read_at')
-                                    ->count();
-                            @endphp
-                            @if($unreadCount > 0)
-                                <span class="badge bg-danger">{{ $unreadCount }}</span>
-                            @endif
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.simple-notifications.index') }}">
-                            <i class="fas fa-envelope me-1"></i>Thông báo mới
-                            @php
-                                $simpleUnreadCount = App\Models\SimpleNotification::where('user_id', auth()->user()->user_id)
-                                    ->where('is_read', false)
-                                    ->count();
-                            @endphp
-                            @if($simpleUnreadCount > 0)
-                                <span class="badge bg-danger">{{ $simpleUnreadCount }}</span>
-                            @endif
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.notification-preferences.index') }}">
-                            <i class="fas fa-cog me-1"></i>Cài đặt thông báo
-                        </a>
-                    </li>
-                    @endauth
-                </ul>
-                
-                <ul class="navbar-nav">
-                    @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ auth()->user()->name }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                @if(auth()->user()->role === 'admin')
-                                    <li><a class="dropdown-item" href="{{ route('dashboard.admin') }}">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
-                                    </a></li>
-                                @endif
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        <div class="relative">
+                            <button id="userMenuToggle"
+                                class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
+                                <div
+                                    class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 shrink-0">
+                                    <span
+                                        class="text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                </div>
+                                <span class="font-medium hidden xl:block text-sm">{{ auth()->user()->name }}</span>
+                                <i class="fas fa-chevron-down ml-1.5 text-xs hidden xl:block"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="userMenuDropdown"
+                                class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
+                                <div class="py-2">
+                                    @if (auth()->user()->role === 'admin')
+                                        <a href="{{ route('dashboard.admin') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard
+                                        </a>
+                                        <hr class="my-1 border-gray-200">
+                                    @endif
+
+                                    <a href="{{ route('profile.show') }}"
+                                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                        <i class="fa-regular fa-address-card mr-2"></i>Hồ sơ
+                                    </a>
+
+                                    <hr class="my-1 border-gray-400">
+
+                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        <button type="submit"
+                                            class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg mx-1">
+                                            <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
-                                </li>
-                            </ul>
-                        </li>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">
-                                <i class="fas fa-user-plus me-1"></i>Đăng ký
-                            </a>
-                        </li>
+                        <a href="{{ route('login') }}" class="nav-link-item">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Đăng nhập
+                        </a>
+                        <a href="{{ route('register') }}" class="nav-link-item bg-white/20 hover:bg-white/30">
+                            <i class="fas fa-user-plus mr-1"></i>Đăng ký
+                        </a>
                     @endauth
-                </ul>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button id="mobileMenuToggle"
+                        class="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="lg:hidden hidden border-t border-white/20 pb-4">
+                <div class="flex flex-col gap-2 mt-4">
+                    <a href="{{ route('home') }}" class="nav-link-item">
+                        <i class="fas fa-home mr-2"></i>Trang chủ
+                    </a>
+                    <a href="{{ route('user.posts.home') }}" class="nav-link-item">
+                        <i class="fas fa-newspaper mr-2"></i>Bài viết
+                    </a>
+                    <a href="{{ route('user.events.index') }}" class="nav-link-item">
+                        <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
+                    </a>
+                    <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                        <i class="fa-solid fa-recycle mr-2"></i>Báo cáo thu gom rác
+                    </a>
+                    <a href="{{ route('home.about') }}" class="nav-link-item">
+                        <i class="fas fa-info-circle mr-2"></i>Giới thiệu
+                    </a>
+                    <a href="{{ route('home.contact') }}" class="nav-link-item">
+                        <i class="fas fa-envelope mr-2"></i>Liên hệ
+                    </a>
+                    @auth
+                        <!-- Cá nhân Section -->
+                        <div class="border-t border-white/20 pt-2 mt-2">
+                            <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
+                            <a href="{{ route('user.reports.create') }}" class="nav-link-item">
+                                <i class="fas fa-flag mr-2"></i>Báo cáo
+                            </a>
+                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
+                                <i class="fas fa-chart-line mr-2"></i>Thống kê
+                            </a>
+                        </div>
+                        
+                        <!-- Thông báo Section -->
+                        <div class="border-t border-white/20 pt-2 mt-2">
+                            <p class="text-white/70 text-xs font-semibold mb-2 px-2">THÔNG BÁO</p>
+                            <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative">
+                                <i class="fas fa-bell mr-2"></i>Thông báo
+                                @php
+                                    $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
+                                        ->whereNull('read_at')
+                                        ->count();
+                                @endphp
+                                @if ($unreadCount > 0)
+                                    <span
+                                        class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('user.simple-notifications.index') }}" class="nav-link-item relative">
+                                <i class="fas fa-envelope mr-2"></i>Thông báo mới
+                                @php
+                                    $simpleUnreadCount = App\Models\SimpleNotification::where(
+                                        'user_id',
+                                        auth()->user()->user_id,
+                                    )
+                                        ->where('is_read', false)
+                                        ->count();
+                                @endphp
+                                @if ($simpleUnreadCount > 0)
+                                    <span
+                                        class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item">
+                                <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
+                            </a>
+                        </div>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>
@@ -360,13 +529,17 @@
         @yield('content')
     </main>
 
+    {{-- <x-chatbot /> --}}
+
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <h5><i class="fas fa-recycle me-2"></i>EcoWaste</h5>
-                    <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, góp phần bảo vệ môi trường và xây dựng tương lai bền vững.</p>
+                    <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, góp phần bảo vệ môi trường và xây
+                        dựng tương lai bền vững.</p>
                     <div class="d-flex gap-3">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -395,7 +568,8 @@
                 <div class="col-lg-3 mb-4">
                     <h5>Liên hệ</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận XYZ, TP.HCM</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận XYZ, TP.HCM
+                        </li>
                         <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
                         <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@ecowaste.com</li>
                     </ul>
@@ -418,7 +592,134 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // User menu dropdown toggle
+            const userMenuToggle = document.getElementById('userMenuToggle');
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+            if (userMenuToggle && userMenuDropdown) {
+                userMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !userMenuDropdown.classList.contains('invisible');
+
+                    if (isVisible) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        userMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuToggle.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            }
+
+            // Personal menu dropdown toggle
+            const personalMenuToggle = document.getElementById('personalMenuToggle');
+            const personalMenuDropdown = document.getElementById('personalMenuDropdown');
+
+            if (personalMenuToggle && personalMenuDropdown) {
+                personalMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !personalMenuDropdown.classList.contains('invisible');
+
+                    // Close other dropdowns
+                    const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
+                    if (notificationMenuDropdown) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                    if (userMenuDropdown) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+
+                    if (isVisible) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        personalMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e.target)) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            }
+
+            // Notification menu dropdown toggle
+            const notificationMenuToggle = document.getElementById('notificationMenuToggle');
+            const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
+
+            if (notificationMenuToggle && notificationMenuDropdown) {
+                notificationMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !notificationMenuDropdown.classList.contains('invisible');
+
+                    // Close other dropdowns
+                    if (personalMenuDropdown) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                    if (userMenuDropdown) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+
+                    if (isVisible) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        notificationMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e.target)) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            }
+
+            // Logout confirmation
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+        // Xóa #_=_ do Facebook thêm vào
+        if (window.location.hash === '#_=_') {
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState('', document.title, window.location.pathname);
+            } else {
+                // Fallback cho trình duyệt cũ
+                window.location.hash = '';
+            }
+        }
+    </script>
+
     @stack('scripts')
 </body>
+
 </html>

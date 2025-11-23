@@ -27,4 +27,6 @@ class PostHomeController extends Controller
         return view('user.posts.show', compact('post'));
     }
 
+    
+
 }

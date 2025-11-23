@@ -1,5 +1,7 @@
 @extends('layouts.admin-with-sidebar')
 
+@section('title', 'Quản lý banners - Admin')
+
 @section('content')
 <!-- ✅ Thông báo thành công / lỗi -->
 @if (session('success') || session('error'))

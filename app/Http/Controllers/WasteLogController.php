@@ -7,6 +7,7 @@ use App\Models\CollectionSchedule;
 use App\Models\WasteType;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -21,13 +22,13 @@ class WasteLogController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->user()->user_id;
+        $user_id = auth()->id();
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
         $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
         // dd( $collectionSchedules);
         $isSearch = false;
-        return view('admin.waste_logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+        return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
     }
 
     /**
@@ -65,7 +66,7 @@ class WasteLogController extends Controller
                     ->filter(fn($v) => !empty($v))
                     ->isNotEmpty();
 
-            
+
             if (!$hasNewData) {
                 DB::commit();
 
@@ -87,14 +88,23 @@ class WasteLogController extends Controller
                 $imagePath = $request->input('old_waste_image.' . $i);
 
                 if ($request->hasFile('waste_image') && isset($request->file('waste_image')[$i])) {
-                    $imagePath = $request->file('waste_image')[$i];
-                    $data['waste_image'] = $imagePath->store('waste_logs/' . (int) $request->input('schedule_id'), 'public');
+                    $file = $request->file('waste_image')[$i];
+                    $wasteTypeName = WasteType::find($wasteTypeId)?->name ?? 'unknown';
+                    
+                    $timestamp = now()->format('Y-m-d_H-i-s');
+                    $slug = Str::slug($wasteTypeName, '-');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = "{$timestamp}_{$slug}.{$extension}";
+
+                    $folder = 'waste_logs/' . (int) $request->input('schedule_id');
+
+                    $imagePath = $file->storeAs($folder, $filename, 'public');
                 }
+
+                $data['waste_image'] = $imagePath;
 
                 WasteLog::create($data);
             }
-            // dd('abc');
-
 
             DB::commit();
 

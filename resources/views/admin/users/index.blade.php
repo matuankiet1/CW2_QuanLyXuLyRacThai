@@ -30,35 +30,67 @@
 
         {{-- Card chứa bảng danh sách --}}
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            {{-- Form tìm kiếm --}}
+            {{-- Form tìm kiếm và lọc --}}
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center gap-4">
-                    {{-- Ô nhập từ khóa tìm kiếm --}}
-                    <div class="flex-1">
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                name="keyword" 
-                                value="{{ $keyword ?? '' }}" 
-                                placeholder="Tìm kiếm theo tên hoặc email..." 
-                                class="form-control pl-10 pr-4 py-2 w-full"
-                            >
-                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-4">
+                    {{-- Giữ lại tham số sắp xếp khi submit form --}}
+                    @if(($sortBy ?? 'created_at') !== 'created_at' || ($sortOrder ?? 'desc') !== 'desc')
+                        <input type="hidden" name="sort_by" value="{{ $sortBy ?? 'created_at' }}">
+                        <input type="hidden" name="sort_order" value="{{ $sortOrder ?? 'desc' }}">
+                    @endif
+                    <div class="flex items-center gap-4 flex-wrap">
+                        {{-- Ô nhập từ khóa tìm kiếm --}}
+                        <div class="flex-1 min-w-[250px]">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="keyword" 
+                                    value="{{ $keyword ?? '' }}" 
+                                    placeholder="Tìm kiếm theo tên hoặc email..." 
+                                    class="form-control pl-10 pr-4 py-2 w-full"
+                                >
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
                         </div>
+                        
+                        {{-- Dropdown lọc theo role --}}
+                        <div class="min-w-[150px]">
+                            <select name="role" class="form-control py-2 w-full">
+                                <option value="all" {{ ($roleFilter ?? 'all') === 'all' ? 'selected' : '' }}>Tất cả vai trò</option>
+                                <option value="admin" {{ ($roleFilter ?? 'all') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="user" {{ ($roleFilter ?? 'all') === 'user' ? 'selected' : '' }}>User</option>
+                            </select>
+                        </div>
+                        
+                        {{-- Nút tìm kiếm --}}
+                        <button type="submit" class="btn-primary px-6 py-2 flex items-center whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        
+                        {{-- Nút xóa bộ lọc (hiển thị khi có filter) --}}
+                        @if(($keyword ?? false) || (($roleFilter ?? 'all') !== 'all'))
+                            <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 flex items-center whitespace-nowrap">
+                                <i class="fas fa-times mr-2"></i>
+                                <span>Xóa bộ lọc</span>
+                            </a>
+                        @endif
                     </div>
                     
-                    {{-- Nút tìm kiếm --}}
-                    <button type="submit" class="btn-primary px-6 py-2 flex items-center">
-                        <i class="fas fa-search mr-2"></i>
-                        <span>Tìm kiếm</span>
-                    </button>
-                    
-                    {{-- Nút xóa bộ lọc (hiển thị khi có từ khóa) --}}
-                    @if($keyword ?? false)
-                        <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 flex items-center">
-                            <i class="fas fa-times mr-2"></i>
-                            <span>Xóa</span>
-                        </a>
+                    {{-- Hiển thị thông tin kết quả tìm kiếm --}}
+                    @if(($keyword ?? false) || (($roleFilter ?? 'all') !== 'all'))
+                        <div class="text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            <span>
+                                @if($keyword && ($roleFilter ?? 'all') !== 'all')
+                                    Đang tìm kiếm "{{ $keyword }}" với vai trò {{ $roleFilter === 'admin' ? 'Admin' : 'User' }}
+                                @elseif($keyword)
+                                    Đang tìm kiếm "{{ $keyword }}"
+                                @elseif(($roleFilter ?? 'all') !== 'all')
+                                    Đang lọc theo vai trò: {{ $roleFilter === 'admin' ? 'Admin' : 'User' }}
+                                @endif
+                            </span>
+                        </div>
                     @endif
                 </form>
             </div>
@@ -68,21 +100,95 @@
                 <table class="w-full border-collapse">
                     <thead class="bg-gray-50">
                         <tr>
-                            {{-- Cột ID --}}
+                            {{-- Cột ID với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                ID
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'user_id',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'user_id' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>ID</span>
+                                    @if(($sortBy ?? 'created_at') === 'user_id')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Tên --}}
+                            {{-- Cột Tên với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Tên
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'name',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'name' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Tên</span>
+                                    @if(($sortBy ?? 'created_at') === 'name')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Email --}}
+                            {{-- Cột Email với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Email
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'email',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'email' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Email</span>
+                                    @if(($sortBy ?? 'created_at') === 'email')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
-                            {{-- Cột Ngày tạo --}}
+                            {{-- Cột Vai trò với sắp xếp --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                                Ngày tạo
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'role',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'role' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Vai trò</span>
+                                    @if(($sortBy ?? 'created_at') === 'role')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
+                            </th>
+                            {{-- Cột Ngày tạo với sắp xếp --}}
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
+                                <a href="{{ route('admin.users.index', array_merge(request()->except(['sort_by', 'sort_order']), [
+                                    'sort_by' => 'created_at',
+                                    'sort_order' => ($sortBy ?? 'created_at') === 'created_at' && ($sortOrder ?? 'desc') === 'asc' ? 'desc' : 'asc'
+                                ])) }}" class="flex items-center gap-2 hover:text-gray-900 transition-colors">
+                                    <span>Ngày tạo</span>
+                                    @if(($sortBy ?? 'created_at') === 'created_at')
+                                        @if(($sortOrder ?? 'desc') === 'asc')
+                                            <i class="fas fa-sort-up text-blue-600"></i>
+                                        @else
+                                            <i class="fas fa-sort-down text-blue-600"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort text-gray-400"></i>
+                                    @endif
+                                </a>
                             </th>
                         </tr>
                     </thead>
@@ -112,6 +218,19 @@
                                     {{ $user->email }}
                                 </td>
                                 
+                                {{-- Hiển thị vai trò với badge màu sắc --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($user->role === 'admin')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-shield-alt mr-1"></i>Admin
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <i class="fas fa-user mr-1"></i>User
+                                        </span>
+                                    @endif
+                                </td>
+                                
                                 {{-- Hiển thị ngày tạo (định dạng: dd/mm/yyyy) --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $user->created_at->format('d/m/Y') }}
@@ -120,7 +239,7 @@
                         @empty
                             {{-- Hiển thị thông báo khi không có người dùng --}}
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center">
+                                <td colspan="5" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
                                         <p class="text-gray-500 text-lg font-medium">
