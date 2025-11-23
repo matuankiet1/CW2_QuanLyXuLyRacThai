@@ -176,11 +176,6 @@
                         </div>
                     @endif
                 </div>
-                @if ($wasteLogs->hasPages())
-                    <div class="mt-3">
-                        {{ $wasteLogs->links() }}
-                    </div>
-                @endif
         @endif
 
             <div id="modal"
