@@ -32,6 +32,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
+//------------------------------------ STAFF HOME -------------------------------------//
+Route::prefix('staff')->name('staff.')->group(function () {
+    Route::get('/home', [App\Http\Controllers\StaffHomeController::class, 'index'])->name('home.index');
+    Route::get('/home/about', [App\Http\Controllers\StaffHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/contact', [App\Http\Controllers\StaffHomeController::class, 'contact'])->name('home.contact');
+    Route::get('/collection_schedules', [App\Http\Controllers\StaffHomeController::class, 'collection_schedules'])->name('collection_schedules.index');
+});
+
 //------------------------------------ ADMIN HOME -------------------------------------//
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/home', [App\Http\Controllers\AdminHomeController::class, 'index'])->name('home');
@@ -93,6 +101,7 @@ Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class
 Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
     ->name('waste-logs.get-by-collection-schedules');
 Route::resource('waste-logs', WasteLogController::class);
+Route::get('/waste-logs', [WasteLogController::class, 'index'])->name('user.waste-logs.index');
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
