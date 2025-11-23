@@ -387,11 +387,11 @@
                         hệ</a>
                     <div class="border-t border-white/20 pt-2 mt-2">
                         <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
-                        <a href="{{ route('user.reports.create') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.reports.create') }}" class="nav-link-item"><i
                                 class="fas fa-flag mr-2"></i>Báo cáo</a>
-                        <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.waste-logs.index') }}" class="nav-link-item"><i
                                 class="fas fa-file-alt mr-2"></i>Báo cáo thu gom</a>
-                        <a href="{{ route('user.statistics.index') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.statistics.index') }}" class="nav-link-item"><i
                                 class="fas fa-chart-line mr-2"></i>Thống kê</a>
                     </div>
                 </div>
