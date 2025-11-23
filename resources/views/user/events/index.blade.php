@@ -58,16 +58,24 @@
             
             {{-- Lọc theo trạng thái --}}
             <div class="flex gap-2">
-                <a href="{{ route('user.events.index', ['status' => 'upcoming']) }}" 
-                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'upcoming') === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                <a href="{{ route('user.events.index', ['status' => 'up_coming']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'up_coming') === 'up_coming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Sắp tới
                 </a>
-                <a href="{{ route('user.events.index', ['status' => 'ongoing']) }}" 
-                   class="px-4 py-2 rounded-lg transition {{ ($status ?? '') === 'ongoing' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                 <a href="{{ route('user.events.index', ['status' => 'register_ended']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'register_ended') === 'register_ended' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    Hết đăng ký
+                </a>
+                <a href="{{ route('user.events.index', ['status' => 'registering']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'registering') === 'registering' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    Đang đăng ký
+                </a>
+                <a href="{{ route('user.events.index', ['status' => 'on_going']) }}" 
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'on_going') === 'on_going' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Đang diễn ra
                 </a>
                 <a href="{{ route('user.events.index', ['status' => 'ended']) }}" 
-                   class="px-4 py-2 rounded-lg transition {{ ($status ?? '') === 'ended' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                   class="px-4 py-2 rounded-lg transition {{ ($status ?? 'ended') === 'ended' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                     Đã kết thúc
                 </a>
             </div>
@@ -106,11 +114,11 @@
                             </div>
                             <div class="flex items-center text-gray-600">
                                 <i class="fas fa-calendar mr-2 text-green-600 w-4"></i>
-                                <span class="text-sm">{{ $event->event_start_date->format('d/m/Y') }}</span>
+                                <span class="text-sm"> Ngày đăng ký: {{ $event->register_date->format('d/m/Y') }} - {{ $event->register_end_date->format('d/m/Y') }}</span>
                             </div>
                             <div class="flex items-center text-gray-600">
-                                <i class="fas fa-clock mr-2 text-green-600 w-4"></i>
-                                <span class="text-sm">{{ $event->event_start_date->format('H:i') }} - {{ $event->event_end_date->format('H:i') }}</span>
+                                <i class="fas fa-calendar mr-2 text-green-600 w-4"></i>
+                                <span class="text-sm"> Ngày diễn ra: {{ $event->event_start_date->format('d/m/Y') }} - {{ $event->event_end_date->format('d/m/Y') }}</span>
                             </div>
                             @if($event->capacity)
                                 <div class="flex items-center text-gray-600">
@@ -123,20 +131,19 @@
                         {{-- Status badge --}}
                         <div class="mb-4 flex flex-wrap gap-2">
                             @php
-                                $statusColor = 'bg-gray-500';
-                                $statusText = 'Không xác định';
-                                if ($event->event_start_date > now()) {
-                                    $statusColor = 'bg-blue-500';
-                                    $statusText = 'Sắp tới';
-                                } elseif ($event->event_end_date < now()) {
-                                    $statusColor = 'bg-gray-500';
-                                    $statusText = 'Đã kết thúc';
-                                } else {
-                                    $statusColor = 'bg-green-500';
-                                    $statusText = 'Đang diễn ra';
-                                }
+                            $statusColors = [
+                                'Sắp diễn ra'   => 'bg-purple-500',
+                                'Đang đăng ký'  => 'bg-blue-500',
+                                'Hết đăng ký'  => 'bg-red-500',
+                                'Đang diễn ra'  => 'bg-green-500',
+                                'Kết thúc'      => 'bg-gray-500',
+                                'Đang xử lý'   => 'bg-gray-500',
+                            ];
+
+                            $statusText = $event->status; // Sử dụng getter status
+                            $statusColor = $statusColors[$statusText] ?? 'bg-gray-500';
                             @endphp
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold text-white {{ $statusColor }}">
+                           <span class="px-3 py-1 rounded-full text-xs font-semibold text-white {{ $statusColor }}">
                                 {{ $statusText }}
                             </span>
                             

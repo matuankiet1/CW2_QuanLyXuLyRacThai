@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\CollectionSchedule;
 use App\Models\WasteLog;
 use App\Exports\CollectionScheduleExport;
+use App\Mail\NotificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CollectionScheduleController extends Controller
@@ -18,7 +20,7 @@ class CollectionScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CollectionSchedule::query()->with('staff');
+        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
         $isSearch = false;
         $isFilter = false;
 
@@ -98,10 +100,18 @@ class CollectionScheduleController extends Controller
         } catch (ValidationException $e) {
             return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
         }
-        return back()->with('status', [
-            'type' => 'success',
-            'message' => 'Thêm lịch thu gom thành công!'
-        ]);
+
+        $user = User::where('user_id', $validated['staff_id'])->first();
+
+        if ($user && $user->email) {
+            Mail::to($user->email)->queue(new NotificationMail(
+                'Thông báo về lịch thu gom rác mới',
+                'Bạn có một lịch thu gom rác mới được lên lịch vào ngày ' . $validated['scheduled_date'] . '. Vui lòng kiểm tra và chuẩn bị thực hiện nhiệm vụ đúng hạn.',
+                $user->name
+            ));
+        }
+
+        return back()->with('success', 'Thêm lịch thu gom thành công!');
     }
 
     /**
@@ -212,9 +222,11 @@ class CollectionScheduleController extends Controller
     public function search(Request $request)
     {
         $q = $request->input('q');
-        $collectionSchedules = CollectionSchedule::whereHas('staff', function ($query) use ($q) {
+        $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy', 'report'])
+            ->whereHas('staff', function ($query) use ($q) {
             $query->where('name', 'like', '%' . $q . '%');
-        })->orWhere('scheduled_date', 'like', '%' . $q . '%')
+            })
+            ->orWhere('scheduled_date', 'like', '%' . $q . '%')
             ->orderBy('schedule_id', 'desc')
             ->paginate(7);
         $isSearch = true;
@@ -226,6 +238,66 @@ class CollectionScheduleController extends Controller
         $q = $request->input('q');
         $fileName = 'Tất cả lịch thu gom.xlsx';
         return Excel::download(new CollectionScheduleExport($q), $fileName);
+    }
+
+    /**
+     * Update status of collection schedule
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user || !$user->hasRole(['manager', 'admin'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền xác nhận lịch thu gom này.'
+                ], 403);
+            }
+
+            $validated = $request->validate([
+                'status' => ['required', Rule::in(['Đã hoàn thành'])],
+            ]);
+
+            $collectionSchedule = CollectionSchedule::with('confirmedBy')->findOrFail($id);
+
+            if ($collectionSchedule->confirmed_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lịch thu gom này đã được xác nhận vào ' . $collectionSchedule->confirmed_at->format('d/m/Y H:i') . '.'
+                ], 422);
+            }
+
+            $collectionSchedule->status = $validated['status'];
+
+            if (!$collectionSchedule->completed_at) {
+                $collectionSchedule->completed_at = now();
+            }
+
+            $collectionSchedule->confirmed_by = $user->user_id;
+            $collectionSchedule->confirmed_at = now();
+            $collectionSchedule->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã xác nhận lịch thu gom.',
+                'status' => $collectionSchedule->status,
+                'completed_at' => $collectionSchedule->completed_at?->format('Y-m-d'),
+                'confirmed_at' => $collectionSchedule->confirmed_at?->format('Y-m-d H:i'),
+                'confirmed_by' => $user->name,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ!',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 }
