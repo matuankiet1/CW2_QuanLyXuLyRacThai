@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $upcomingEventsCount = Event::where('status', 'upcoming')->whereDate('event_start_date', '>=', $today)->count();
+        $upcomingEventsCount = Event::whereDate('event_start_date', '>=', $today)->count();
 
         // Nếu user không chọn năm -> lấy năm hiện tại
         $year = $request['year'];
@@ -35,9 +35,32 @@ class DashboardController extends Controller
         return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification'));
     }
 
-    public function app()
+    public function manager()
     {
-        return view('dashboard.app');
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.manager', compact('upcomingEvents'));
+    }
+
+    public function staff()
+    {
+        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.staff', compact('upcomingEvents'));
+    }
+
+    public function student()
+    {
+        $upcomingEvents = Event::where('status', 'upcoming')
+            ->orderBy('event_start_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.student', compact('upcomingEvents'));
     }
 
     // Thống kê rác thải theo tháng dựa vào năm mà người dùng chọn

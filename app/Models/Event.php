@@ -40,10 +40,10 @@ class Event extends Model
      * Cast các trường dữ liệu
      */
     protected $casts = [
-        'register_date' => 'datetime',
-        'register_end_date' => 'datetime',
-        'event_start_date' => 'datetime',
-        'event_end_date' => 'datetime',
+        'register_date' => 'date',
+        'register_end_date' => 'date',
+        'event_start_date' => 'date',
+        'event_end_date' => 'date',
     ];
 
     /**
@@ -60,9 +60,9 @@ class Event extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
-                    ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
-                    ->withTimestamps()
-                    ->using(EventUser::class);
+            ->withPivot('status', 'student_id', 'student_class', 'registered_at', 'confirmed_at', 'attended_at')
+            ->withTimestamps()
+            ->using(EventUser::class);
     }
 
     /**
@@ -73,33 +73,6 @@ class Event extends Model
         return $this->hasMany(EventUser::class, 'event_id');
     }
 
-    /**
-     * Scope: Lấy sự kiện sắp tới
-     */
-    public function scopeUpcoming($query)
-    {
-        return $query->where('event_start_date', '>', now())
-                     ->where('status', 'upcoming');
-    }
-
-    /**
-     * Scope: Lấy sự kiện đang diễn ra
-     */
-    public function scopeOngoing($query)
-    {
-        return $query->where('event_start_date', '<=', now())
-                     ->where('event_end_date', '>=', now())
-                     ->where('status', '!=', 'completed');
-    }
-
-    /**
-     * Scope: Lấy sự kiện đã kết thúc
-     */
-    public function scopeEnded($query)
-    {
-        return $query->where('event_end_date', '<', now())
-                     ->orWhere('status', 'completed');
-    }
 
     /**
      * Kiểm tra sự kiện có còn chỗ không
@@ -109,11 +82,11 @@ class Event extends Model
         if (!$this->capacity) {
             return true; // Không giới hạn
         }
-        
+
         $registeredCount = $this->registrations()
             ->whereIn('status', ['pending', 'confirmed', 'attended'])
             ->count();
-        
+
         return $registeredCount < $this->capacity;
     }
 
@@ -125,11 +98,11 @@ class Event extends Model
         if (!$this->capacity) {
             return 999999; // Không giới hạn
         }
-        
+
         $registeredCount = $this->registrations()
             ->whereIn('status', ['pending', 'confirmed', 'attended'])
             ->count();
-        
+
         return max(0, $this->capacity - $registeredCount);
     }
 
@@ -149,11 +122,13 @@ class Event extends Model
      */
     public function canRegister(): bool
     {
-        $now = now();
-        return $now >= $this->register_date && 
-               $now <= $this->register_end_date &&
-               $this->status === 'upcoming' &&
-               $this->hasAvailableSlots();
+        $now = now()->startOfDay();
+        $registerStart = optional($this->register_date)->startOfDay();
+        $registerEnd = optional($this->register_end_date)->startOfDay();
+
+        return $registerStart && $registerEnd
+            && $now->between($registerStart, $registerEnd)
+            && $this->hasAvailableSlots();
     }
 
     /**
@@ -169,23 +144,39 @@ class Event extends Model
      */
     public function getStatusAttribute()
     {
-        $today = Carbon::today();
-        $register_end = Carbon::parse($this->register_end_date);
-        $event_start = Carbon::parse($this->event_start_date);
-        $event_end = Carbon::parse($this->event_end_date);
+        $today = now()->toDateString();
 
-        if ($event_end->lt($today)) {
-            return 'Kết thúc';
-        } elseif ($event_start->lte($today) && $event_end->gte($today)) {
+        $register_start = $this->register_date->toDateString();
+        $register_end = $this->register_end_date->toDateString();
+        $event_start = $this->event_start_date->toDateString();
+        $event_end = $this->event_end_date->toDateString();
+
+        if ($today >= $event_start && $today <= $event_end) {
             return 'Đang diễn ra';
-        } elseif ($register_end->gte($today) && $event_start->gt($today)) {
-            return 'Đang đăng ký';
-        } elseif ($register_end->lt($today) && $event_start->gt($today)) {
-            return 'Hết đăng ký';
-        } elseif ($event_start->gt($today)) {
-            return 'Sắp diễn ra';
-        } else {
-            return 'Đang xử lý';
         }
+
+        if ($today > $event_end) {
+            return 'Kết thúc';
+        }
+
+        if ($today >= $register_start && $today <= $register_end) {
+            return 'Đang đăng ký';
+        }
+
+        if ($today > $register_end && $today < $event_start) {
+            return 'Hết đăng ký';
+        }
+
+        if ($today < $register_start) {
+            return 'Sắp diễn ra';
+        }
+
+        return 'Đang xử lý';
     }
+
+    public function getAttendParticipantsCountAttribute()
+    {
+        return $this->participants()->where('status', 'attended')->count();
+    }
+
 }

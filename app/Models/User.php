@@ -163,4 +163,112 @@ class User extends Authenticatable
     {
         return $this->hasMany(EventUser::class, 'user_id', 'user_id');
     }
+
+    /**
+     * ========== ROLE & PERMISSION METHODS ==========
+     */
+
+    /**
+     * Kiểm tra user có phải admin không
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Kiểm tra user có phải manager không
+     */
+    public function isManager(): bool
+    {
+        return $this->role === 'manager';
+    }
+
+    /**
+     * Kiểm tra user có phải staff không
+     */
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
+    }
+
+    /**
+     * Kiểm tra user có phải student không
+     */
+    public function isStudent(): bool
+    {
+        return $this->role === 'student';
+    }
+
+    /**
+     * Kiểm tra user có role trong danh sách không
+     */
+    public function hasRole(array|string $roles): bool
+    {
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+        return in_array($this->role, $roles);
+    }
+
+    /**
+     * Kiểm tra user có permission không
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        // Admin có tất cả quyền
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Lấy permission từ database
+        $permission = \App\Models\Permission::where('name', $permissionName)->first();
+        if (!$permission) {
+            return false;
+        }
+
+        // Kiểm tra role có permission này không
+        return \App\Models\RolePermission::where('role', $this->role)
+            ->where('permission_id', $permission->id)
+            ->exists();
+    }
+
+    /**
+     * Lấy tất cả permissions của user
+     */
+    public function getPermissions(): array
+    {
+        if ($this->isAdmin()) {
+            // Admin có tất cả permissions
+            return \App\Models\Permission::pluck('name')->toArray();
+        }
+
+        return \App\Models\RolePermission::getPermissionsForRole($this->role);
+    }
+
+    /**
+     * Kiểm tra user có bất kỳ permission nào trong danh sách không
+     */
+    public function hasAnyPermission(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra user có tất cả permissions trong danh sách không
+     */
+    public function hasAllPermissions(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if (!$this->hasPermission($permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

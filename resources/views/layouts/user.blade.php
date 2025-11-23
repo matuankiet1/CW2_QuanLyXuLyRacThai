@@ -281,7 +281,7 @@
         <div class="w-full mx-auto px-3">
             <div class="flex items-center justify-between h-16 gap-2">
                 <!-- Logo - Left Side -->
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <a href="{{ route('home') }}"
                         class="flex items-center text-white font-bold text-base hover:text-white/90 transition whitespace-nowrap">
                         <i class="fas fa-recycle mr-1.5"></i>
@@ -302,7 +302,7 @@
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
                         <a href="{{ route('waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
-                            <i class="fa-solid fa-recycle me-1"></i>Báo cáo thu gom rác
+                            <i class="fas fa-trash-alt me-1"></i>Thu gom rác
                         </a>
                         <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
                             <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
@@ -311,60 +311,93 @@
                             <i class="fas fa-envelope mr-1"></i><span>Liên hệ</span>
                         </a>
                         @auth
-                            <a href="{{ route('user.reports.create') }}" class="nav-link-item" title="Báo cáo">
-                                <i class="fas fa-flag mr-1"></i><span>Báo cáo</span>
-                            </a>
-                            <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative"
-                                title="Thông báo">
-                                <i class="fas fa-bell mr-1"></i><span>Thông báo</span>
-                                @php
-                                    $unreadCount = App\Models\NotificationUser::where(
-                                        'user_id',
-                                        auth()->user()->user_id,
-                                    )
-                                        ->whereNull('read_at')
-                                        ->count();
-                                @endphp
-                                @if ($unreadCount > 0)
-                                    <span
-                                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
-                                @endif
-                            </a>
-                            <a href="{{ route('user.simple-notifications.index') }}" class="nav-link-item relative"
-                                title="Thông báo mới">
-                                <i class="fas fa-envelope mr-1"></i><span>Thông báo mới</span>
-                                @php
-                                    $simpleUnreadCount = App\Models\SimpleNotification::where(
-                                        'user_id',
-                                        auth()->user()->user_id,
-                                    )
-                                        ->where('is_read', false)
-                                        ->count();
-                                @endphp
-                                @if ($simpleUnreadCount > 0)
-                                    <span
-                                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
-                                @endif
-                            </a>
-                            <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item"
-                                title="Cài đặt thông báo">
-                                <i class="fas fa-cog mr-1"></i><span>Cài đặt</span>
-                            </a>
-                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item" title="Thống kê cá nhân">
-                                <i class="fas fa-chart-line mr-1"></i><span>Thống kê</span>
-                            </a>
+                            <!-- Cá nhân Dropdown -->
+                            <div class="relative">
+                                <button id="personalMenuToggle"
+                                    class="nav-link-item flex items-center">
+                                    <i class="fas fa-user mr-1"></i><span>Cá nhân</span>
+                                    <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                                </button>
+                                <div id="personalMenuDropdown"
+                                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
+                                    <div class="py-2">
+                                        <a href="{{ route('user.reports.create') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-flag mr-2"></i>Báo cáo
+                                        </a>
+                                        <a href="{{ route('user.statistics.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-chart-line mr-2"></i>Thống kê
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông báo Dropdown -->
+                            <div class="relative">
+                                <button id="notificationMenuToggle"
+                                    class="nav-link-item relative flex items-center">
+                                    <i class="fas fa-bell mr-1"></i><span>Thông báo</span>
+                                    @php
+                                        $unreadCount = App\Models\NotificationUser::where(
+                                            'user_id',
+                                            auth()->user()->user_id,
+                                        )
+                                            ->whereNull('read_at')
+                                            ->count();
+                                        $simpleUnreadCount = App\Models\SimpleNotification::where(
+                                            'user_id',
+                                            auth()->user()->user_id,
+                                        )
+                                            ->where('is_read', false)
+                                            ->count();
+                                        $totalUnread = $unreadCount + $simpleUnreadCount;
+                                    @endphp
+                                    @if ($totalUnread > 0)
+                                        <span
+                                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $totalUnread > 9 ? '9+' : $totalUnread }}</span>
+                                    @endif
+                                    <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                                </button>
+                                <div id="notificationMenuDropdown"
+                                    class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
+                                    <div class="py-2">
+                                        <a href="{{ route('user.notifications.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1 relative">
+                                            <i class="fas fa-bell mr-2"></i>Thông báo
+                                            @if ($unreadCount > 0)
+                                                <span
+                                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                            @endif
+                                        </a>
+                                        <a href="{{ route('user.simple-notifications.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1 relative">
+                                            <i class="fas fa-envelope mr-2"></i>Thông báo mới
+                                            @if ($simpleUnreadCount > 0)
+                                                <span
+                                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
+                                            @endif
+                                        </a>
+                                        <hr class="my-1 border-gray-200">
+                                        <a href="{{ route('user.notification-preferences.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         @endauth
                     </nav>
                 </div>
 
                 <!-- User Profile - Right Side -->
-                <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="flex items-center gap-2 shrink-0">
                     @auth
                         <div class="relative">
                             <button id="userMenuToggle"
                                 class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
                                 <div
-                                    class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+                                    class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 shrink-0">
                                     <span
                                         class="text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                                 </div>
@@ -440,42 +473,51 @@
                         <i class="fas fa-envelope mr-2"></i>Liên hệ
                     </a>
                     @auth
-                        <a href="{{ route('user.reports.create') }}" class="nav-link-item">
-                            <i class="fas fa-flag mr-2"></i>Báo cáo
-                        </a>
-                        <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative">
-                            <i class="fas fa-bell mr-2"></i>Thông báo
-                            @php
-                                $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
-                                    ->whereNull('read_at')
-                                    ->count();
-                            @endphp
-                            @if ($unreadCount > 0)
-                                <span
-                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
-                            @endif
-                        </a>
-                        <a href="{{ route('user.simple-notifications.index') }}" class="nav-link-item relative">
-                            <i class="fas fa-envelope mr-2"></i>Thông báo mới
-                            @php
-                                $simpleUnreadCount = App\Models\SimpleNotification::where(
-                                    'user_id',
-                                    auth()->user()->user_id,
-                                )
-                                    ->where('is_read', false)
-                                    ->count();
-                            @endphp
-                            @if ($simpleUnreadCount > 0)
-                                <span
-                                    class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
-                            @endif
-                        </a>
-                        <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item">
-                            <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
-                        </a>
-                        <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
-                            <i class="fas fa-chart-line mr-2"></i>Thống kê cá nhân
-                        </a>
+                        <!-- Cá nhân Section -->
+                        <div class="border-t border-white/20 pt-2 mt-2">
+                            <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
+                            <a href="{{ route('user.reports.create') }}" class="nav-link-item">
+                                <i class="fas fa-flag mr-2"></i>Báo cáo
+                            </a>
+                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
+                                <i class="fas fa-chart-line mr-2"></i>Thống kê
+                            </a>
+                        </div>
+                        
+                        <!-- Thông báo Section -->
+                        <div class="border-t border-white/20 pt-2 mt-2">
+                            <p class="text-white/70 text-xs font-semibold mb-2 px-2">THÔNG BÁO</p>
+                            <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative">
+                                <i class="fas fa-bell mr-2"></i>Thông báo
+                                @php
+                                    $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
+                                        ->whereNull('read_at')
+                                        ->count();
+                                @endphp
+                                @if ($unreadCount > 0)
+                                    <span
+                                        class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('user.simple-notifications.index') }}" class="nav-link-item relative">
+                                <i class="fas fa-envelope mr-2"></i>Thông báo mới
+                                @php
+                                    $simpleUnreadCount = App\Models\SimpleNotification::where(
+                                        'user_id',
+                                        auth()->user()->user_id,
+                                    )
+                                        ->where('is_read', false)
+                                        ->count();
+                                @endphp
+                                @if ($simpleUnreadCount > 0)
+                                    <span
+                                        class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $simpleUnreadCount > 9 ? '9+' : $simpleUnreadCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('user.notification-preferences.index') }}" class="nav-link-item">
+                                <i class="fas fa-cog mr-2"></i>Cài đặt thông báo
+                            </a>
+                        </div>
                     @endauth
                 </div>
             </div>
@@ -583,6 +625,71 @@
                 document.addEventListener('click', function(e) {
                     if (!userMenuToggle.contains(e.target) && !userMenuDropdown.contains(e.target)) {
                         userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            }
+
+            // Personal menu dropdown toggle
+            const personalMenuToggle = document.getElementById('personalMenuToggle');
+            const personalMenuDropdown = document.getElementById('personalMenuDropdown');
+
+            if (personalMenuToggle && personalMenuDropdown) {
+                personalMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !personalMenuDropdown.classList.contains('invisible');
+
+                    // Close other dropdowns
+                    const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
+                    if (notificationMenuDropdown) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                    if (userMenuDropdown) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+
+                    if (isVisible) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        personalMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e.target)) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            }
+
+            // Notification menu dropdown toggle
+            const notificationMenuToggle = document.getElementById('notificationMenuToggle');
+            const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
+
+            if (notificationMenuToggle && notificationMenuDropdown) {
+                notificationMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = !notificationMenuDropdown.classList.contains('invisible');
+
+                    // Close other dropdowns
+                    if (personalMenuDropdown) {
+                        personalMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+                    if (userMenuDropdown) {
+                        userMenuDropdown.classList.add('opacity-0', 'invisible');
+                    }
+
+                    if (isVisible) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
+                    } else {
+                        notificationMenuDropdown.classList.remove('opacity-0', 'invisible');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e.target)) {
+                        notificationMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
             }

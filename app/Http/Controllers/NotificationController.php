@@ -36,7 +36,7 @@ class NotificationController extends Controller
      */
     public function create()
     {
-        $users = User::where('role', 'user')->orderBy('name')->get();
+        $users = User::orderBy('name')->get();
         return view('admin.notifications.create', compact('users'));
     }
 
@@ -50,7 +50,7 @@ class NotificationController extends Controller
             'content' => 'required|string',
             'type' => 'required|in:announcement,academic,event,urgent',
             'send_to_type' => 'required|in:all,role,user',
-            'target_role' => 'nullable|required_if:send_to_type,role|in:admin,user',
+            'target_role' => 'nullable|required_if:send_to_type,role|in:admin,manager,staff,student',
             'user_ids' => 'nullable|required_if:send_to_type,user|array',
             'user_ids.*' => 'exists:users,user_id',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
@@ -94,8 +94,8 @@ class NotificationController extends Controller
         $recipients = collect();
 
         if ($validated['send_to_type'] === 'all') {
-            // Gửi cho tất cả user
-            $recipients = User::where('role', 'user')->get();
+            // Gửi cho tất cả sinh viên
+            $recipients = User::where('role', 'student')->get();
         } elseif ($validated['send_to_type'] === 'role') {
             // Gửi theo role
             $recipients = User::where('role', $validated['target_role'])->get();
