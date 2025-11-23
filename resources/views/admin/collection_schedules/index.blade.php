@@ -37,7 +37,7 @@
                                         d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
                                 </svg>
 
-                                <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
+                                <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm (Nhân viên thực hiện, ngày thu gom)"
                                     class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
                focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                             </div>
