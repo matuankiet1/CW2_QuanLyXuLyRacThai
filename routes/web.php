@@ -220,19 +220,18 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// User Feedback
+// USER FEEDBACK ROUTES
 Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
-    Route::get('/feedback/create', [UserFeedbackController::class, 'create'])->name('feedback.create');
-    Route::post('/feedback/store', [UserFeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/feedback', [FeedbackController::class, 'userIndex'])->name('feedback.index'); // Danh sách feedback của user
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'userShow'])->name('feedback.show'); // Chi tiết feedback
 });
 
-
-
-/** --------------------------
- *  ADMIN – Feedback
- * -------------------------- */
-Route::prefix('admin/feedback')->name('admin.feedback.')->group(function () {
-    Route::get('/', [FeedbackController::class, 'index'])->name('index');           
-    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');   
-    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply'); 
+// ADMIN FEEDBACK ROUTES
+Route::middleware('admin')->prefix('admin/feedback')->name('admin.feedback.')->group(function () {
+    Route::get('/', [FeedbackController::class, 'index'])->name('index');
+    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
+    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply');
 });
+
