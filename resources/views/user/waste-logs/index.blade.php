@@ -1,4 +1,4 @@
-@extends('layouts.admin-with-sidebar')
+@extends('layouts.user')
 
 @section('content')
     <div class="max-w-7xl mx-auto">
@@ -7,17 +7,21 @@
                 <p>Không có lịch thu gom nào cần báo cáo.</p>
             </div>
         @else
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="bg-white p-6 mt-10 rounded-xl shadow-sm border border-gray-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div class="flex flex-col flex-row items-center md:w-1/2 gap-3">
                         <form action="{{ route('admin.collection-schedules.search') }}" method="GET" class="relative w-full">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
-                            </svg>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
-                                class="w-full pl-10 pr-3 py-2 rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                            <div class="relative w-full flex items-center">
+                                <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
+                                </svg>
+
+                                <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm..."
+                                    class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
+               focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -60,7 +64,7 @@
                                     <td class="py-3 px-4 text-center">
                                         <div class="flex items-center justify-center">
                                             <button data-id="{{ $collectionSchedule->schedule_id }}"
-                                                class="addWasteLogBtn group inline-flex items-center justify-center hover:bg-green-300 rounded-xl mx-1 p-2 transition cursor-pointer"
+                                                class="addWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
                                                 data-modal="add" aria-label="Thêm">
                                                 <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
                                                     color="#254434" fill="none" stroke="currentColor" aria-hidden="true">
@@ -129,7 +133,7 @@
                 class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-2xl w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300 flex flex-col max-h-[95vh]">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold px-7 titleModal">Báo cáo lượng rác thu gom</h2>
+                    <h2 class="text-lg font-semibold px-7 titleModal">Báo cáo thu gom rác</h2>
                     <button id="closeModalBtn" class="px-7 text-gray-400 hover:text-gray-600 cursor-pointer">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
