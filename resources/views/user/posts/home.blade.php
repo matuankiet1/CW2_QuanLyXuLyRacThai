@@ -2,8 +2,25 @@
 
 @section('content')
 <div class="container py-5">
-    <h1 class="fw-bold mb-5 text-center">📰 Bài viết mới nhất</h1>
-
+    <h1 class="text-4xl font-bold text-gray-900 mb-5 text-center">📰 Bài viết mới nhất</h1>
+     {{-- Filter và Search --}}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="GET" action="{{ route('user.posts.home') }}" class="flex flex-col md:flex-row gap-4">
+            {{-- Tìm kiếm --}}
+            <div class="flex-1">
+                <input type="text" 
+                       name="search" 
+                       value="{{ $search ?? '' }}" 
+                       placeholder="Tìm kiếm sự kiện..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            </div>
+            
+            {{-- Nút tìm kiếm --}}
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-search mr-2"></i>Tìm kiếm
+            </button>
+        </form>
+    </div>
     <div class="row g-4">
         @foreach ($posts as $post)
             <div class="col-md-4">

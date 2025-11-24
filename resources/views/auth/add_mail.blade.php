@@ -29,7 +29,7 @@
             @csrf
 
             <div class="space-y-2">
-                <label for="passwordInput" class="text-sm font-medium text-gray-700">Nhập email: <span
+                <label for="email" class="text-sm font-medium text-gray-700">Email: <span
                         class="text-red-500">*</span></label>
                 <div class="relative">
                     <input type="email" id="email" name="email" required
