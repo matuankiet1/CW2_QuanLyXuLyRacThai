@@ -25,7 +25,7 @@
                 Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
             </button>
             <h1 class="font-semibold">Thông tin cá nhân</h1>
-            <form action="{{ route('profile.update') }}" method="POST" class="mt-5">
+            <form action="{{ route('profile.update') }}" method="POST" class="profileForm mt-5">
                 @csrf
                 <div class="mt-5">
                     <label for="name" class="text-gray-500">Họ và tên</label>
@@ -226,6 +226,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Ẩn/hiện các trường chỉnh sửa thông tin cá nhân
+            const profileForm = document.querySelector('.profileForm');
             const btnEditInfo = document.querySelector('#btnEditInfo');
             const btnCancel = document.querySelector('#btnCancel');
             const btnActions = document.querySelector('.btnActions');
@@ -244,6 +245,8 @@
             });
 
             btnCancel.addEventListener('click', function() {
+                profileForm.reset();
+                
                 arrFieldView.forEach(el => {
                     el.classList.remove('hidden');
                 });

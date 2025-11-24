@@ -1,215 +1,232 @@
 @extends('layouts.admin-with-sidebar')
 
 @section('content')
-    <div class="border border-gray-300 rounded-xl p-5 bg-white relative">
-        <button id="btnOpenModalAvatar"
-            class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200">
-            Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
-        </button>
-        <div class="flex items-center justify-center">
-            @if ($user->avatar)
-                <img class="w-36 h-36 object-cover rounded-full" src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar">
-            @else
-                <div class="w-36 h-36 bg-[#f0d364] text-white text-5xl rounded-full flex items-center justify-center">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
-            @endif
+    <div class="container max-w-7xl mx-auto pt-5">
+        <div class="border border-gray-300 rounded-xl p-5 bg-white shadow-md relative">
+            <button id="btnOpenModalAvatar"
+                class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200">
+                Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
+            </button>
+            <div class="flex items-center justify-center">
+                @if ($user->avatar)
+                    <img class="w-36 h-36 object-cover rounded-full" src="{{ asset('storage/' . $user->avatar) }}"
+                        alt="Avatar">
+                @else
+                    <div class="w-36 h-36 bg-[#f0d364] text-white text-5xl rounded-full flex items-center justify-center">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
 
-    <div class="border border-gray-300 rounded-xl mt-5 p-5 bg-white relative">
-        <button id="btnEditInfo"
-            class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200">
-            Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
-        </button>
-        <h1 class="font-semibold">Thông tin cá nhân</h1>
-        <form action="{{ route('profile.update') }}" method="POST" class="mt-5">
-            @csrf
-            <div class="mt-5">
-                <label for="name" class="text-gray-500">Họ và tên</label>
-                <span class="field-view block mb-4" data-field="name">{{ $user->name }}</span>
-                <input type="text" id="name" name="name" value="{{ $user->name }}"
-                    class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 hidden" />
-            </div>
-            <div class="mt-5">
-                <label for="email" class="text-gray-500">Email</label>
-                <span class="field-view block mb-4" data-field="email">{{ $user->email }}</span>
-                <input type="email" id="email" name="email" value="{{ $user->email }}"
-                    class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 hidden" />
-            </div>
-            <div class="mt-5">
-                <label for="phone" class="text-gray-500">Số điện thoại</label>
-                <span class="field-view block mb-4" data-field="phone">{{ $user->phone }}</span>
-                <input type="text" id="phone" name="phone" value="{{ $user->phone }}"
-                    class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 hidden" />
-            </div>
-
-            <div class="btnActions flex mt-5 hidden gap-3">
-                <button type="submit" id="btnSave"
-                    class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
-                    Lưu
-                </button>
-
-                <button type="button" id="btnCancel"
-                    class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-300 py-2 px-4 rounded-lg cursor-pointer transition">
-                    Hủy
-                </button>
-            </div>
-        </form>
-
-    </div>
-
-    <div class="border border-gray-300 rounded-xl mt-5 p-5 bg-white">
-        <h1 class="font-semibold mb-5">Bảo mật</h1>
-        @if ($user->auth_provider != 'local')
-            <p class="">Tài khoản của bạn đang đăng nhập bằng <span
-                    class="font-bold">{{ ucfirst($user->auth_provider) }}</span>.
-                Mật khẩu được quản lý bởi <span class="font-bold">{{ ucfirst($user->auth_provider) }}</span>, vì vậy không
-                thể đổi mật khẩu tại đây.</p>
-        @else
-            <button type="button" id="btnShowFormChangePassword" class="text-blue-600 underline">Đổi mật khẩu</button>
-        @endif
-
-        <form action="{{ route('change_password') }}" method="POST" id="formChangePassword" class="hidden">
-            @csrf
-            <div class="mt-5">
-                <label for="current_password" class="text-sm font-medium text-gray-700">Mật khẩu hiện tại: <span
-                        class="text-red-500">*</span></label>
-                <div class="relative">
-                    <input type="password" id="current_password" name="current_password" placeholder="••••••••" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                    @error('password')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        <div class="border border-gray-300 rounded-xl mt-5 p-5 bg-white shadow-md relative">
+            <button id="btnEditInfo"
+                class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200 {{ $errors->any() ? 'hidden' : '' }}">
+                Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
+            </button>
+            <h1 class="font-semibold">Thông tin cá nhân</h1>
+            <form action="{{ route('profile.update') }}" method="POST" class="profileForm mt-5">
+                @csrf
+                <div class="mt-5">
+                    <label for="name" class="text-gray-500">Họ và tên</label>
+                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                        data-field="name">{{ $user->name }}</span>
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
+                    @error('name')
+                        <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
                     @enderror
-                    <button type="button"
-                        class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
-                        <i class="fa-regular fa-eye"></i>
+                </div>
+                <div class="mt-5">
+                    <label for="email" class="text-gray-500">Email</label>
+                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                        data-field="email">{{ $user->email }}</span>
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
+                    @error('email')
+                        <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="mt-5">
+                    <label for="phone" class="text-gray-500">Số điện thoại</label>
+                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                        data-field="phone">{{ $user->phone }}</span>
+                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
+                    @error('phone')
+                        <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="btnActions flex mt-5 gap-3 {{ $errors->any() ? '' : 'hidden' }}">
+                    <button type="submit" id="btnSave"
+                        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
+                        Lưu
+                    </button>
+
+                    <button type="button" id="btnCancel"
+                        class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-300 py-2 px-4 rounded-lg cursor-pointer transition">
+                        Hủy
                     </button>
                 </div>
-            </div>
+            </form>
 
-            <div class="mt-5">
-                <label for="new_password" class="text-sm font-medium text-gray-700">Mật khẩu mới: <span
-                        class="text-red-500">*</span></label>
-                <div class="relative">
-                    <input type="password" id="new_password" name="new_password" placeholder="••••••••" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                    @error('password')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <button type="button"
-                        class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
-                        <i class="fa-regular fa-eye"></i>
+        </div>
+
+        <div class="border border-gray-300 rounded-xl mt-5 p-5 bg-white">
+            <h1 class="font-semibold mb-5">Bảo mật</h1>
+            @if ($user->auth_provider != 'local')
+                <p class="">Tài khoản của bạn đang đăng nhập bằng <span
+                        class="font-bold">{{ ucfirst($user->auth_provider) }}</span>.
+                    Mật khẩu được quản lý bởi <span class="font-bold">{{ ucfirst($user->auth_provider) }}</span>, vì vậy
+                    không
+                    thể đổi mật khẩu tại đây.</p>
+            @else
+                <button type="button" id="btnShowFormChangePassword" class="text-blue-600 underline">Đổi mật khẩu</button>
+            @endif
+
+            <form action="{{ route('change_password') }}" method="POST" id="formChangePassword" class="hidden">
+                @csrf
+                <div class="mt-5">
+                    <label for="current_password" class="text-sm font-medium text-gray-700">Mật khẩu hiện tại: <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" id="current_password" name="current_password" placeholder="••••••••" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <button type="button"
+                            class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <label for="new_password" class="text-sm font-medium text-gray-700">Mật khẩu mới: <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" id="new_password" name="new_password" placeholder="••••••••" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <button type="button"
+                            class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <label for="renew_password" class="text-sm font-medium text-gray-700">Xác nhận mật khẩu mới: <span
+                            class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" id="renew_password" name="new_password_confirmation"
+                            placeholder="••••••••" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
+                        @error('re-password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <button type="button"
+                            class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="btnActionsPassword flex mt-5 gap-3">
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
+                        Lưu
+                    </button>
+
+                    <button type="button" id="btnCancelChangePassword"
+                        class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-300 py-2 px-4 rounded-lg cursor-pointer transition">
+                        Hủy
                     </button>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="mt-5">
-                <label for="renew_password" class="text-sm font-medium text-gray-700">Xác nhận mật khẩu mới: <span
-                        class="text-red-500">*</span></label>
-                <div class="relative">
-                    <input type="password" id="renew_password" name="new_password_confirmation" placeholder="••••••••"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                    @error('re-password')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <button type="button"
-                        class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="btnActionsPassword flex mt-5 gap-3">
-                <button type="submit"
-                    class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
-                    Lưu
-                </button>
-
-                <button type="button" id="btnCancelChangePassword"
-                    class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-300 py-2 px-4 rounded-lg cursor-pointer transition">
-                    Hủy
-                </button>
-            </div>
-        </form>
-    </div>
-
-    {{-- Modal chọn chức năng avatar --}}
-    <div id="avatarActionModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
-        <div id="avatarActionPanel"
-            class="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 space-y-5 transform transition-all duration-300 ease-out
+        {{-- Modal chọn chức năng avatar --}}
+        <div id="avatarActionModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+            <div id="avatarActionPanel"
+                class="bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 space-y-5 transform transition-all duration-300 ease-out
                 opacity-0 translate-y-4 scale-95">
 
-            {{-- Header --}}
-            <div class="flex items-start justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-800">Chỉnh sửa ảnh đại diện</h2>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Chọn một thao tác bên dưới để cập nhật ảnh đại diện của bạn.
-                    </p>
+                {{-- Header --}}
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Chỉnh sửa ảnh đại diện</h2>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Chọn một thao tác bên dưới để cập nhật ảnh đại diện của bạn.
+                        </p>
+                    </div>
+                    <button type="button" id="btnX" class="text-gray-400 hover:text-gray-600">
+                        ✕
+                    </button>
                 </div>
-                <button type="button" id="btnX" class="text-gray-400 hover:text-gray-600">
-                    ✕
-                </button>
-            </div>
 
-            {{-- Các nút chức năng --}}
-            <div class="space-y-3">
-                <button type="button" id="btnPickNewAvatar"
-                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+                {{-- Các nút chức năng --}}
+                <div class="space-y-3">
+                    <button type="button" id="btnPickNewAvatar"
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
                            border border-green-500 text-green-600 text-sm font-medium
                            hover:bg-green-50">
-                    <span>Chọn ảnh từ thiết bị</span>
-                </button>
+                        <span>Chọn ảnh từ thiết bị</span>
+                    </button>
 
-                <button type="button" disabled
-                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+                    <button type="button" disabled
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
                            border border-blue-500 text-blue-600 text-sm font-medium
                            hover:bg-blue-50 opacity-50 cursor-not-allowed pointer-events-none">
-                    <span>Chụp ảnh mới bằng camera</span>
-                </button>
+                        <span>Chụp ảnh mới bằng camera</span>
+                    </button>
 
-                @if (auth()->user()->avatar)
-                    <form action="{{ route('profile.delete-avatar') }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+                    @if (auth()->user()->avatar)
+                        <form action="{{ route('profile.delete-avatar') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
                                    border border-red-500 text-red-600 text-sm font-medium
                                    hover:bg-red-50">
-                            <span>Xóa ảnh đại diện hiện tại</span>
-                        </button>
-                    </form>
-                @endif
+                                <span>Xóa ảnh đại diện hiện tại</span>
+                            </button>
+                        </form>
+                    @endif
 
-                <p class="textPreview text-center text-sm italic text-gray-600"></p>
-                <!-- Vùng preview -->
+                    <p class="textPreview text-center text-sm italic text-gray-600"></p>
+                    <!-- Vùng preview -->
 
-                <img id="avatarPreview" src="{{ auth()->user()->avatar_url }}"
-                    class="w-28 h-28 rounded-full object-cover border mx-auto hidden">
-            </div>
+                    <img id="avatarPreview" src="{{ auth()->user()->avatar_url }}"
+                        class="w-28 h-28 rounded-full object-cover border mx-auto hidden">
+                </div>
 
-            {{-- Actions --}}
-            <div class="btnActionsAvatar flex justify-end gap-3 pt-3 hidden">
-                <button type="button" id="btnCancelModalAvatar"
-                    class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                <button type="button" id="saveAvatarBtn"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
+                {{-- Actions --}}
+                <div class="btnActionsAvatar flex justify-end gap-3 pt-3 hidden">
+                    <button type="button" id="btnCancelModalAvatar"
+                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
+                    <button type="button" id="saveAvatarBtn"
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    {{-- Input file ẩn để chọn ảnh mới --}}
-    <form id="avatarUploadForm" action="{{ route('profile.update-avatar') }}" method="POST"
-        enctype="multipart/form-data" class="hidden">
-        @csrf
-        <input type="file" id="avatarFileInput" name="avatar" accept="image/*">
-    </form>
+        {{-- Input file ẩn để chọn ảnh mới --}}
+        <form id="avatarUploadForm" action="{{ route('profile.update-avatar') }}" method="POST"
+            enctype="multipart/form-data" class="hidden">
+            @csrf
+            <input type="file" id="avatarFileInput" name="avatar" accept="image/*">
+        </form>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Ẩn/hiện các trường chỉnh sửa thông tin cá nhân
+            const profileForm = document.querySelector('.profileForm');
             const btnEditInfo = document.querySelector('#btnEditInfo');
             const btnCancel = document.querySelector('#btnCancel');
             const btnActions = document.querySelector('.btnActions');
@@ -228,6 +245,8 @@
             });
 
             btnCancel.addEventListener('click', function() {
+                profileForm.reset();
+
                 arrFieldView.forEach(el => {
                     el.classList.remove('hidden');
                 });
@@ -236,6 +255,10 @@
                 });
                 btnActions.classList.add('hidden');
                 btnEditInfo.classList.remove('hidden');
+
+                document.querySelectorAll('.profile-error').forEach(el => {
+                    el.classList.add('hidden');
+                });
             });
 
             // Mở modal chỉnh sửa avatar
@@ -350,7 +373,7 @@
                     this.classList.add("hidden");
                 });
             }
-            
+
             if (btnCancelChangePassword) {
                 btnCancelChangePassword.addEventListener("click", function() {
                     formChangePassword.classList.add("hidden");

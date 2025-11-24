@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Exception\ClientException;
 
 class AuthController extends Controller
 {
@@ -120,20 +121,26 @@ class AuthController extends Controller
         abort(404);
     }
 
-    public function handleProviderCallback(string $provider)
+    public function handleProviderCallback(Request $request, string $provider)
     {
         abort_unless(in_array($provider, ['google', 'facebook']), 404);
 
+        // Nếu social trả error (user bấm Hủy)
+        if ($request->has('error') || $request->has('error_reason')) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'info',
+                'message' => 'Bạn đã hủy đăng nhập bằng ' . ucfirst($provider) . '.',
+            ]);
+        }
+
         try {
             $socialUser = Socialite::driver($provider)->user();
-        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
-            dd($e->getMessage(), $e);
-            // return redirect()->route('login')->withErrors([
-            //     'oauth' => 'Không thể xác thực bằng ' . $provider . '. Vui lòng thử lại.',
-            // ]);
+        } catch (ClientException $e) {
+            // dd($e->getMessage(), $e);
+            
             return redirect()->route('login')->with('status', [
                 'type' => 'error',
-                'message' => 'Không thể xác thực bằng ' . strtoupper($provider) . '. Vui lòng kiểm tra và thử lại.'
+                'message' => 'Đăng nhập ' . ucfirst($provider) . ' thất bại, vui lòng thử lại.',
             ]);
         }
 
@@ -443,7 +450,7 @@ class AuthController extends Controller
             $role = Auth::user()->role;
             if ($role == 'admin') {
                 return view('admin.profiles.index', compact('user'));
-            } else if ($role == 'user') {
+            } else {
                 return view('user.profiles.index', compact('user'));
             }
         }

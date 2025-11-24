@@ -2,7 +2,11 @@
 
 @section('content')
     @php
-        $canConfirmSchedule = auth()->check() && auth()->user()->hasRole(['manager', 'admin']);
+        $canConfirmSchedule =
+            auth()->check() &&
+            auth()
+                ->user()
+                ->hasRole(['manager', 'admin']);
     @endphp
     <div class="max-w-7xl mx-auto">
         @if ($collectionSchedules->isEmpty() && $isSearch == false && $isFilter == false)
@@ -37,7 +41,8 @@
                                         d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
                                 </svg>
 
-                                <input type="text" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm (Nhân viên thực hiện, ngày thu gom)"
+                                <input type="text" name="q" value="{{ request('q') }}"
+                                    placeholder="Tìm kiếm (Nhân viên thực hiện, ngày thu gom)"
                                     class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
                focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                             </div>
@@ -133,9 +138,10 @@
                                                         class="update-status-btn inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 transition cursor-pointer"
                                                         data-schedule-id="{{ $collectionSchedule->schedule_id }}"
                                                         title="Xác nhận đã thu gom lịch này">
-                                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        <svg class="w-4 h-4 text-gray-600" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
                                                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                         </svg>
                                                     </button>
@@ -144,14 +150,16 @@
                                                 <span
                                                     class="confirmation-chip {{ $isConfirmed ? 'flex' : 'hidden' }} items-center gap-1 text-xs font-medium text-green-600"
                                                     data-schedule-id="{{ $collectionSchedule->schedule_id }}">
-                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="m5 13 4 4L19 7" />
+                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="m5 13 4 4L19 7" />
                                                     </svg>
                                                     Đã xác nhận
                                                 </span>
-                                                @if($collectionSchedule->report)
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                                @if ($collectionSchedule->report)
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
                                                         Báo cáo: {{ ucfirst($collectionSchedule->report->status) }}
                                                     </span>
                                                 @endif
@@ -174,7 +182,8 @@
                                                 data-modal="edit" aria-label="Chỉnh sửa">
                                                 {{-- Icon chỉnh sửa --}}
                                                 <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
-                                                    color="#254434" fill="none" stroke="currentColor" aria-hidden="true">
+                                                    color="#254434" fill="none" stroke="currentColor"
+                                                    aria-hidden="true">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
                                                 </svg>
@@ -219,24 +228,6 @@
                 </div>
 
                 <!-- Phân trang -->
-                {{-- <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
-                    <p>Hiển thị 1 - 5 trong tổng số 6 sự kiện</p>
-                    <div class="flex items-center gap-2 mt-3 md:mt-0">
-                        <button class="p-2 border rounded-lg hover:bg-green-50" aria-label="Trang trước">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <span>Trang 1 / 2</span>
-                        <button class="p-2 border rounded-lg hover:bg-green-50" aria-label="Trang sau">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div> --}}
                 @if ($collectionSchedules->hasPages())
                     <div class="mt-3">
                         {{ $collectionSchedules->appends(request()->except('page'))->links() }}
@@ -250,80 +241,81 @@
                 <div id="modalBox"
                     class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold titleModal">Thêm lịch thu gom mới</h2>
-                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold titleModal">Thêm lịch thu gom mới</h2>
+                        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form class="space-y-4" action="{{ route('admin.collection-schedules.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" id="statusHidden" name="status" value="Chưa thực hiện">
+                        <div class="relative">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" id="inputName" name="staff_id"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
+                                placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}" autocomplete="off">
+                            @error('staff_id')
+                                <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
+                            <!-- Dropdown suggestions -->
+                            <ul id="suggestions"
+                                class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
+                            </ul>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
+                                    class="text-red-500">*</span></label>
+                            <input type="date" id="inputScheduledDate" name="scheduled_date"
+                                value="{{ old('scheduled_date') }}"
+                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
+                            @error('scheduled_date')
+                                <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="completed-at-field">
+                            <label class="block text-sm font-medium text-gray-700">Ngày hoàn thành:</label>
+                            <input type="date" id="inputCompletedAt" name="completed_at"
+                                value="{{ old('completed_at') }}"
+                                class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
+                            @error('completed_at')
+                                <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="status-field">
+                            <label class="block text-sm font-medium text-gray-700">Trạng thái:</label>
+                            <select id="selectStatus" name="status"
+                                class="block w-full mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+                                <option value="Chưa thực hiện" selected
+                                    {{ old('status', 'Chưa thực hiện') === 'Chưa thực hiện' ? 'selected' : '' }}>
+                                    Chưa thực hiện</option>
+                                <option value="Đã hoàn thành" {{ old('status') === 'Đã hoàn thành' ? 'selected' : '' }}>Đã
+                                    hoàn thành</option>
+                            </select>
+                            @error('status')
+                                <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="waste-logs">
+                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline">Xem lượng rác đã thu
+                                gom</button>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-3">
+                            <button type="button" id="cancelBtn"
+                                class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
+                            <button type="submit"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
+                        </div>
+                    </form>
                 </div>
-
-                <form class="space-y-4" action="{{ route('admin.collection-schedules.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" id="statusHidden" name="status" value="Chưa thực hiện">
-                    <div class="relative">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="inputName" name="staff_id"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                            placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}" autocomplete="off">
-                        @error('staff_id')
-                            <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                        <!-- Dropdown suggestions -->
-                        <ul id="suggestions"
-                            class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
-                        </ul>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Ngày thu gom: <span
-                                class="text-red-500">*</span></label>
-                        <input type="date" id="inputScheduledDate" name="scheduled_date"
-                            value="{{ old('scheduled_date') }}"
-                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
-                        @error('scheduled_date')
-                            <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="completed-at-field">
-                        <label class="block text-sm font-medium text-gray-700">Ngày hoàn thành:</label>
-                        <input type="date" id="inputCompletedAt" name="completed_at"
-                            value="{{ old('completed_at') }}"
-                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring focus:ring-green-200 outline-none">
-                        @error('completed_at')
-                            <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="status-field">
-                        <label class="block text-sm font-medium text-gray-700">Trạng thái:</label>
-                        <select id="selectStatus" name="status"
-                            class="block w-full mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                            <option value="Chưa thực hiện" selected
-                                {{ old('status', 'Chưa thực hiện') === 'Chưa thực hiện' ? 'selected' : '' }}>
-                                Chưa thực hiện</option>
-                            <option value="Đã hoàn thành" {{ old('status') === 'Đã hoàn thành' ? 'selected' : '' }}>Đã
-                                hoàn thành</option>
-                        </select>
-                        @error('status')
-                            <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <span class="mx-auto border border-top">Lượng rác đã thu gom</span>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button type="button" id="cancelBtn"
-                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                        <button type="submit"
-                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Lưu</button>
-                    </div>
-                </form>
             </div>
-        </div>
         </div>
 
         <div id="confirmModal"
@@ -332,30 +324,30 @@
                 <div id="confirmModalBox"
                     class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl p-6 max-w-md w-full
               transform opacity-0 translate-y-5 scale-95 transition-all duration-300">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
-                    <button id="closeConfirmModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <h2 class="mb-3">Bạn có chắc chắn muốn xóa không?</h2>
-                <div class="flex justify-end gap-3 pt-3">
-                    <button type="button" id="cancelConfirmModalBtn"
-                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
-                    <form action="" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <div id="idsContainer"></div>
-                        <button type="submit"
-                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Chắc
-                            chắn!</button>
-                    </form>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Xác nhận xóa</h2>
+                        <button id="closeConfirmModalBtn" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <h2 class="mb-3">Bạn có chắc chắn muốn xóa không?</h2>
+                    <div class="flex justify-end gap-3 pt-3">
+                        <button type="button" id="cancelConfirmModalBtn"
+                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-300 cursor-pointer">Hủy</button>
+                        <form action="" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <div id="idsContainer"></div>
+                            <button type="submit"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer">Chắc
+                                chắn!</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
         {{-- Offcanvas fillter --}}
@@ -457,14 +449,14 @@
         </div>
     </div>
 
-    <div id="collectionScheduleState"
-        data-open-modal="{{ (session('show_modal') || $errors->any()) ? 'true' : 'false' }}" class="hidden"></div>
+    <div id="collectionScheduleState" data-open-modal="{{ session('show_modal') || $errors->any() ? 'true' : 'false' }}"
+        class="hidden"></div>
 
     <script>
         // Modal logic
         const stateElement = document.getElementById('collectionScheduleState');
         const shouldShowModal = stateElement ? stateElement.dataset.openModal === 'true' : false;
-        
+
         const modal = document.getElementById('modal');
         const modalBox = document.getElementById('modalBox');
         const openBtn = document.querySelectorAll('.openModalBtn');
@@ -534,8 +526,10 @@
                 const methodInput = form.querySelector('input[name="_method"]');
                 if (methodInput) methodInput.remove();
 
-                // displayCompletedAtField(false);
-                // displayStatusField(false);
+                displayCompletedAtField(false);
+                displayStatusField(false);
+                displayWasteLogs(false);
+
                 openModal(modal, modalBox);
             });
         });
@@ -558,7 +552,7 @@
                 const id = button.dataset.id;
                 const res = await fetch(`/collection-schedules/${id}`);
                 const data = await res.json();
-                console.log(data);
+                // console.log(data);
 
                 if (data) {
                     inputName.value = data[0].staff.name;
@@ -568,10 +562,14 @@
                         .toISOString().split('T')[0] : '';
                     selectStatus.value = data[0].status;
                     statusHidden.value = data[0].status;
+                    document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0].schedule_id;
                 }
+
                 titleModal.textContent = 'Chỉnh sửa lịch thu gom';
-                // displayCompletedAtField(true);
-                // displayStatusField(true);
+                displayCompletedAtField(true);
+                displayStatusField(true);
+                displayWasteLogs(true);
+
                 openModal(modal, modalBox);
 
                 const form = modalBox.querySelector('form');
@@ -583,6 +581,20 @@
                     <input type="hidden" name="_method" value="PUT">
                 `);
             });
+        });
+
+        document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
+            const id = this.dataset.scheduleId;
+            const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
+            const data = await res.json();
+            let logsMessage = 'Lượng rác đã thu gom:\n';
+            data.forEach(log => {
+                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
+            });
+            console.log(logsMessage);
+
+            document.querySelector('.waste-logs').innerText = logsMessage;
+            
         });
 
         function displayCompletedAtField(show) {
@@ -600,6 +612,15 @@
                 statusField.classList.remove('hidden');
             } else {
                 statusField.classList.add('hidden');
+            }
+        }
+
+        function displayWasteLogs(show) {
+            const wasteLogs = document.querySelector('.waste-logs');
+            if (show) {
+                wasteLogs.classList.remove('hidden');
+            } else {
+                wasteLogs.classList.add('hidden');
             }
         }
 
@@ -708,64 +729,73 @@
         // Update status functionality
         const updateStatusButtons = document.querySelectorAll('.update-status-btn');
         const FINAL_STATUS = 'Đã hoàn thành';
-        
+
         updateStatusButtons.forEach(button => {
             button.addEventListener('click', async function() {
                 const scheduleId = this.dataset.scheduleId;
-                
-                const isConfirmed = confirm('Xác nhận đã hoàn thành lịch thu gom này? Sau khi xác nhận sẽ không thể hoàn tác.');
+
+                const isConfirmed = confirm(
+                    'Xác nhận đã hoàn thành lịch thu gom này? Sau khi xác nhận sẽ không thể hoàn tác.'
+                );
                 if (!isConfirmed) {
                     return;
                 }
-                
+
                 this.disabled = true;
                 const originalHTML = this.innerHTML;
-                this.innerHTML = '<svg class="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
-                
+                this.innerHTML =
+                    '<svg class="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
                 try {
                     const response = await fetch(`/collection-schedules/${scheduleId}/update-status`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                ?.content || '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({
                             status: FINAL_STATUS
                         })
                     });
-                    
+
                     const data = await response.json();
-                    
+
                     if (data.success) {
-                        const statusBadge = document.querySelector(`.status-badge[data-schedule-id="${scheduleId}"]`);
+                        const statusBadge = document.querySelector(
+                            `.status-badge[data-schedule-id="${scheduleId}"]`);
                         if (statusBadge) {
                             statusBadge.dataset.status = data.status;
                             statusBadge.dataset.confirmed = 'true';
                             statusBadge.textContent = data.status;
-                            statusBadge.className = 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge';
+                            statusBadge.className =
+                                'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 status-badge';
                         }
-                        
+
                         const row = this.closest('tr');
                         const completedAtCell = row?.querySelector('td:nth-child(5)');
                         if (completedAtCell) {
                             completedAtCell.textContent = data.completed_at ?? '-';
                         }
-                        
-                        const confirmationText = document.querySelector(`.confirmation-text[data-schedule-id="${scheduleId}"]`);
+
+                        const confirmationText = document.querySelector(
+                            `.confirmation-text[data-schedule-id="${scheduleId}"]`);
                         if (confirmationText) {
-                            const confirmedLabel = data.confirmed_by ? `${data.confirmed_by}` : 'quản lý';
-                            confirmationText.textContent = data.confirmed_at
-                                ? `Xác nhận bởi ${confirmedLabel} lúc ${data.confirmed_at}`
-                                : `Xác nhận bởi ${confirmedLabel}`;
+                            const confirmedLabel = data.confirmed_by ? `${data.confirmed_by}` :
+                                'quản lý';
+                            confirmationText.textContent = data.confirmed_at ?
+                                `Xác nhận bởi ${confirmedLabel} lúc ${data.confirmed_at}` :
+                                `Xác nhận bởi ${confirmedLabel}`;
                             confirmationText.classList.remove('text-gray-500');
                             confirmationText.classList.add('text-green-600');
                         }
-                        
-                        const confirmationChip = document.querySelector(`.confirmation-chip[data-schedule-id="${scheduleId}"]`);
+
+                        const confirmationChip = document.querySelector(
+                            `.confirmation-chip[data-schedule-id="${scheduleId}"]`);
                         if (confirmationChip) {
                             confirmationChip.classList.remove('hidden');
                         }
-                        
+
                         if (window.showToast) {
                             showToast('success', data.message || 'Đã xác nhận lịch thu gom.');
                         } else {

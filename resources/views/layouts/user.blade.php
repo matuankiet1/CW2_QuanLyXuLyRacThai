@@ -428,10 +428,10 @@
 
                                     <hr class="my-1 border-gray-400">
 
-                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm">
+                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm" class="mx-1">
                                         @csrf
                                         <button type="submit"
-                                            class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg mx-1">
+                                            class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg">
                                             <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
@@ -534,8 +534,8 @@
         @yield('content')
     </main>
 
-    {{-- <x-chatbot /> --}}
-
+    {{-- Chatbot AI --}}
+    <x-chatbot />
 
     <!-- Footer -->
     <footer class="footer">
@@ -713,7 +713,7 @@
     </script>
 
     <script>
-        // Xóa #_=_ do Facebook thêm vào
+        // Xóa #_=_ do Facebook tự động thêm vào URL
         if (window.location.hash === '#_=_') {
             if (window.history && window.history.replaceState) {
                 window.history.replaceState('', document.title, window.location.pathname);

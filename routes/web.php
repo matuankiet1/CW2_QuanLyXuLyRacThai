@@ -21,6 +21,7 @@ use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
+use App\Http\Controllers\ChatbotController;
 use App\Models\Banner;
 
 
@@ -235,6 +236,9 @@ Route::middleware('manager')->group(function () {
     Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
         ->name('admin.collection-schedules.update-status');
 
+    Route::get('/collection-schedules/get-waste-logs/{id}', [CollectionScheduleController::class, 'getWasteLogs'])
+        ->name('admin.collection-schedules.get-waste-logs');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -326,10 +330,10 @@ Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('p
 Route::post('update-avatar', [AuthController::class, 'updateAvatar'])->name('profile.update-avatar');
 Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('profile.delete-avatar');
 
-
-
-
-
+// Chatbot AI
+Route::middleware('auth')->group(function () {
+    Route::post('recycle-suggestion', [ChatbotController::class, 'suggestWasteRecycle'])->name('chatbot.recycle-suggestion');
+});
 
 // Route phục vụ ảnh banner - FIXED
 Route::get('/banner-img/{filename}', function ($filename) {
