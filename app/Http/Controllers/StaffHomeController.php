@@ -58,7 +58,7 @@ class StaffHomeController extends Controller
 
     public function collection_schedule(Request $request)
     {
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 
@@ -236,11 +236,11 @@ class StaffHomeController extends Controller
 
     public function wasteLog(Request $request)
     {
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        $userId = auth()->id(); // nhân viên hiện tại
+        $userId = Auth::id(); // nhân viên hiện tại
 
         $wasteTypes = WasteType::pluck('name', 'id');
 

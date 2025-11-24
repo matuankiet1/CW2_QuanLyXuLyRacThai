@@ -8,6 +8,7 @@ use App\Models\WasteType;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -19,10 +20,10 @@ class WasteLogController extends Controller
      */
     public function index()
     {
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
+        $user_id = Auth::id();
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
         $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'asc')->get();

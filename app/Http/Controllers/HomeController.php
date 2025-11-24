@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Post;
 use App\Models\CollectionSchedule;
 use App\Models\Banner;
@@ -43,7 +44,7 @@ class HomeController extends Controller
 
      public function collection_schedules(Request $request)
     {
-       if (!auth()->check()) {
+       if (!Auth::check()) {
             return redirect()->route('login');
         }
 
