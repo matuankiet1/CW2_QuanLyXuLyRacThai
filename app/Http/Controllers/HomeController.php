@@ -27,9 +27,48 @@ class HomeController extends Controller
             ->get();
 
         // Lấy banner mới nhất
-        $banners = Banner::orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
+
+    $stats = [
+            'total_posts' => Post::count(),
+            'total_schedules' => CollectionSchedule::count(), // Sửa thành CollectionSchedule
+            'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(), // Sửa thành CollectionSchedule
+        ];
+
+        $latestPosts = Post::where('status', 'published')
+                          ->latest()
+                          ->take(6)
+                          ->get();
+
+        $upcomingSchedules = CollectionSchedule::where('scheduled_date', '>=', now()) // Sửa thành CollectionSchedule
+                                              ->orderBy('scheduled_date')
+                                              ->take(3)
+                                              ->get();
+
+        // Phân loại banner theo vị trí
+        $topBanners = Banner::where('position', 'top')
+                            ->where('status', 1)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+        $sidebarBanners = Banner::where('position', 'sidebar')
+                               ->where('status', 1)
+                               ->orderBy('created_at', 'desc')
+                               ->get();
+
+        $footerBanners = Banner::where('position', 'footer')
+                              ->where('status', 1)
+                              ->orderBy('created_at', 'desc')
+                              ->get();
+
+        return view('home.index', compact(
+            'stats', 
+            'latestPosts', 
+            'upcomingSchedules',
+            'topBanners',
+            'sidebarBanners', 
+            'footerBanners'
+        ));
+
 
         // Thống kê nhanh
         $stats = [
