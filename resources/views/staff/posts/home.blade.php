@@ -1,14 +1,14 @@
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('content')
 <div class="container py-5">
-    <h1 class="fw-bold mb-5 text-center">Sự kiện</h1>
+    <h1 class="fw-bold mb-5 text-center">📰 Bài viết mới nhất</h1>
 
     <div class="row g-4">
-        @foreach ($events as $event)
+        @foreach ($posts as $post)
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm border-0">
-                    @if ($event->image)
+                    @if ($post->image)
                         <img src="{{ asset( $post->image) }}" 
                              alt="{{ $post->title }}" 
                              class="card-img-top" 

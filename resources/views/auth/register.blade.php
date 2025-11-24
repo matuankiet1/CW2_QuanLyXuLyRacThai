@@ -4,13 +4,13 @@
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 p-4 relative overflow-hidden">
     {{-- Decorative image --}}
-    <div class="absolute top-8 right-8 w-32 h-32 opacity-20 hidden md:block">
+    {{-- <div class="absolute top-8 right-8 w-32 h-32 opacity-20 hidden md:block">
         <img src="https://images.unsplash.com/photo-1736977591945-6a62f3d621ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xpbmclMjBlbnZpcm9ubWVudCUyMGdyZWVufGVufDF8fHx8MTc1OTk3MDUxNXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
              alt="Recycling"
              class="w-full h-full object-cover rounded-2xl" />
-    </div>
+    </div> --}}
 
-    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-400 relative z-10">
+    <div class="w-full max-w-md px-8 py-6 bg-white rounded-xl shadow-lg border border-gray-400 relative z-10">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-green-600 text-white rounded-xl mb-4">
                 {{-- SVG Icon Leaf --}}

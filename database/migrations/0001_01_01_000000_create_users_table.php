@@ -15,7 +15,9 @@ return new class extends Migration {
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone')->nullable();
             $table->string('password');
+            $table->string('avatar')->nullable();
             // Kiểu đăng nhập: local | google | facebook
             $table->enum('auth_provider', ['local', 'google', 'facebook'])->default('local');
             // ID do provider cấp
@@ -23,7 +25,7 @@ return new class extends Migration {
             $table->unique(['auth_provider', 'provider_id'], 'users_authprovider_providerid_unique');
             $table->rememberToken();
             $table->timestamps();
-            $table->string('phone')->nullable();
+            
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

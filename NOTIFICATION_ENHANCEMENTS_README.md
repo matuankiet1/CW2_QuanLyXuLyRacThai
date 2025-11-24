@@ -5,7 +5,7 @@
 Branch này đã thêm các chức năng nâng cao cho hệ thống thông báo:
 
 1. ✅ Simple Notification System
-2. ✅ Email Notifications  
+2. ✅ Email Notifications
 3. ✅ Push Notifications (FCM)
 4. ✅ Notification Preferences
 5. ✅ Notification Templates
@@ -195,16 +195,16 @@ use App\Services\IntegratedNotificationService;
 public function store(Request $request)
 {
     // ... logic tạo bài viết ...
-    
+
     // Gửi thông báo tích hợp đến admin
     $admins = User::where('role', 'admin')->pluck('user_id')->toArray();
-    
+
     IntegratedNotificationService::sendToMany(
         $admins,
         'Bài viết mới',
         'Một bài viết mới vừa được đăng: ' . $post->title
     );
-    
+
     return redirect()->route('admin.posts.index')
         ->with('success', 'Bài viết đã được tạo thành công!');
 }
@@ -218,10 +218,10 @@ use App\Services\IntegratedNotificationService;
 public function store(Request $request)
 {
     // ... logic tạo sự kiện ...
-    
-    // Gửi thông báo đến tất cả users
-    $userIds = User::where('role', 'user')->pluck('user_id')->toArray();
-    
+
+    // Gửi thông báo đến tất cả sinh viên
+    $userIds = User::where('role', 'student')->pluck('user_id')->toArray();
+
     foreach ($userIds as $userId) {
         $user = User::find($userId);
         IntegratedNotificationService::sendTemplate(
@@ -285,38 +285,42 @@ resources/views/emails/
 ## 🎯 Features
 
 ### NotificationService
-- ✅ Gửi thông báo đơn giản
-- ✅ Gửi đến nhiều users
-- ✅ Validation và error handling
-- ✅ Logging
-- ✅ Đánh dấu đã đọc
+
+-   ✅ Gửi thông báo đơn giản
+-   ✅ Gửi đến nhiều users
+-   ✅ Validation và error handling
+-   ✅ Logging
+-   ✅ Đánh dấu đã đọc
 
 ### TemplateNotificationService
-- ✅ Sử dụng template với variables
-- ✅ Validate variables
-- ✅ Hỗ trợ {{key}} và {{{key}}}
-- ✅ Gửi đến nhiều users
+
+-   ✅ Sử dụng template với variables
+-   ✅ Validate variables
+-   ✅ Hỗ trợ {{key}} và {{{key}}}
+-   ✅ Gửi đến nhiều users
 
 ### IntegratedNotificationService
-- ✅ Tự động gửi qua tất cả kênh
-- ✅ Tự động kiểm tra preferences
-- ✅ Fallback khi một kênh fail
-- ✅ Thống kê kết quả
-- ✅ Hỗ trợ template
+
+-   ✅ Tự động gửi qua tất cả kênh
+-   ✅ Tự động kiểm tra preferences
+-   ✅ Fallback khi một kênh fail
+-   ✅ Thống kê kết quả
+-   ✅ Hỗ trợ template
 
 ### Models
-- ✅ Scopes (unread, read, forUser)
-- ✅ Helper methods
-- ✅ Relationships
-- ✅ Validation
+
+-   ✅ Scopes (unread, read, forUser)
+-   ✅ Helper methods
+-   ✅ Relationships
+-   ✅ Validation
 
 ## ⚠️ Lưu ý
 
-- **FCM Package**: Chưa được cài đặt mặc định, cần chạy `composer require laravel-notification-channels/fcm` và uncomment code trong `FirebaseNotification.php`
-- **Migrations**: Cần chạy migrations trước khi sử dụng
-- **Mail Configuration**: Cần cấu hình mail trong `.env` để gửi email
-- **Firebase**: Cần có Firebase project và server key để sử dụng FCM
-- **Preferences**: Mặc định tất cả notifications đều được bật (email, push, in_app = true)
+-   **FCM Package**: Chưa được cài đặt mặc định, cần chạy `composer require laravel-notification-channels/fcm` và uncomment code trong `FirebaseNotification.php`
+-   **Migrations**: Cần chạy migrations trước khi sử dụng
+-   **Mail Configuration**: Cần cấu hình mail trong `.env` để gửi email
+-   **Firebase**: Cần có Firebase project và server key để sử dụng FCM
+-   **Preferences**: Mặc định tất cả notifications đều được bật (email, push, in_app = true)
 
 ## 🔄 Commits
 
@@ -340,10 +344,10 @@ resources/views/emails/
 
 ## 📊 Performance
 
-- **Batch Operations**: Sử dụng `sendToMany()` cho nhiều users thay vì loop
-- **Scopes**: Sử dụng scopes để query hiệu quả hơn
-- **Lazy Loading**: Sử dụng `with()` để tránh N+1 query
+-   **Batch Operations**: Sử dụng `sendToMany()` cho nhiều users thay vì loop
+-   **Scopes**: Sử dụng scopes để query hiệu quả hơn
+-   **Lazy Loading**: Sử dụng `with()` để tránh N+1 query
 
 ---
 
-*Last updated: {{ date('Y-m-d H:i:s') }}*
+_Last updated: {{ date('Y-m-d H:i:s') }}_

@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\Schema;
  *   canceled (đã hủy), attended (đã tham gia)
  * - Lưu thời điểm đăng ký, xác nhận, điểm danh
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -22,39 +21,45 @@ return new class extends Migration
     {
         Schema::create('event_user', function (Blueprint $table) {
             $table->id();
-            
-            // Foreign key đến bảng users (sinh viên)
-            $table->foreignId('user_id')
-                  ->constrained('users', 'user_id')
-                  ->onDelete('cascade');
-            
-            // Foreign key đến bảng events (sự kiện)
+
+            // FK tới users.user_id (custom primary key)
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('user_id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            // FK tới events.id
             $table->foreignId('event_id')
-                  ->constrained('events')
-                  ->onDelete('cascade');
-            
-            // Trạng thái tham gia: pending, confirmed, canceled, attended
+                ->constrained('events')
+                ->onDelete('cascade');
+
+            // Thông tin sinh viên
+            $table->string('name');
+            $table->string('student_id');
+            $table->string('student_class');
+            $table->string('email');
+
+            // Trạng thái tham gia
             $table->enum('status', ['pending', 'confirmed', 'canceled', 'attended'])
-                  ->default('pending');
-            
-            // Thời điểm đăng ký
+                ->default('pending');
+
             $table->datetime('registered_at')->nullable();
-            
-            // Thời điểm xác nhận (bởi admin)
             $table->datetime('confirmed_at')->nullable();
-            
-            // Thời điểm điểm danh (bởi admin)
             $table->datetime('attended_at')->nullable();
-            
+
             $table->timestamps();
-            
-            // Đảm bảo mỗi sinh viên chỉ đăng ký một lần cho mỗi sự kiện
+
+            // Một user chỉ đăng ký 1 lần / 1 event
             $table->unique(['user_id', 'event_id']);
-            
-            // Index để tăng hiệu suất truy vấn
+
+            // Index
             $table->index('status');
             $table->index('event_id');
+            $table->index(['event_id', 'status']);
         });
+
+
     }
 
     /**
