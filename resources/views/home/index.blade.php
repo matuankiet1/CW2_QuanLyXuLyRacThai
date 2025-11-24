@@ -15,7 +15,7 @@
                          class="d-block w-100 banner-image" 
                          alt="{{ $banner->title }}">
                     <div class="banner-content">
-                        <div class="container">
+                        <div class="container px-5">
                             <div class="row align-items-center min-vh-75">
                                 <div class="col-lg-6">
                                     <h1 class="display-4 fw-bold text-white mb-4">
@@ -58,7 +58,7 @@
 @else
 <!-- Fallback Hero Section khi không có banner -->
 <section class="hero-section">
-    <div class="container">
+    <div class="container px-5">
         <div class="row align-items-center">
             <div class="col-lg-6 hero-content">
                 <h1 class="display-4 fw-bold mb-4">
@@ -78,7 +78,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
+            <div class="col-lg-6 text-center d-none d-md-block">
                 <div class="hero-image">
                     <i class="fas fa-recycle" style="font-size: 15rem; color: rgba(255,255,255,0.3);"></i>
                 </div>
@@ -139,7 +139,7 @@
 @endif -->
 
 <!-- Stats Section -->
-<section class="py-5">
+<section class="m-3 m-md-5">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-3 col-md-6">
@@ -171,7 +171,7 @@
 </section>
 
 <!-- Features Section -->
-<section class="py-5 bg-white">
+<section class="m-3 m-md-5">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="section-title">Tại sao chọn chúng tôi?</h2>
@@ -262,7 +262,7 @@
 
 <!-- Latest Posts Section -->
 @if($latestPosts->count() > 0)
-<section class="py-5">
+<section class="m-3 m-md-5">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="section-title">Bài viết mới nhất</h2>
@@ -311,7 +311,7 @@
 
 <!-- Upcoming Schedules Section -->
 @if($upcomingSchedules->count() > 0)
-<section class="py-5 bg-light">
+<section class="m-3 m-md-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="section-title">Lịch thu gom sắp tới</h2>
@@ -357,7 +357,7 @@
 <!-- Banners Section -->
 <!-- Sidebar Banners Section - Hiển thị banner vị trí "sidebar" -->
 @if(isset($sidebarBanners) && $sidebarBanners->count() > 0)
-<section class="py-5 bg-light">
+<section class="m-3 m-md-5 bg-light">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="section-title">Thông tin quan trọng</h2>
