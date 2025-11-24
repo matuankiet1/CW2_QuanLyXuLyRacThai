@@ -34,6 +34,8 @@
     </div>
 </section>
 
+
+
 <!-- Stats Section -->
 <section class="py-5">
     <div class="container">
@@ -262,7 +264,7 @@
         <div class="row g-4">
             @foreach($banners as $banner)
             <div class="col-lg-4 col-md-6">
-                <div class="banner-slide" style="background-image: url('{{ asset($banner->image) }}')">
+                <div class="banner-slide" style="background-image: url('{{ asset('storage/' . $banner->image) }}')">
                     <div class="banner-overlay">
                         <div>
                             <h5 class="mb-3">{{ $banner->title }}</h5>
@@ -283,6 +285,8 @@
     </div>
 </section>
 @endif
+
+
 
 <!-- CTA Section -->
 <section class="py-5 bg-primary text-white">
