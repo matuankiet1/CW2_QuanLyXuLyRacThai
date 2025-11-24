@@ -167,7 +167,7 @@ class AuthController extends Controller
 
                     return redirect()->route('login')->with('status', [
                         'type' => 'error',
-                        'message' => 'Email này đã đăng ký bằng ' . strtoupper($$usedProvider) .
+                        'message' => 'Email này đã đăng ký bằng ' . $usedProvider .
                             '. Vui lòng đăng nhập bằng cách đó.'
                     ]);
                 }
@@ -406,7 +406,15 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Vui lòng đăng nhập để tiếp tục.'
+            ]);
+        }
+        
         $request->validate([
             'current_password' => ['required'],
             'new_password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
@@ -437,9 +445,9 @@ class AuthController extends Controller
 
     public function getProfile()
     {
-        if (auth()->check()) {
-            $user = auth()->user();
-            $role = auth()->user()->role;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $role = Auth::user()->role;
             if ($role == 'admin') {
                 return view('admin.profiles.index', compact('user'));
             } else {
@@ -450,7 +458,7 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
@@ -477,7 +485,7 @@ class AuthController extends Controller
 
     public function updateAvatar(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $request->validate([
             'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // Tối đa 2MB
         ]);
@@ -503,7 +511,7 @@ class AuthController extends Controller
 
     public function deleteAvatar(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user && $user->avatar && Storage::disk('public')->exists($user->avatar)) {
             Storage::disk('public')->delete($user->avatar);

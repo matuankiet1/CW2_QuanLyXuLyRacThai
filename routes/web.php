@@ -1,6 +1,8 @@
 <?php
+use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
@@ -17,8 +19,11 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
 use App\Http\Controllers\ChatbotController;
+use App\Models\Banner;
+
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -32,6 +37,22 @@ Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+
+//------------------------------------ STAFF HOME -------------------------------------//
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
+    Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
+    Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
+    Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
+    Route::get('/events', [StaffHomeController::class, 'eventHome'])->name('events.index');
+    Route::get('/events/{event}', [StaffHomeController::class, 'eventShow'])->name('events.show');
+    Route::get('/posts', [StaffHomeController::class, 'postHome'])->name('posts.home');
+    Route::get('/posts/{post}', [StaffHomeController::class, 'postShow'])->name('posts.show');
+    Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedule'])->name('collection_schedules.index');
+    Route::get('/waste-logs', [StaffHomeController::class, 'wasteLog'])->name('waste-logs.index');
+    Route::get('/statistics', [StaffHomeController::class, 'statistic'])->name('statistics.index');
+    Route::get('/reports', [StaffHomeController::class, 'createReport'])->name('reports.create');
+    //Route::get('/reports/waste', [StaffReportController::class, 'waste'])->name('reports.waste');
+});
 
 //------------------------------------ ADMIN HOME -------------------------------------//
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -98,6 +119,7 @@ Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class
 Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
     ->name('waste-logs.get-by-collection-schedules');
 Route::resource('waste-logs', WasteLogController::class);
+Route::get('/waste-logs', [WasteLogController::class, 'index'])->name('user.waste-logs.index');
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
@@ -132,8 +154,12 @@ Route::middleware('admin')->group(function () {
         // 🟢 Banners
         Route::resource('banners', BannerController::class);
 
+
+        //Route::get('banners/{banner}/confirm-delete', 
+
         Route::get(
             'banners/{banner}/confirm-delete',
+
             [BannerController::class, 'confirmDelete']
         )->name('banners.confirm-delete');
 
@@ -149,6 +175,9 @@ Route::middleware('admin')->group(function () {
         Route::put('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'update'])->name('permissions.update');
         Route::delete('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'destroy'])->name('permissions.destroy');
         Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
+
+        Route::get('collection_reports', [WasteLogController::class, 'wasteReport'])->name('collection_reports.index');
+
     });
 
     // Notifications (Admin)
@@ -187,6 +216,8 @@ Route::middleware('auth')->group(function () {
 
     // User Statistics
     Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
+
+    Route::get('/collection_schedules', [HomeController::class, 'collection_schedules'])->name('user.collection_schedules.index');
 });
 
 //--------------------------------------- MANAGER ROUTES (Quản lý + Admin) -------------------------------------//
@@ -275,6 +306,24 @@ Route::middleware('student')->group(function () {
     Route::get('/student/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
 });
 
+
+
+// USER FEEDBACK ROUTES
+Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/feedback', [FeedbackController::class, 'userIndex'])->name('feedback.index'); // Danh sách feedback của user
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'userShow'])->name('feedback.show'); // Chi tiết feedback
+});
+
+// ADMIN FEEDBACK ROUTES
+Route::middleware('admin')->prefix('admin/feedback')->name('admin.feedback.')->group(function () {
+    Route::get('/', [FeedbackController::class, 'index'])->name('index');
+    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
+    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply');
+});
+
+
 // --------------------------------------- USER PROFILE -------------------------------------//
 Route::get('profile', [AuthController::class, 'getProfile'])->name('profile.show');
 Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('profile.update');
@@ -285,3 +334,16 @@ Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('p
 Route::middleware('auth')->group(function () {
     Route::post('recycle-suggestion', [ChatbotController::class, 'suggestWasteRecycle'])->name('chatbot.recycle-suggestion');
 });
+
+// Route phục vụ ảnh banner - FIXED
+Route::get('/banner-img/{filename}', function ($filename) {
+    $path = storage_path('app/public/banners/' . $filename);
+    
+    if (!file_exists($path)) {
+        // Log lỗi để debug
+        \Log::error("Banner image not found: " . $path);
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->name('banner.image');

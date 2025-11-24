@@ -1,183 +1,135 @@
-@extends('layouts.user')
+@extends('layouts.staff')
+
+@section('title', 'Lịch thu gom')
 
 @section('content')
-    <style>
-        .ai-hint .ai-tooltip {
-            position: absolute;
-            top: 100%;
-            left: 100%;
-            margin-left: 6px;
-            min-width: 14rem;
-
-            padding: 6px 10px;
-            border-radius: 0.375rem;
-            border: 1px solid #dee2e6;
-            background: #fff;
-            font-size: 0.75rem;
-            color: #374151;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
-
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease-out, transform .15s ease-out;
-            z-index: 1050;
-        }
-
-        .ai-hint:hover .ai-tooltip {
-            opacity: 1;
-            transition: all .15s ease-out;
-        }
-    </style>
-
-    <div class="container max-w-7xl mx-auto pt-5">
-        @if ($collectionSchedules->isEmpty() && $isSearching == false)
+    <div class="p-6 space-y-6 max-w-7xl mx-auto">
+        {{-- Thông báo khi không có dữ liệu --}}
+        @if ($collectionSchedules->isEmpty() && !$isSearching)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
-                <p>Không có lịch thu gom nào cần báo cáo.</p>
+                <p>Không có lịch thu gom nào.</p>
             </div>
         @else
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                        {{-- Thanh tìm kiếm --}}
-                        <form action="{{ route('user.waste-logs.index') }}" method="GET" class="flex-1 relative">
-                            <input type="hidden" name="status" value="{{ request('status') }}">
-                            <input type="hidden" name="sort" value="{{ request('sort') }}">
-                            <div class="relative w-full flex items-center">
-                                <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
-                                </svg>
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm..."
-                                    class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300
-                                focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
-                            </div>
-                        </form>
-
-                        <form method="GET" action="{{ route('user.waste-logs.index') }}" class="flex items-center ml-3">
-                            <input type="hidden" name="search" value="{{ request('search') }}">
-
-                            {{-- Dropdown Lọc trạng thái --}}
-                            <select name="status" onchange="this.form.submit()"
-                                class="px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
-                                <option value="Chưa thực hiện" {{ request('status') == 'Chưa thực hiện' ? 'selected' : '' }}>Chưa
-                                    thực hiện</option>
-                                <option value="Đã hoàn thành" {{ request('status') == 'Đã hoàn thành' ? 'selected' : '' }}>Đã hoàn
-                                    thành</option>
-                            </select>
-
-                            {{-- Dropdown Sắp xếp --}}
-                            <select name="sort" onchange="this.form.submit()"
-                                class="px-3 py-2 border border-gray-300 rounded-lg ml-1">
-                                <option value="id_asc" {{ request('sort') == 'id_asc' ? 'selected' : '' }}>ID tăng dần</option>
-                                <option value="id_desc" {{ request('sort') == 'id_desc' ? 'selected' : '' }}>ID giảm dần</option>
-                                <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>Ngày thu gom tăng
-                                    dần</option>
-                                <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Ngày thu gom giảm
-                                    dần</option>
-                            </select>
-                        </form>
+            {{-- Thanh tìm kiếm & lọc --}}
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <form action="{{ route('staff.waste-logs.index') }}" method="GET" class="flex-1 relative">
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                    <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    <div class="relative w-full flex items-center">
+                        <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
+                        </svg>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm..."
+                            class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none transition" />
                     </div>
-                </div>
+                </form>
 
-                <div class="overflow-x-auto" id="tableContainer">
-                    <table class="min-w-full border-t border-gray-100">
-                        <thead class="bg-green-50 text-gray-600 text-sm font-semibold">
-                            <tr>
-                                <th class="py-3 px-4 text-left">Mã lịch thu gom</th>
-                                <th class="py-3 px-4 text-left">Nhân viên thực hiện</th>
-                                <th class="py-3 px-4 text-left">Ngày thu gom</th>
-                                <th class="py-3 px-4 text-left">Ngày hoàn thành</th>
-                                <th class="py-3 px-4 text-left">Trạng thái</th>
+                <form method="GET" action="{{ route('staff.collection_schedules.index') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <select name="status" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
+                        <option value="Chưa thực hiện" {{ request('status') == 'Chưa thực hiện' ? 'selected' : '' }}>Chưa thực
+                            hiện</option>
+                        <option value="Đã hoàn thành" {{ request('status') == 'Đã hoàn thành' ? 'selected' : '' }}>Đã hoàn thành
+                        </option>
+                    </select>
+
+                    <select name="sort" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="id_asc" {{ request('sort') == 'id_asc' ? 'selected' : '' }}>ID tăng dần</option>
+                        <option value="id_desc" {{ request('sort') == 'id_desc' ? 'selected' : '' }}>ID giảm dần</option>
+                        <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>Ngày thu gom tăng dần
+                        </option>
+                        <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Ngày thu gom giảm dần
+                        </option>
+                    </select>
+                </form>
+            </div>
+
+            {{-- Bảng lịch thu gom --}}
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full border-t border-gray-100">
+                    <thead class="bg-green-50 text-gray-600 text-sm font-semibold">
+                        <tr>
+                            <th class="py-3 px-4 text-left">ID</th>
+                            <th class="py-3 px-4 text-left">Nhân viên thực hiện</th>
+                            <th class="py-3 px-4 text-left">Ngày thu gom</th>
+                            <th class="py-3 px-4 text-left">Ngày hoàn thành</th>
+                            <th class="py-3 px-4 text-left">Trạng thái</th>
+                            <th class="py-3 px-4 text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-gray-100">
+                        @forelse ($collectionSchedules as $schedule)
+                            <tr class="hover:bg-green-50">
+                                <td class="py-3 px-4">{{ $schedule->schedule_id }}</td>
+                                <td class="py-3 px-4">{{ $schedule->staff->name ?? '-' }}</td>
+                                <td class="py-3 px-4">{{ $schedule->scheduled_date?->format('d/m/Y') ?? '-' }}</td>
+                                <td class="py-3 px-4">{{ $schedule->completed_at?->format('d/m/Y') ?? '-' }}</td>
+                                <td class="py-3 px-4">
+                                    @if ($schedule->status == 'Chưa thực hiện')
+                                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
+                                            {{ $schedule->status }}
+                                        </span>
+                                    @elseif ($schedule->status == 'Đã hoàn thành')
+                                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                            {{ $schedule->status }}
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                                            {{ $schedule->status }}
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="flex items-center justify-center">
+                                        <button data-id="{{ $schedule->schedule_id }}"
+                                            class="addWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
+                                            data-modal="add" aria-label="Thêm">
+                                            <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24" color="#254434"
+                                                fill="none" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
+                                            </svg>
+                                        </button>
+
+                                        {{-- <button data-id="{{ $collectionSchedule->schedule_id }}"
+                                            class="editWasteLogBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
+                                            data-modal="edit" aria-label="Chỉnh sửa">
+                                            <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24" color="#254434"
+                                                fill="none" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
+                                            </svg>
+                                        </button> --}}
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="text-sm divide-y divide-gray-100">
-                            @forelse ($collectionSchedules as $collectionSchedule)
-                                <tr class="hover:bg-green-50">
-                                    <td class="py-3 px-4">{{ $collectionSchedule->schedule_id }}</td>
-                                    <td class="py-3 px-4">{{ $collectionSchedule->staff->name }}</td>
-                                    <td class="py-3 px-4">
-                                        {{ $collectionSchedule->scheduled_date?->format('Y-m-d') ?? '-' }}
-                                    </td>
-                                    <td class="py-3 px-4">{{ $collectionSchedule->completed_at?->format('Y-m-d') ?? '-' }}
-                                    </td>
-                                    <td class="py-3 px-4">
-                                        @if ($collectionSchedule->status == 'Chưa thực hiện')
-                                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
-                                                {{ $collectionSchedule->status }}
-                                            </span>
-                                        @elseif($collectionSchedule->status == 'Đã hoàn thành')
-                                            <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                                                {{ $collectionSchedule->status }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 italic">
-                                        @if ($isSearching == true)
-                                            Không có kết quả tìm kiếm cho từ khóa
-                                            "<strong class="text-gray-700">{{ $search }}</strong>".
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-6 text-center text-gray-500 italic">
+                                    @if ($isSearching)
+                                        Không có kết quả tìm kiếm cho từ khóa "<strong>{{ request('search') }}</strong>".
+                                    @else
+                                        Không có lịch thu gom nào.
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
 
-                </div>
-
-                <!-- Phân trang -->
-                <div class="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
-                    <p class="mb-2 text-gray-600 text-sm">
-                        Hiển thị {{ $collectionSchedules->firstItem() ?? 0 }} - {{ $collectionSchedules->lastItem() ?? 0 }}
-                        trong tổng số {{ $collectionSchedules->total() }} sự kiện
-                    </p>
-                    {{-- Phân trang --}}
-                    @if ($collectionSchedules->hasPages())
-                        <div class="flex items-center gap-2 mt-3 md:mt-0">
-                            {{-- Trang trước --}}
-                            @if ($collectionSchedules->onFirstPage())
-                                <span class="p-2 border rounded-lg text-gray-400 cursor-not-allowed" aria-label="Trang trước">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
-                                    </svg>
-                                </span>
-                            @else
-                                <a href="{{ $collectionSchedules->previousPageUrl() }}" class="p-2 border rounded-lg hover:bg-green-50"
-                                    aria-label="Trang trước">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7" />
-                                    </svg>
-                                </a>
-                            @endif
-
-                            {{-- Số trang hiện tại --}}
-                            <span>Trang {{ $collectionSchedules->currentPage() }} / {{ $collectionSchedules->lastPage() }}</span>
-
-                            {{-- Trang sau --}}
-                            @if ($collectionSchedules->hasMorePages())
-                                <a href="{{ $collectionSchedules->nextPageUrl() }}" class="p-2 border rounded-lg hover:bg-green-50"
-                                    aria-label="Trang sau">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
-                                    </svg>
-                                </a>
-                            @else
-                                <span class="p-2 border rounded-lg text-gray-400 cursor-not-allowed" aria-label="Trang sau">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
-                                    </svg>
-                                </span>
-                            @endif
-                        </div>
-                    @endif
-                </div>
+                {{-- Phân trang --}}
+                @if ($collectionSchedules->hasPages())
+                    <div class="p-4">
+                        {{ $collectionSchedules->withQueryString()->links() }}
+                    </div>
+                @endif
+            </div>
         @endif
-
-            <div id="modal"
+    </div>
+    <div id="modal"
                 class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0 overflow-y-auto p-4">
                 <div id="modalBox"
                     class="bg-white backdrop-blur-md border border-green-100 shadow-xl rounded-xl py-6 max-w-3xl w-full
@@ -745,5 +697,6 @@
                 document.body.classList.remove('overflow-hidden');
             }
         </script>
+
 
 @endsection
