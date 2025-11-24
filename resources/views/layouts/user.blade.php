@@ -325,6 +325,10 @@
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-flag mr-2"></i>Báo cáo
                                         </a>
+                                        <a href="{{ route('user.feedback.index') }}" 
+                                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                <i class="fas fa-comment-dots mr-2"></i>Gửi phản hồi
+                            </a>
                                         <a href="{{ route('user.statistics.index') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-chart-line mr-2"></i>Thống kê
@@ -479,6 +483,7 @@
                             <a href="{{ route('user.reports.create') }}" class="nav-link-item">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>
+                            
                             <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
                                 <i class="fas fa-chart-line mr-2"></i>Thống kê
                             </a>
