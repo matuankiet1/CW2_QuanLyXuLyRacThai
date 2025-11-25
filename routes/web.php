@@ -49,6 +49,7 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(fun
     Route::get('/posts/{post}', [StaffHomeController::class, 'postShow'])->name('posts.show');
     Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedule'])->name('collection_schedules.index');
     Route::get('/waste-logs', [StaffHomeController::class, 'wasteLog'])->name('waste-logs.index');
+    Route::get('/waste-logs/history', [StaffHomeController::class, 'history'])->name('waste-logs.history');
     Route::get('/statistics', [StaffHomeController::class, 'statistic'])->name('statistics.index');
     Route::get('/reports', [StaffHomeController::class, 'createReport'])->name('reports.create');
     //Route::get('/reports/waste', [StaffReportController::class, 'waste'])->name('reports.waste');

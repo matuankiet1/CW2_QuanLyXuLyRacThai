@@ -294,8 +294,13 @@ class StaffHomeController extends Controller
         if ($search) {
             $collectionSchedules = $collectionSchedules->where(function ($query) use ($search) {
                 $query->where('schedule_id', 'like', "%$search%")
-                    ->orWhereHas('staff', fn($q) => $q->where('name', 'like', "%$search%"));
+                    ->orWhereHas('staff', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%");
+                    });
             });
+            $isSearching = true;
+        } else {
+            $isSearching = false;
         }
 
         // Sắp xếp
@@ -324,7 +329,8 @@ class StaffHomeController extends Controller
             'collectionSchedules',
             'search',
             'sort',
-            'statusFilter'
+            'statusFilter',
+            'isSearching'
         ));
     }
 
@@ -404,5 +410,9 @@ class StaffHomeController extends Controller
     public function createReport()
     {
         return view('staff.reports.create');
+    }
+
+    public function history(){
+        return view('staff.waste-logs.history');
     }
 }
