@@ -111,7 +111,10 @@ class CollectionScheduleController extends Controller
             ));
         }
 
-        return back()->with('success', 'Thêm lịch thu gom thành công!');
+        return back()->with('status', [
+            'type' => 'success',
+            'message' => 'Thêm lịch thu gom thành công!'
+        ]);
     }
 
     /**
@@ -217,6 +220,14 @@ class CollectionScheduleController extends Controller
             'type' => 'success',
             'message' => 'Xóa ' . count($ids) . ' lịch thu gom đã chọn thành công!'
         ]);
+    }
+
+    public function getWasteLogs($id)
+    {
+        $wasteLogs = WasteLog::where('schedule_id', $id)
+            ->with('wasteType') //
+            ->get();
+        return response()->json($wasteLogs);
     }
 
     public function search(Request $request)

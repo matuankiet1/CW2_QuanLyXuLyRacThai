@@ -2,6 +2,8 @@
 use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
@@ -20,7 +22,12 @@ use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
+use App\Http\Controllers\ChatbotController;
+use App\Models\Banner;
 
+
+// Route tạm thời để sửa CHECK constraint SQLite - PHẢI ĐẶT Ở ĐẦU FILE
+Route::get('/fix-db-role', [AuthController::class, 'fixSqliteRoleConstraint']);
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -34,18 +41,21 @@ Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+Route::get('/guide', [HomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
 
 //------------------------------------ STAFF HOME -------------------------------------//
 Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
     Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
     Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
     Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/sortingGuide', [StaffHomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
     Route::get('/events', [StaffHomeController::class, 'eventHome'])->name('events.index');
     Route::get('/events/{event}', [StaffHomeController::class, 'eventShow'])->name('events.show');
     Route::get('/posts', [StaffHomeController::class, 'postHome'])->name('posts.home');
     Route::get('/posts/{post}', [StaffHomeController::class, 'postShow'])->name('posts.show');
     Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedule'])->name('collection_schedules.index');
     Route::get('/waste-logs', [StaffHomeController::class, 'wasteLog'])->name('waste-logs.index');
+    Route::get('/waste-logs/history', [StaffHomeController::class, 'history'])->name('waste-logs.history');
     Route::get('/statistics', [StaffHomeController::class, 'statistic'])->name('statistics.index');
     Route::get('/reports', [StaffHomeController::class, 'createReport'])->name('reports.create');
     //Route::get('/reports/waste', [StaffReportController::class, 'waste'])->name('reports.waste');
@@ -233,6 +243,9 @@ Route::middleware('manager')->group(function () {
     Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
         ->name('admin.collection-schedules.update-status');
 
+    Route::get('/collection-schedules/get-waste-logs/{id}', [CollectionScheduleController::class, 'getWasteLogs'])
+        ->name('admin.collection-schedules.get-waste-logs');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -324,3 +337,20 @@ Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('p
 Route::post('update-avatar', [AuthController::class, 'updateAvatar'])->name('profile.update-avatar');
 Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('profile.delete-avatar');
 
+// Chatbot AI
+Route::middleware('auth')->group(function () {
+    Route::post('recycle-suggestion', [ChatbotController::class, 'suggestWasteRecycle'])->name('chatbot.recycle-suggestion');
+});
+
+// Route phục vụ ảnh banner - FIXED
+Route::get('/banner-img/{filename}', function ($filename) {
+    $path = storage_path('app/public/banners/' . $filename);
+    
+    if (!file_exists($path)) {
+        // Log lỗi để debug
+        Log::error("Banner image not found: " . $path);
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->name('banner.image');
