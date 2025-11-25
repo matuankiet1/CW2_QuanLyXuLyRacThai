@@ -403,8 +403,32 @@ class StaffHomeController extends Controller
         return view('staff.reports.create');
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        return view('staff.waste-logs.history');
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+
+        $query = WasteLog::with(['schedule']);
+
+        // 🔍 Nếu có lọc theo trạng thái
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('schedule', function ($s) use ($search) {
+                    $s->where('route_name', 'like', "%$search%")
+                        ->orWhere('id', 'like', "%$search%");
+                })
+                    ->orWhere('note', 'like', "%$search%");
+            });
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('staff.waste-logs.history', compact('logs', 'search', 'status'));
     }
+
 }
