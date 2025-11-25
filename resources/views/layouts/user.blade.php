@@ -258,7 +258,12 @@
 
         .nav-link-item:hover {
             color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-link-item-active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -292,23 +297,23 @@
                 <!-- Navigation Links - Center -->
                 <div class="hidden lg:flex items-center justify-center flex-1 min-w-0 px-1">
                     <nav class="flex items-center gap-0.5 justify-center w-full">
-                        <a href="{{ route('home') }}" class="nav-link-item" title="Trang chủ">
+                        <a href="{{ route('home') }}" class="nav-link-item  {{ Request::is('/') ? 'nav-link-item-active' : '' }}" title="Trang chủ">
                             <i class="fas fa-home mr-1"></i><span>Trang chủ</span>
                         </a>
-                        <a href="{{ route('user.posts.home') }}" class="nav-link-item" title="Bài viết">
+                        <a href="{{ route('user.posts.home') }}" class="nav-link-item {{ Request::is('posts*') ? 'nav-link-item-active' : '' }}" title="Bài viết">
                             <i class="fas fa-newspaper mr-1"></i><span>Bài viết</span>
                         </a>
-                        <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
+                        <a href="{{ route('user.events.index') }}" class="nav-link-item {{ Request::is('events*') ? 'nav-link-item-active' : '' }}" title="Sự kiện">
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
-                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item"
+                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item {{ Request::is('collection_schedules*') ? 'nav-link-item-active' : '' }}"
                             title="Báo cáo rác thải">
                             <i class="fas fa-trash-alt me-1"></i>Thu gom rác
                         </a>
-                        <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
+                        <a href="{{ route('home.about') }}" class="nav-link-item {{ Request::is('about') ? 'nav-link-item-active' : '' }}" title="Giới thiệu">
                             <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
                         </a>
-                        <a href="{{ route('home.contact') }}" class="nav-link-item" title="Liên hệ">
+                        <a href="{{ route('home.contact') }}" class="nav-link-item {{ Request::is('contact') ? 'nav-link-item-active' : '' }}" title="Liên hệ">
                             <i class="fas fa-envelope mr-1"></i><span>Liên hệ</span>
                         </a>
                         @auth
@@ -398,7 +403,7 @@
                     @auth
                         <div class="relative">
                             <button id="userMenuToggle"
-                                class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
+                                class="flex items-center text-white rounded-lg px-2 py-1.5 transition whitespace-nowrap nav-link-item">
                                 <div
                                     class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 shrink-0">
                                     <span
@@ -457,33 +462,33 @@
             <!-- Mobile Menu -->
             <div id="mobileMenu" class="lg:hidden hidden border-t border-white/20 pb-4">
                 <div class="flex flex-col gap-2 mt-4">
-                    <a href="{{ route('home') }}" class="nav-link-item">
+                    <a href="{{ route('home') }}" class="nav-link-item {{ Request::is('/') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-home mr-2"></i>Trang chủ
                     </a>
-                    <a href="{{ route('user.posts.home') }}" class="nav-link-item">
+                    <a href="{{ route('user.posts.home') }}" class="nav-link-item {{ Request::is('posts*') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-newspaper mr-2"></i>Bài viết
                     </a>
-                    <a href="{{ route('user.events.index') }}" class="nav-link-item">
+                    <a href="{{ route('user.events.index') }}" class="nav-link-item {{ Request::is('events*') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
                     </a>
-                    <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                    <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item {{ Request::is('waste-logs*') ? 'nav-link-item-active' : '' }}" title="Báo cáo rác thải">
                         <i class="fa-solid fa-recycle mr-2"></i>Báo cáo thu gom rác
                     </a>
-                    <a href="{{ route('home.about') }}" class="nav-link-item">
+                    <a href="{{ route('home.about') }}" class="nav-link-item {{ Request::is('about') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-info-circle mr-2"></i>Giới thiệu
                     </a>
-                    <a href="{{ route('home.contact') }}" class="nav-link-item">
+                    <a href="{{ route('home.contact') }}" class="nav-link-item {{ Request::is('contact') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-envelope mr-2"></i>Liên hệ
                     </a>
                     @auth
                         <!-- Cá nhân Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
-                            <a href="{{ route('user.reports.create') }}" class="nav-link-item">
+                            <a href="{{ route('user.reports.create') }}" class="nav-link-item {{ Request::is('reports*') ? 'nav-link-item-active' : '' }}">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>
 
-                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
+                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item {{ Request::is('statistics') ? 'nav-link-item-active' : '' }}">
                                 <i class="fas fa-chart-line mr-2"></i>Thống kê
                             </a>
                         </div>
@@ -578,7 +583,7 @@
                             TP.HCM
                         </li>
                         <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>hethongquanlyxulyracthai@gmail.com</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@ecowaste.com</li>
                     </ul>
                     <div class="d-flex gap-3">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>

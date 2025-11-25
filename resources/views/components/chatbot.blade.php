@@ -35,7 +35,7 @@
         <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
             🤖
         </span>
-        <span class="text-sm font-medium hidden sm:inline">
+        <span class="text-sm font-medium">
             Chatbot AI
         </span>
     </button>
@@ -128,37 +128,38 @@
         </main>
 
         {{-- Input --}}
-        
+
         <footer class="border-t border-slate-800 px-3 py-2 bg-slate-900/95">
             @if (!auth()->check())
                 <p class="text-sm text-white mb-2">
-                    Vui lòng <a href="{{ route('login') }}" class="underline text-indigo-400 hover:text-indigo-600">đăng nhập</a> để sử
+                    Vui lòng <a href="{{ route('login') }}" class="underline text-indigo-400 hover:text-indigo-600">đăng
+                        nhập</a> để sử
                     dụng
                     chatbot.
                 </p>
             @else
-            <p class="text-xs text-slate-500 mb-2">
-                Mẹo: Hãy hỏi cụ thể để câu trả lời chính xác hơn.
-            </p>
+                <p class="text-xs text-slate-500 mb-2">
+                    Mẹo: Hãy hỏi cụ thể để câu trả lời chính xác hơn.
+                </p>
 
-            <form method="POST" action="#" id="chatbotForm" class="flex items-end gap-2">
-                @csrf
-                <textarea id="chatbotInput" name="message" rows="1" placeholder="Nhập câu hỏi của bạn..."
-                    class="no-scrollbar w-full resize-none rounded-2xl bg-slate-900 border border-slate-700 px-3 py-2 pr-10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-400"></textarea>
+                <form method="POST" action="#" id="chatbotForm" class="flex items-end gap-2">
+                    @csrf
+                    <textarea id="chatbotInput" name="message" rows="1" placeholder="Nhập câu hỏi của bạn..."
+                        class="no-scrollbar w-full resize-none rounded-2xl bg-slate-900 border border-slate-700 px-3 py-2 pr-10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-400"></textarea>
 
-                <button type="submit"
-                    class="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 via-sky-500 to-emerald-400 text-white shadow-md shadow-indigo-500/40 hover:brightness-110 active:scale-95 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 -translate-x-[1px]" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="1.7">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M5 12h6m0 0l-3 3m3-3l-3-3m4-5.5l7.362 7.362a1.5 1.5 0 010 2.121L12 21.5" />
-                    </svg>
-                </button>
-            </form>
+                    <button type="submit"
+                        class="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 via-sky-500 to-emerald-400 text-white shadow-md shadow-indigo-500/40 hover:brightness-110 active:scale-95 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 -translate-x-[1px]"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M5 12h6m0 0l-3 3m3-3l-3-3m4-5.5l7.362 7.362a1.5 1.5 0 010 2.121L12 21.5" />
+                        </svg>
+                    </button>
+                </form>
 
-            <p class="mt-2 text-xs text-slate-500 text-left">
-                AI có thể sai. Hãy kiểm tra thông tin quan trọng.
-            </p>
+                <p class="mt-2 text-xs text-slate-500 text-left">
+                    AI có thể sai. Hãy kiểm tra thông tin quan trọng.
+                </p>
             @endif
         </footer>
     </div>
@@ -215,6 +216,9 @@
 
         if (!chatArea || !chatbotForm || !chatbotInput) return;
 
+        let chatHistory = [];
+        const CHAT_KEY   = 'ecowaste_chat_history';
+
         chatbotForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -230,6 +234,9 @@
             appendUserMessage(query);
             chatbotInput.value = '';
             chatbotInput.focus();
+
+            // Lưu tin nhắn user vào localStorage
+            saveMessage('user', query);
 
             // Hiển thị loading
             const loadingNode = appendBotLoading();
@@ -259,6 +266,8 @@
 
                 // Hiển thị tin nhắn bot từ dữ liệu AI
                 appendBotMessageFromAI(data.data);
+                // Lưu tin nhắn bot vào localStorage
+                saveMessage('bot', JSON.stringify(data.data));
             } catch (err) {
                 console.error(err);
                 // Xóa bubble loading nếu còn
@@ -437,6 +446,40 @@
 
             chatArea.appendChild(wrapper);
             scrollToBottom();
+        }
+
+        function saveMessage(role, text) {
+            try {
+                chatHistory.push({
+                    role: role,
+                    content: text,
+                    time: new Date().toISOString(),
+                });
+
+                localStorage.setItem(CHAT_KEY, JSON.stringify(chatHistory));
+            } catch (e) {
+                console.error('Save chat history error', e);
+            }
+        }
+
+        function loadHistory() {
+            try {
+                const raw = localStorage.getItem(CHAT_KEY);
+                if (!raw) return;
+
+                chatHistory = JSON.parse(raw) || [];
+
+                chatHistory.forEach(msg => {
+                    if (msg.role === 'user') {
+                        appendUserMessage(msg.content, msg.time);
+                    } else if (msg.role === 'bot') {
+                        appendBotMessageFromAI(msg.data, msg.time);
+                    }
+                });
+            } catch (e) {
+                console.error('Load chat history error', e);
+                chatHistory = [];
+            }
         }
     });
 </script>
