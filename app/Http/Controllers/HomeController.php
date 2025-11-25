@@ -69,15 +69,6 @@ class HomeController extends Controller
             'footerBanners'
         ));
 
-
-        // Thống kê nhanh
-        $stats = [
-            'total_posts' => Post::where('status', 'published')->count(),
-            'total_schedules' => CollectionSchedule::count(),
-            'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
-        ];
-
-        return view('home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
     }
 
      public function collection_schedules(Request $request)
@@ -154,5 +145,9 @@ class HomeController extends Controller
     public function contact()
     {
         return view('home.contact');
+    }
+
+     public function wasteSortingGuide(){
+        return view('home.sorting_guide');
     }
 }
