@@ -43,6 +43,7 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(fun
     Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
     Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
     Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/sortingGuide', [StaffHomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
     Route::get('/events', [StaffHomeController::class, 'eventHome'])->name('events.index');
     Route::get('/events/{event}', [StaffHomeController::class, 'eventShow'])->name('events.show');
     Route::get('/posts', [StaffHomeController::class, 'postHome'])->name('posts.home');

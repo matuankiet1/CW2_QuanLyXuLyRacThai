@@ -431,4 +431,8 @@ class StaffHomeController extends Controller
         return view('staff.waste-logs.history', compact('logs', 'search', 'status'));
     }
 
+    public function wasteSortingGuide(){
+        return view('staff.home.sorting_guide');
+    }
+
 }
