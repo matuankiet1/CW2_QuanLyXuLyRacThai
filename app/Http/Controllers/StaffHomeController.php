@@ -35,38 +35,40 @@ class StaffHomeController extends Controller
         $stats = [
             'total_posts' => Post::count(),
             'total_schedules' => CollectionSchedule::count(),
-            'upcoming_schedules' => CollectionSchedule::where('date', '>=', now())->count(),
+            'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
         ];
 
         $latestPosts = Post::latest()->take(3)->get();
-        $upcomingSchedules = CollectionSchedule::where('date', '>=', now())
-            ->orderBy('date')
+        $upcomingSchedules = CollectionSchedule::where('scheduled_date', '>=', now())
+            ->orderBy('scheduled_date')
             ->take(3)
             ->get();
 
-        // Phân loại banner theo vị trí
-        $topBanners = Banner::where('position', 'top')
-            ->where('status', 1)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // // Phân loại banner theo vị trí
+        // $banners = Banner::where('status', 1)->orderBy('created_at', 'desc')->get();
 
-        $sidebarBanners = Banner::where('position', 'sidebar')
-            ->where('status', 1)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // $topBanners = Banner::where('position', 'top')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
 
-        $footerBanners = Banner::where('position', 'footer')
-            ->where('status', 1)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // $sidebarBanners = Banner::where('position', 'sidebar')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
 
-        return view('staff.home', compact(
+        // $footerBanners = Banner::where('position', 'footer')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        return view('staff.home.index', compact(
             'stats',
             'latestPosts',
             'upcomingSchedules',
-            'topBanners',
-            'sidebarBanners',
-            'footerBanners'
+            // 'topBanners',
+            // 'sidebarBanners',
+            // 'footerBanners'
         ));
     }
 
