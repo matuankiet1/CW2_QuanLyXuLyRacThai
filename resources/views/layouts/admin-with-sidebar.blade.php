@@ -399,6 +399,18 @@
         });
     </script>
 
+    <script>
+        // Xóa #_=_ do Facebook tự động thêm vào URL
+        if (window.location.hash === '#_=_') {
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState('', document.title, window.location.pathname);
+            } else {
+                // Fallback cho trình duyệt cũ
+                window.location.hash = '';
+            }
+        }
+    </script>
+
     @stack('scripts')
 </body>
 

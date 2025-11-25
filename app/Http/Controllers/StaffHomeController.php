@@ -32,9 +32,42 @@ class StaffHomeController extends Controller
             ->get();
 
         // Lấy banner mới nhất
-        $banners = Banner::orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
+        $stats = [
+        'total_posts' => Post::count(),
+        'total_schedules' => Schedule::count(),
+        'upcoming_schedules' => Schedule::where('date', '>=', now())->count(),
+    ];
+
+    $latestPosts = Post::latest()->take(3)->get();
+    $upcomingSchedules = Schedule::where('date', '>=', now())
+                                ->orderBy('date')
+                                ->take(3)
+                                ->get();
+
+    // Phân loại banner theo vị trí
+    $topBanners = Banner::where('position', 'top')
+                        ->where('status', 1)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+
+    $sidebarBanners = Banner::where('position', 'sidebar')
+                           ->where('status', 1)
+                           ->orderBy('created_at', 'desc')
+                           ->get();
+
+    $footerBanners = Banner::where('position', 'footer')
+                          ->where('status', 1)
+                          ->orderBy('created_at', 'desc')
+                          ->get();
+
+    return view('staff.home', compact(
+        'stats', 
+        'latestPosts', 
+        'upcomingSchedules',
+        'topBanners',
+        'sidebarBanners', 
+        'footerBanners'
+    ));
 
         // Thống kê nhanh
         $stats = [

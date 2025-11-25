@@ -278,12 +278,12 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar fixed top-0 left-0 right-0 z-50">
-        <div class="w-full mx-auto px-3">
+        <div class="w-full mx-auto px-5">
             <div class="flex items-center justify-between h-16 gap-2">
                 <!-- Logo - Left Side -->
                 <div class="shrink-0">
                     <a href="{{ route('home') }}"
-                        class="flex items-center text-white font-bold text-base hover:text-white/90 transition whitespace-nowrap">
+                        class="flex items-center text-white text-2xl font-bold hover:text-white/90 transition whitespace-nowrap">
                         <i class="fas fa-recycle mr-1.5"></i>
                         <span class="hidden sm:inline">EcoWaste</span>
                     </a>
@@ -301,7 +301,8 @@
                         <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
-                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item"
+                            title="Báo cáo rác thải">
                             <i class="fas fa-trash-alt me-1"></i>Thu gom rác
                         </a>
                         <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
@@ -313,8 +314,7 @@
                         @auth
                             <!-- Cá nhân Dropdown -->
                             <div class="relative">
-                                <button id="personalMenuToggle"
-                                    class="nav-link-item flex items-center">
+                                <button id="personalMenuToggle" class="nav-link-item flex items-center">
                                     <i class="fas fa-user mr-1"></i><span>Cá nhân</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
@@ -324,6 +324,10 @@
                                         <a href="{{ route('user.reports.create') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-flag mr-2"></i>Báo cáo
+                                        </a>
+                                        <a href="{{ route('user.feedback.index') }}"
+                                            class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                            <i class="fas fa-comment-dots mr-2"></i>Gửi phản hồi
                                         </a>
                                         <a href="{{ route('user.statistics.index') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
@@ -335,8 +339,7 @@
 
                             <!-- Thông báo Dropdown -->
                             <div class="relative">
-                                <button id="notificationMenuToggle"
-                                    class="nav-link-item relative flex items-center">
+                                <button id="notificationMenuToggle" class="nav-link-item relative flex items-center">
                                     <i class="fas fa-bell mr-1"></i><span>Thông báo</span>
                                     @php
                                         $unreadCount = App\Models\NotificationUser::where(
@@ -424,10 +427,10 @@
 
                                     <hr class="my-1 border-gray-400">
 
-                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm">
+                                    <form action="{{ route('logout') }}" method="POST" id="logoutForm" class="mx-1">
                                         @csrf
                                         <button type="submit"
-                                            class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg mx-1">
+                                            class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-lg">
                                             <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
                                         </button>
                                     </form>
@@ -479,18 +482,22 @@
                             <a href="{{ route('user.reports.create') }}" class="nav-link-item">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>
+
                             <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
                                 <i class="fas fa-chart-line mr-2"></i>Thống kê
                             </a>
                         </div>
-                        
+
                         <!-- Thông báo Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">THÔNG BÁO</p>
                             <a href="{{ route('user.notifications.index') }}" class="nav-link-item relative">
                                 <i class="fas fa-bell mr-2"></i>Thông báo
                                 @php
-                                    $unreadCount = App\Models\NotificationUser::where('user_id', auth()->user()->user_id)
+                                    $unreadCount = App\Models\NotificationUser::where(
+                                        'user_id',
+                                        auth()->user()->user_id,
+                                    )
                                         ->whereNull('read_at')
                                         ->count();
                                 @endphp
@@ -529,8 +536,8 @@
         @yield('content')
     </main>
 
-    {{-- <x-chatbot /> --}}
-
+    {{-- Chatbot AI --}}
+    <x-chatbot />
 
     <!-- Footer -->
     <footer class="footer">
@@ -538,14 +545,13 @@
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <h5><i class="fas fa-recycle me-2"></i>EcoWaste</h5>
-                    <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, góp phần bảo vệ môi trường và xây
-                        dựng tương lai bền vững.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+                    <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, hỗ trợ theo dõi, thu gom và phân loại
+                        rác thải một cách hiệu quả. Ứng dụng công nghệ để giảm thiểu ô nhiễm, tối ưu quy trình vận hành
+                        và xây dựng một môi trường sống xanh – sạch – bền vững.</p>
+                    {{-- <p>EcoWaste là nền tảng hỗ trợ quản lý, theo dõi và tối ưu hóa toàn bộ quy trình thu gom – phân loại
+                        – xử lý rác thải. Hệ thống giúp tiết kiệm thời gian, nâng cao hiệu suất công việc, cung cấp dữ
+                        liệu trực quan và góp phần bảo vệ môi trường thông qua các giải pháp công nghệ thông minh.</p> --}}
+
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5>Liên kết</h5>
@@ -568,11 +574,18 @@
                 <div class="col-lg-3 mb-4">
                     <h5>Liên hệ</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận XYZ, TP.HCM
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>53 Võ Văn Ngân, Phường Thủ Đức,
+                            TP.HCM
                         </li>
                         <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@ecowaste.com</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>hethongquanlyxulyracthai@gmail.com</li>
                     </ul>
+                    <div class="d-flex gap-3">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
                 </div>
             </div>
             <hr class="my-4">
@@ -656,7 +669,8 @@
 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
-                    if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e.target)) {
+                    if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e
+                            .target)) {
                         personalMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -688,7 +702,8 @@
 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
-                    if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e.target)) {
+                    if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e
+                            .target)) {
                         notificationMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -708,7 +723,7 @@
     </script>
 
     <script>
-        // Xóa #_=_ do Facebook thêm vào
+        // Xóa #_=_ do Facebook tự động thêm vào URL
         if (window.location.hash === '#_=_') {
             if (window.history && window.history.replaceState) {
                 window.history.replaceState('', document.title, window.location.pathname);
