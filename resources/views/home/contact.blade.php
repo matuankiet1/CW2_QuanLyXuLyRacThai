@@ -89,7 +89,7 @@
                                 <div>
                                     <h6 class="mb-1">Địa chỉ</h6>
                                     <p class="text-muted mb-0">
-                                        123 Đường ABC, Quận XYZ<br>
+                                        53 Võ Văn Ngân, Phường Thủ Đức<br>
                                         Thành phố Hồ Chí Minh, Việt Nam
                                     </p>
                                 </div>
