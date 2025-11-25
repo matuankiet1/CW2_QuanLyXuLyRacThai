@@ -336,9 +336,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="{{ route('home.sorting_guide') }}" class="nav-link-item">
-                                <i class="fas fa-recycle mr-1"></i>Phân loại rác
-                            </a>
 
                             <!-- Thông báo Dropdown -->
                             <div class="relative">
@@ -393,6 +390,9 @@
                                 </div>
                             </div>
                         @endauth
+                        <a href="{{ route('home.sorting_guide') }}" class="nav-link-item">
+                            <i class="fas fa-recycle mr-1"></i>Phân loại rác
+                        </a>
                     </nav>
                 </div>
 
