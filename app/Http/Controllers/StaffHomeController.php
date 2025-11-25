@@ -33,50 +33,41 @@ class StaffHomeController extends Controller
 
         // Lấy banner mới nhất
         $stats = [
-        'total_posts' => Post::count(),
-        'total_schedules' => Schedule::count(),
-        'upcoming_schedules' => Schedule::where('date', '>=', now())->count(),
-    ];
-
-    $latestPosts = Post::latest()->take(3)->get();
-    $upcomingSchedules = Schedule::where('date', '>=', now())
-                                ->orderBy('date')
-                                ->take(3)
-                                ->get();
-
-    // Phân loại banner theo vị trí
-    $topBanners = Banner::where('position', 'top')
-                        ->where('status', 1)
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-
-    $sidebarBanners = Banner::where('position', 'sidebar')
-                           ->where('status', 1)
-                           ->orderBy('created_at', 'desc')
-                           ->get();
-
-    $footerBanners = Banner::where('position', 'footer')
-                          ->where('status', 1)
-                          ->orderBy('created_at', 'desc')
-                          ->get();
-
-    return view('staff.home', compact(
-        'stats', 
-        'latestPosts', 
-        'upcomingSchedules',
-        'topBanners',
-        'sidebarBanners', 
-        'footerBanners'
-    ));
-
-        // Thống kê nhanh
-        $stats = [
-            'total_posts' => Post::where('status', 'published')->count(),
+            'total_posts' => Post::count(),
             'total_schedules' => CollectionSchedule::count(),
-            'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
+            'upcoming_schedules' => CollectionSchedule::where('date', '>=', now())->count(),
         ];
 
-        return view('staff.home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
+        $latestPosts = Post::latest()->take(3)->get();
+        $upcomingSchedules = CollectionSchedule::where('date', '>=', now())
+            ->orderBy('date')
+            ->take(3)
+            ->get();
+
+        // Phân loại banner theo vị trí
+        $topBanners = Banner::where('position', 'top')
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $sidebarBanners = Banner::where('position', 'sidebar')
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $footerBanners = Banner::where('position', 'footer')
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('staff.home', compact(
+            'stats',
+            'latestPosts',
+            'upcomingSchedules',
+            'topBanners',
+            'sidebarBanners',
+            'footerBanners'
+        ));
     }
 
     public function about()
@@ -155,7 +146,7 @@ class StaffHomeController extends Controller
         ));
     }
 
-   
+
 
 
     public function postHome()
@@ -412,7 +403,32 @@ class StaffHomeController extends Controller
         return view('staff.reports.create');
     }
 
-    public function history(){
-        return view('staff.waste-logs.history');
+    public function history(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+
+        $query = WasteLog::with(['schedule']);
+
+        // 🔍 Nếu có lọc theo trạng thái
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('schedule', function ($s) use ($search) {
+                    $s->where('route_name', 'like', "%$search%")
+                        ->orWhere('id', 'like', "%$search%");
+                })
+                    ->orWhere('note', 'like', "%$search%");
+            });
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('staff.waste-logs.history', compact('logs', 'search', 'status'));
     }
+
 }
