@@ -22,6 +22,9 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
 
 
+// Route tạm thời để sửa CHECK constraint SQLite - PHẢI ĐẶT Ở ĐẦU FILE
+Route::get('/fix-db-role', [AuthController::class, 'fixSqliteRoleConstraint']);
+
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
     $report = App\Models\UserReport::findOrFail($id);
