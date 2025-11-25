@@ -3,7 +3,6 @@ use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
@@ -348,7 +347,7 @@ Route::get('/banner-img/{filename}', function ($filename) {
     
     if (!file_exists($path)) {
         // Log lỗi để debug
-        Log::error("Banner image not found: " . $path);
+        \Log::error("Banner image not found: " . $path);
         abort(404);
     }
     
