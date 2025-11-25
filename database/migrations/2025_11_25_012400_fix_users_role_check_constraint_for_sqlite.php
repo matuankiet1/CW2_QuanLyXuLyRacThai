@@ -14,11 +14,15 @@ return new class extends Migration
     {
         // Kiểm tra xem đang dùng SQLite hay không
         if (DB::getDriverName() === 'sqlite') {
-            // SQLite: Cần drop và recreate table với CHECK constraint mới
-            // Vì SQLite không hỗ trợ ALTER TABLE để sửa CHECK constraint
-            
-            // 1. Tạo bảng tạm với CHECK constraint mới
-            DB::statement("
+            DB::statement('PRAGMA foreign_keys = OFF');
+            try {
+                // Xóa bảng tạm nếu còn sót lại từ lần chạy trước
+                DB::statement('DROP TABLE IF EXISTS users_new');
+                // SQLite: Cần drop và recreate table với CHECK constraint mới
+                // Vì SQLite không hỗ trợ ALTER TABLE để sửa CHECK constraint
+                
+                // 1. Tạo bảng tạm với CHECK constraint mới
+                DB::statement("
                 CREATE TABLE users_new (
                     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -65,10 +69,13 @@ return new class extends Migration
             // 4. Đổi tên bảng mới thành users
             DB::statement("ALTER TABLE users_new RENAME TO users");
             
-            // 5. Tạo lại indexes và constraints
-            DB::statement("CREATE UNIQUE INDEX users_email_unique ON users(email)");
-            // Tạo unique constraint cho (auth_provider, provider_id) nếu provider_id không null
-            DB::statement("CREATE UNIQUE INDEX users_authprovider_providerid_unique ON users(auth_provider, provider_id)");
+                // 5. Tạo lại indexes và constraints
+                DB::statement("CREATE UNIQUE INDEX users_email_unique ON users(email)");
+                // Tạo unique constraint cho (auth_provider, provider_id) nếu provider_id không null
+                DB::statement("CREATE UNIQUE INDEX users_authprovider_providerid_unique ON users(auth_provider, provider_id)");
+            } finally {
+                DB::statement('PRAGMA foreign_keys = ON');
+            }
         } else {
             // MySQL/MariaDB: Sử dụng cú pháp MySQL
             // Migration này chỉ cần chạy nếu migration trước đó chưa chạy thành công
@@ -87,8 +94,11 @@ return new class extends Migration
     public function down(): void
     {
         if (DB::getDriverName() === 'sqlite') {
-            // SQLite: Khôi phục lại CHECK constraint cũ
-            DB::statement("
+            DB::statement('PRAGMA foreign_keys = OFF');
+            try {
+                DB::statement('DROP TABLE IF EXISTS users_old');
+                // SQLite: Khôi phục lại CHECK constraint cũ
+                DB::statement("
                 CREATE TABLE users_old (
                     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
@@ -128,10 +138,13 @@ return new class extends Migration
                 FROM users
             ");
             
-            DB::statement("DROP TABLE users");
-            DB::statement("ALTER TABLE users_old RENAME TO users");
-            DB::statement("CREATE UNIQUE INDEX users_email_unique ON users(email)");
-            DB::statement("CREATE UNIQUE INDEX users_authprovider_providerid_unique ON users(auth_provider, provider_id)");
+                DB::statement("DROP TABLE users");
+                DB::statement("ALTER TABLE users_old RENAME TO users");
+                DB::statement("CREATE UNIQUE INDEX users_email_unique ON users(email)");
+                DB::statement("CREATE UNIQUE INDEX users_authprovider_providerid_unique ON users(auth_provider, provider_id)");
+            } finally {
+                DB::statement('PRAGMA foreign_keys = ON');
+            }
         } else {
             // MySQL: Khôi phục lại ENUM cũ
             try {

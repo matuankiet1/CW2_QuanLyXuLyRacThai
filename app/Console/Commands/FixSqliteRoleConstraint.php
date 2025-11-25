@@ -37,14 +37,18 @@ class FixSqliteRoleConstraint extends Command
 
         $this->info('🔧 Bắt đầu sửa CHECK constraint cho cột role...');
 
-        try {
-            $pdo = DB::connection()->getPdo();
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('PRAGMA foreign_keys = OFF');
 
+        try {
             $this->info('✅ Đã kết nối đến database');
 
             // Bắt đầu transaction
             $pdo->beginTransaction();
+
+            // Xóa bảng tạm nếu còn sót từ lần chạy trước
+            $pdo->exec("DROP TABLE IF EXISTS users_new");
 
             // 1. Tạo bảng tạm với CHECK constraint mới
             $this->info('📝 Đang tạo bảng tạm với CHECK constraint mới...');
@@ -117,6 +121,8 @@ class FixSqliteRoleConstraint extends Command
             }
             $this->error('❌ Lỗi: ' . $e->getMessage());
             return 1;
+        } finally {
+            $pdo->exec('PRAGMA foreign_keys = ON');
         }
     }
 }
