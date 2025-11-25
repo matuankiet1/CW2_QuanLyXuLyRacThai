@@ -186,4 +186,29 @@ class WasteLogController extends Controller
         }
         return response()->json($result);
     }
+
+    public function history(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status', 'Đã hoàn thành');
+
+        $query = WasteLog::with(['schedule'])
+            ->where('status', 'Đã hoàn thành');
+
+        // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('schedule', function ($s) use ($search) {
+                    $s->where('route_name', 'like', "%$search%")
+                        ->orWhere('id', 'like', "%$search%");
+                })
+                    ->orWhere('note', 'like', "%$search%");
+            });
+        }
+
+        $logs = $query->orderBy('completed_at', 'desc')->paginate(10);
+
+        return view('staff.waste-logs.history', compact('logs', 'search'));
+    }
+
 }
