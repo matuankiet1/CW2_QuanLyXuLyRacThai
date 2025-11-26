@@ -93,7 +93,7 @@
                                 <td class="px-4 py-3">{{ \Carbon\Carbon::parse($event->event_start_date)->format('d/m/Y') }}
                                 </td>
                                 <td class="px-4 py-3">{{ $event->location }}</td>
-                                <td class="px-4 py-3">{{ $event->participants }} người</td>
+                                <td class="px-4 py-3">{{ $event->attended_participants_count }} người</td>
                                 <td class="px-4 py-3">
                                     @php
                                         $color = match ($event->status) {
@@ -112,11 +112,24 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-right">
+                                     @if($event->pending_participants_count > 0)
+                                            <div
+                                                class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-yellow-100 text-yellow-800 font-medium">
+                                                ⚠️ {{ $event->pending_participants_count }} người đang chờ xác nhận 
+                                            </div>
+                                    @endif
+                                    @if($event->attending_participants_count > 0)
+                                            <div
+                                                class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
+                                                📝 {{ $event->attending_participants_count }} người đang chờ điểm danh
+                                            </div>
+                                    @endif
                                     <div class="flex gap-2 text-sm justify-end">
-                                        <a href="{{ route('admin.events.rewards.index', $event->id) }}"
+                                       
+                                        <a href="{{ route('admin.events.participants', $event->id) }}"
                                             class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                                             title="Xem điểm thưởng">
-                                            <i class="fas fa-trophy mr-1"></i>Điểm thưởng
+                                            Xem
                                         </a>
                                         <a href="{{ route('admin.events.edit', $event) }}"
                                             class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Sửa</a>

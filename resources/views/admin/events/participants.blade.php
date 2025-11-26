@@ -131,7 +131,9 @@
                         <input type="checkbox" id="selectAllTable" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
                     </th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">STT</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Họ và tên</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Họ tên</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">MSSV</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lớp</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạng thái</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ngày đăng ký</th>
@@ -151,6 +153,12 @@
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">
                             {{ $participant->user->name }}
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                            {{ $participant->student_id }}
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                            {{ $participant->student_class }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">
                             {{ $participant->user->email }}

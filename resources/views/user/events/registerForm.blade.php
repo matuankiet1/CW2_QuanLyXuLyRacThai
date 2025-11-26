@@ -20,12 +20,12 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Mã số sinh viên</label>
-                                <input type="text" name="mssv" value="" required
+                                <input type="text" name="student_id" value="" required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Lớp</label>
-                                <input type="text" name="class" value="" required
+                                <input type="text" name="student_class" value="" required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
                             </div>
                             <div>

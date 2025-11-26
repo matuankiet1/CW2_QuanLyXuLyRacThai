@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- Top Banner Carousel -->
+    <!-- Top Banner Carousel
     @if($topBanners->count() > 0)
     <div class="mb-6">
         <div id="bannerCarousel" class="relative rounded-lg overflow-hidden shadow-lg">
@@ -47,7 +47,7 @@
                 <div class="carousel-item {{ $key === 0 ? 'active' : 'hidden' }} absolute inset-0 transition-opacity duration-500">
                     @if($banner->link)
                         <a href="{{ $banner->link }}" target="_blank" class="block h-full">
-                            <img src="{{ asset('storage/' . $banner->image) }}" 
+                            <img src="{{ route('banner.image', basename($banner->image)) }}" 
                                  alt="{{ $banner->title }}" 
                                  class="w-full h-full object-cover">
                             @if($banner->title || $banner->description)
@@ -62,7 +62,7 @@
                             @endif
                         </a>
                     @else
-                        <img src="{{ asset('storage/' . $banner->image) }}" 
+                        <img src="{{ route('banner.image', basename($banner->image)) }}" 
                              alt="{{ $banner->title }}" 
                              class="w-full h-full object-cover">
                         @if($banner->title || $banner->description)
@@ -94,7 +94,7 @@
             @endif
         </div>
     </div>
-    @endif
+    @endif -->
 
     <!-- Stats Section -->
     <div class="mb-6">
@@ -196,7 +196,7 @@
         </div>
     </div>
 
-    <!-- Sidebar Banners Section -->
+    <!-- Sidebar Banners Section
     @if($sidebarBanners->count() > 0)
     <div class="mb-6">
         <div class="text-center mb-6">
@@ -209,12 +209,12 @@
                 @if($banner->image)
                     @if($banner->link)
                         <a href="{{ $banner->link }}" target="_blank" class="block">
-                            <img src="{{ asset('storage/' . $banner->image) }}" 
+                            <img src="{{ route('banner.image', basename($banner->image)) }}" 
                                  alt="{{ $banner->title }}" 
                                  class="w-full h-48 object-cover">
                         </a>
                     @else
-                        <img src="{{ asset('storage/' . $banner->image) }}" 
+                        <img src="{{ route('banner.image', basename($banner->image)) }}" 
                              alt="{{ $banner->title }}" 
                              class="w-full h-48 object-cover">
                     @endif
@@ -229,7 +229,7 @@
             @endforeach
         </div>
     </div>
-    @endif
+    @endif -->
 
     <!-- Latest Posts Section -->
     @if($latestPosts->count() > 0)
@@ -305,7 +305,7 @@
     </div>
     @endif
 
-    <!-- Footer Banners Section -->
+    <!-- Footer Banners Section
     @if($footerBanners->count() > 0)
     <div class="mb-6 bg-gray-50 rounded-lg p-6">
         <div class="text-center mb-6">
@@ -316,12 +316,12 @@
             <div class="bg-white rounded-lg p-4 text-center hover:shadow-md transition">
                 @if($banner->link)
                     <a href="{{ $banner->link }}" target="_blank" class="block">
-                        <img src="{{ asset('storage/' . $banner->image) }}" 
+                        <img src="{{ route('banner.image', basename($banner->image)) }}" 
                              alt="{{ $banner->title }}" 
                              class="w-full h-20 object-contain mx-auto">
                     </a>
                 @else
-                    <img src="{{ asset('storage/' . $banner->image) }}" 
+                    <img src="{{ route('banner.image', basename($banner->image)) }}" 
                          alt="{{ $banner->title }}" 
                          class="w-full h-20 object-contain mx-auto">
                 @endif
@@ -332,7 +332,7 @@
             @endforeach
         </div>
     </div>
-    @endif
+    @endif -->
 
     <!-- Call to Action Section -->
     <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-8 text-white mb-6">

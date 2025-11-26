@@ -22,10 +22,11 @@ class WasteLogController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->user()->user_id;
+        $user_id = auth()->id();
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
+        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'asc')->get();
+
         // dd( $collectionSchedules);
         $isSearch = false;
         return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
@@ -90,7 +91,7 @@ class WasteLogController extends Controller
                 if ($request->hasFile('waste_image') && isset($request->file('waste_image')[$i])) {
                     $file = $request->file('waste_image')[$i];
                     $wasteTypeName = WasteType::find($wasteTypeId)?->name ?? 'unknown';
-                    
+
                     $timestamp = now()->format('Y-m-d_H-i-s');
                     $slug = Str::slug($wasteTypeName, '-');
                     $extension = $file->getClientOriginalExtension();
@@ -185,4 +186,7 @@ class WasteLogController extends Controller
         }
         return response()->json($result);
     }
+
+    
+
 }

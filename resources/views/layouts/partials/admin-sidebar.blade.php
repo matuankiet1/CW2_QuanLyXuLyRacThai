@@ -71,6 +71,12 @@
                     'route' => 'admin.banners.index',
                     'active' => request()->routeIs('admin.banners.*'),
                 ],
+                [
+                    'label' => 'Phản hồi',
+                    'icon' => 'fa-comment-dots',
+                    'route' => 'admin.feedback.index',
+                    'active' => request()->routeIs('admin.feedback.*'),
+                ],
             ],
         ],
         [
@@ -83,11 +89,18 @@
                     'active' => request()->routeIs('admin.reports.*'),
                 ],
                 [
+                    'label' => 'Báo cáo thu gom rác',
+                    'icon' => 'fa-user-shield',
+                    'route' => 'admin.collection_reports.index',
+                    'active' => request()->routeIs('admin.roles.*'),
+                ],
+                [
                     'label' => 'Phân quyền',
                     'icon' => 'fa-user-shield',
                     'route' => 'admin.roles.index',
                     'active' => request()->routeIs('admin.roles.*'),
                 ],
+                
             ],
         ],
         [

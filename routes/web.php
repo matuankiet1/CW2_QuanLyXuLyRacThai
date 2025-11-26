@@ -1,22 +1,34 @@
 <?php
+use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CollectionScheduleController;
+use App\Http\Controllers\CollectionReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\WasteLogController;
 use App\Http\Controllers\PostHomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimpleNotificationController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
 use App\Http\Controllers\TrashRequestController;
+use App\Http\Controllers\ChatbotController;
+use App\Models\Banner;
+
+
+// Route tạm thời để sửa CHECK constraint SQLite - PHẢI ĐẶT Ở ĐẦU FILE
+Route::get('/fix-db-role', [AuthController::class, 'fixSqliteRoleConstraint']);
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -30,6 +42,25 @@ Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+Route::get('/guide', [HomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
+
+//------------------------------------ STAFF HOME -------------------------------------//
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
+    Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
+    Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
+    Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
+    Route::get('/home/sortingGuide', [StaffHomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
+    Route::get('/events', [StaffHomeController::class, 'eventHome'])->name('events.index');
+    Route::get('/events/{event}', [StaffHomeController::class, 'eventShow'])->name('events.show');
+    Route::get('/posts', [StaffHomeController::class, 'postHome'])->name('posts.home');
+    Route::get('/posts/{post}', [StaffHomeController::class, 'postShow'])->name('posts.show');
+    Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedule'])->name('collection_schedules.index');
+    Route::get('/waste-logs', [StaffHomeController::class, 'wasteLog'])->name('waste-logs.index');
+    Route::get('/waste-logs/history', [StaffHomeController::class, 'history'])->name('waste-logs.history');
+    Route::get('/statistics', [StaffHomeController::class, 'statistic'])->name('statistics.index');
+    Route::get('/reports', [StaffHomeController::class, 'createReport'])->name('reports.create');
+    //Route::get('/reports/waste', [StaffReportController::class, 'waste'])->name('reports.waste');
+});
 
 //------------------------------------ ADMIN HOME -------------------------------------//
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -76,6 +107,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('reset_password');
 });
 
+Route::post('/change-password', [AuthController::class, 'changePassword'])
+    ->middleware('auth')
+    ->name('change_password');
+
 //--------------------------------------- POST ROUTES (Mọi người đều truy cập được) -------------------------------------//
 Route::get('/posts', [PostHomeController::class, 'index'])->name('user.posts.home');
 Route::get('/posts/{id}', [PostHomeController::class, 'show'])->name('user.posts.show');
@@ -92,6 +127,7 @@ Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class
 Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
     ->name('waste-logs.get-by-collection-schedules');
 Route::resource('waste-logs', WasteLogController::class);
+Route::get('/waste-logs', [WasteLogController::class, 'index'])->name('user.waste-logs.index');
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
@@ -124,24 +160,32 @@ Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
 
         // 🟢 Banners
-    Route::resource('banners', BannerController::class);
+        Route::resource('banners', BannerController::class);
 
-    Route::get('banners/{banner}/confirm-delete', 
-        [BannerController::class, 'confirmDelete']
-    )->name('banners.confirm-delete');
+
+        //Route::get('banners/{banner}/confirm-delete', 
+
+        Route::get(
+            'banners/{banner}/confirm-delete',
+
+            [BannerController::class, 'confirmDelete']
+        )->name('banners.confirm-delete');
 
         // Role Management
         Route::get('roles', [App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
         Route::patch('roles/{user}', [App\Http\Controllers\RoleController::class, 'updateRole'])->name('roles.update');
         Route::post('roles/create', [App\Http\Controllers\RoleController::class, 'createAdmin'])->name('roles.create');
         Route::delete('roles/{user}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
-        
+
         // Permission Management
         Route::get('permissions', [App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
         Route::post('permissions', [App\Http\Controllers\PermissionController::class, 'store'])->name('permissions.store');
         Route::put('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'update'])->name('permissions.update');
         Route::delete('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'destroy'])->name('permissions.destroy');
         Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
+
+        Route::get('collection_reports', [WasteLogController::class, 'wasteReport'])->name('collection_reports.index');
+
     });
 
     // Notifications (Admin)
@@ -220,10 +264,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
     Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
     Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
-    ->name('user.events.registerForm');
+        ->name('user.events.registerForm');
 
     // User Statistics
     Route::get('/statistics', [UserStatisticsController::class, 'index'])->name('user.statistics.index');
+
+    Route::get('/collection_schedules', [HomeController::class, 'collection_schedules'])->name('user.collection_schedules.index');
 });
 
 //--------------------------------------- STAFF ROUTES -------------------------------------//
@@ -237,6 +283,10 @@ Route::middleware('staff')->group(function () {
         Route::get('/{id}/edit', [TrashRequestController::class, 'staffEdit'])->name('edit');
         Route::put('/{id}', [TrashRequestController::class, 'staffUpdate'])->name('update');
     });
+
+    Route::get('/staff/collection-reports', [CollectionReportController::class, 'staffIndex'])->name('staff.collection-reports.index');
+    Route::get('/staff/collection-reports/{schedule}/create', [CollectionReportController::class, 'staffCreate'])->name('staff.collection-reports.create');
+    Route::post('/staff/collection-reports/{schedule}', [CollectionReportController::class, 'staffStore'])->name('staff.collection-reports.store');
 });
 
 //--------------------------------------- STUDENT ROUTES -------------------------------------//
@@ -251,3 +301,45 @@ Route::middleware('student')->group(function () {
         Route::get('/{id}', [TrashRequestController::class, 'studentShow'])->name('show');
     });
 });
+
+
+
+// USER FEEDBACK ROUTES
+Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
+    Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/feedback', [FeedbackController::class, 'userIndex'])->name('feedback.index'); // Danh sách feedback của user
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'userShow'])->name('feedback.show'); // Chi tiết feedback
+});
+
+// ADMIN FEEDBACK ROUTES
+Route::middleware('admin')->prefix('admin/feedback')->name('admin.feedback.')->group(function () {
+    Route::get('/', [FeedbackController::class, 'index'])->name('index');
+    Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
+    Route::post('/{feedback}/reply', [FeedbackController::class, 'reply'])->name('reply');
+});
+
+
+// --------------------------------------- USER PROFILE -------------------------------------//
+Route::get('profile', [AuthController::class, 'getProfile'])->name('profile.show');
+Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+Route::post('update-avatar', [AuthController::class, 'updateAvatar'])->name('profile.update-avatar');
+Route::delete('delete-avatar', [AuthController::class, 'deleteAvatar'])->name('profile.delete-avatar');
+
+// Chatbot AI
+Route::middleware('auth')->group(function () {
+    Route::post('recycle-suggestion', [ChatbotController::class, 'suggestWasteRecycle'])->name('chatbot.recycle-suggestion');
+});
+
+// Route phục vụ ảnh banner - FIXED
+Route::get('/banner-img/{filename}', function ($filename) {
+    $path = storage_path('app/public/banners/' . $filename);
+    
+    if (!file_exists($path)) {
+        // Log lỗi để debug
+        Log::error("Banner image not found: " . $path);
+        abort(404);
+    }
+    
+    return response()->file($path);
+})->name('banner.image');
