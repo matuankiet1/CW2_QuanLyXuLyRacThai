@@ -321,6 +321,20 @@
                                 <div id="personalMenuDropdown"
                                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
                                     <div class="py-2">
+                                        @auth
+                                            @if(auth()->user()->isStudent())
+                                                <a href="{{ route('student.trash-requests.index') }}"
+                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
+                                                </a>
+                                            @endif
+                                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                                <a href="{{ route('staff.trash-requests.index') }}"
+                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
+                                                </a>
+                                            @endif
+                                        @endauth
                                         <a href="{{ route('user.reports.create') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-flag mr-2"></i>Báo cáo
@@ -482,6 +496,16 @@
                         <!-- Cá nhân Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
+                            @if(auth()->user()->isStudent())
+                                <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item">
+                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
+                                </a>
+                            @endif
+                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item">
+                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
+                                </a>
+                            @endif
                             <a href="{{ route('user.reports.create') }}" class="nav-link-item">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>

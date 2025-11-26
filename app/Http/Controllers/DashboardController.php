@@ -36,14 +36,8 @@ class DashboardController extends Controller
         return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification'));
     }
 
-    public function manager()
-    {
-        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
-            ->limit(5)
-            ->get();
-
-        return view('dashboard.manager', compact('upcomingEvents'));
-    }
+    // Manager method đã bị xóa vì role manager không còn tồn tại
+    // Các chức năng của manager đã được chuyển sang admin
 
     public function staff()
     {
