@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\TrashRequest;
+use App\Services\TrashRequestStateMachine;
 
 /**
  * Service tự động gán admin cho yêu cầu thu gom rác
