@@ -94,12 +94,29 @@
         </div>
     </div>
 
+    {{-- Bulk Actions --}}
+    <form id="bulkScheduleForm" method="GET" action="{{ route('admin.trash-requests.bulk-schedule.form') }}" class="mb-4">
+        <div class="bg-white rounded-lg shadow-md p-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="selectAll" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                <label for="selectAll" class="text-sm font-medium text-gray-700">Chọn tất cả</label>
+            </div>
+            <button type="submit" id="bulkScheduleBtn" disabled
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <i class="fas fa-calendar-alt mr-2"></i>Chia lịch hàng loạt
+            </button>
+        </div>
+    </form>
+
     {{-- Table --}}
     <div class="bg-white rounded-lg shadow-md">
         <div class="overflow-x-auto">
             <table class="w-full border-collapse table-auto">
                 <thead>
                     <tr class="border-b">
+                        <th class="px-4 py-3 text-left font-semibold" style="width:50px">
+                            <input type="checkbox" id="selectAllHeader" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                        </th>
                         <th class="px-4 py-3 text-left font-semibold" style="width:80px">STT</th>
                         <th class="px-4 py-3 text-left font-semibold">Địa điểm</th>
                         <th class="px-4 py-3 text-left font-semibold">Loại rác</th>
@@ -113,6 +130,12 @@
                 <tbody>
                     @forelse($trashRequests as $index => $request)
                         <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-3 text-center">
+                                @if(in_array($request->status, ['pending', 'assigned', 'waiting_admin']))
+                                    <input type="checkbox" name="request_ids[]" value="{{ $request->request_id }}" 
+                                           class="request-checkbox w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-center">{{ $trashRequests->firstItem() + $index }}</td>
                             <td class="px-4 py-3">{{ $request->location }}</td>
                             <td class="px-4 py-3">{{ $request->type }}</td>
@@ -153,7 +176,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                            <td colspan="9" class="px-4 py-8 text-center text-gray-500">
                                 <i class="fas fa-inbox text-4xl mb-2 block"></i>
                                 Không tìm thấy yêu cầu nào
                             </td>
@@ -171,5 +194,56 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Select All functionality
+    document.getElementById('selectAll')?.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.request-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        updateBulkButton();
+    });
+
+    document.getElementById('selectAllHeader')?.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.request-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        document.getElementById('selectAll').checked = this.checked;
+        updateBulkButton();
+    });
+
+    // Update bulk button state
+    function updateBulkButton() {
+        const checked = document.querySelectorAll('.request-checkbox:checked');
+        const btn = document.getElementById('bulkScheduleBtn');
+        if (btn) {
+            btn.disabled = checked.length === 0;
+        }
+    }
+
+    // Individual checkbox change
+    document.querySelectorAll('.request-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateBulkButton);
+    });
+
+    // Form submission - collect checked IDs
+    document.getElementById('bulkScheduleForm')?.addEventListener('submit', function(e) {
+        const checked = document.querySelectorAll('.request-checkbox:checked');
+        if (checked.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất một yêu cầu để chia lịch.');
+            return false;
+        }
+
+        // Add hidden inputs for selected IDs
+        checked.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'request_ids[]';
+            input.value = cb.value;
+            this.appendChild(input);
+        });
+    });
+</script>
+@endpush
 @endsection
 

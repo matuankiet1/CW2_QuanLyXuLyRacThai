@@ -2,6 +2,12 @@
     // Tính số yêu cầu đang chờ duyệt
     $waitingTrashRequestsCount = \App\Models\TrashRequest::where('status', 'waiting_admin')->count();
     
+    // Tính số thông báo chưa đọc về trash requests cho admin hiện tại
+    $unreadTrashRequestNotificationsCount = 0;
+    if (auth()->check() && auth()->user()->isAdmin()) {
+        $unreadTrashRequestNotificationsCount = \App\Services\TrashRequestNotificationService::getUnreadTrashRequestNotificationsCount(auth()->user()->user_id);
+    }
+    
     // Default menu items - can be overridden by views
     $menuItems = $menuItems ?? [
         [
@@ -19,12 +25,17 @@
                     'route' => 'dashboard.admin',
                     'active' => request()->routeIs('dashboard.admin'),
                 ],
-                [
+                array_merge([
                     'label' => 'Thông báo',
                     'icon' => 'fa-bell',
                     'route' => 'admin.notifications.index',
                     'active' => request()->routeIs('admin.notifications.*'),
-                ],
+                ], $unreadTrashRequestNotificationsCount > 0 ? [
+                    'badge' => [
+                        'text' => $unreadTrashRequestNotificationsCount > 9 ? '9+' : $unreadTrashRequestNotificationsCount,
+                        'class' => 'bg-red-500 text-white',
+                    ],
+                ] : []),
             ],
         ],
         [

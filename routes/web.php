@@ -199,6 +199,8 @@ Route::middleware('admin')->group(function () {
     // Trash Requests (Admin)
     Route::prefix('trash-requests')->name('admin.trash-requests.')->group(function () {
         Route::get('/', [TrashRequestController::class, 'adminIndex'])->name('index');
+        Route::get('/bulk-schedule', [TrashRequestController::class, 'showBulkScheduleForm'])->name('bulk-schedule.form');
+        Route::post('/bulk-schedule', [TrashRequestController::class, 'bulkSchedule'])->name('bulk-schedule');
         Route::get('/{id}', [TrashRequestController::class, 'adminShow'])->name('show');
         Route::post('/{id}/approve', [TrashRequestController::class, 'approve'])->name('approve');
         Route::post('/{id}/reject', [TrashRequestController::class, 'reject'])->name('reject');

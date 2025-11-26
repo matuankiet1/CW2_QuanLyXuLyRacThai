@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\TrashRequest;
 use App\Models\User;
+use App\Models\CollectionSchedule;
 use App\Services\TrashRequestStateMachine;
 use App\Services\TrashRequestAutoAssignService;
+use App\Services\TrashRequestNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -108,6 +111,9 @@ class TrashRequestController extends Controller
 
         // Tự động gán admin
         $assignedAdmin = $this->autoAssignService->autoAssign($trashRequest);
+
+        // Gửi thông báo cho tất cả admin
+        TrashRequestNotificationService::notifyAdminsNewRequest($trashRequest);
 
         if (!$assignedAdmin) {
             return redirect()->route('student.trash-requests.index')
@@ -370,6 +376,9 @@ class TrashRequestController extends Controller
             'admin_notes' => $validated['admin_notes'] ?? null,
         ]);
 
+        // Gửi thông báo cho student
+        TrashRequestNotificationService::notifyStudentReviewResult($trashRequest, 'approved');
+
         return redirect()->route('admin.trash-requests.show', $id)
             ->with('success', 'Yêu cầu đã được duyệt thành công.');
     }
@@ -407,7 +416,118 @@ class TrashRequestController extends Controller
             'admin_notes' => $validated['admin_notes'],
         ]);
 
+        // Gửi thông báo cho student
+        TrashRequestNotificationService::notifyStudentReviewResult($trashRequest, 'rejected');
+
         return redirect()->route('admin.trash-requests.show', $id)
             ->with('success', 'Yêu cầu đã bị từ chối. Staff có thể cập nhật lại.');
+    }
+
+    /**
+     * Hiển thị form chia lịch hàng loạt
+     */
+    public function showBulkScheduleForm(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user->isAdmin()) {
+            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập.');
+        }
+
+        // Lấy danh sách yêu cầu có thể chia lịch (pending, assigned, waiting_admin)
+        $requestIds = $request->input('request_ids', []);
+        
+        if (empty($requestIds)) {
+            return redirect()->route('admin.trash-requests.index')
+                ->with('error', 'Vui lòng chọn ít nhất một yêu cầu để chia lịch.');
+        }
+
+        $trashRequests = TrashRequest::whereIn('request_id', $requestIds)
+            ->whereIn('status', [
+                TrashRequestStateMachine::STATUS_PENDING,
+                TrashRequestStateMachine::STATUS_ASSIGNED,
+                TrashRequestStateMachine::STATUS_WAITING_ADMIN
+            ])
+            ->with(['student'])
+            ->get();
+
+        if ($trashRequests->isEmpty()) {
+            return redirect()->route('admin.trash-requests.index')
+                ->with('error', 'Không tìm thấy yêu cầu hợp lệ để chia lịch.');
+        }
+
+        // Lấy danh sách staff
+        $staffs = User::where('role', 'staff')->get();
+
+        return view('admin.trash-requests.bulk-schedule', compact('trashRequests', 'staffs'));
+    }
+
+    /**
+     * Xử lý chia lịch hàng loạt
+     */
+    public function bulkSchedule(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user->isAdmin()) {
+            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập.');
+        }
+
+        $validated = $request->validate([
+            'request_ids' => 'required|array',
+            'request_ids.*' => 'exists:trash_requests,request_id',
+            'staff_id' => 'required|exists:users,user_id',
+            'scheduled_date' => 'required|date|after_or_equal:today',
+        ], [
+            'request_ids.required' => 'Vui lòng chọn ít nhất một yêu cầu.',
+            'staff_id.required' => 'Vui lòng chọn nhân viên.',
+            'staff_id.exists' => 'Nhân viên không tồn tại.',
+            'scheduled_date.required' => 'Vui lòng chọn ngày thu gom.',
+            'scheduled_date.after_or_equal' => 'Ngày thu gom phải từ hôm nay trở đi.',
+        ]);
+
+        // Kiểm tra staff có phải là staff không
+        $staff = User::findOrFail($validated['staff_id']);
+        if (!$staff->isStaff()) {
+            return back()->withErrors(['staff_id' => 'Người được chọn không phải là nhân viên.'])->withInput();
+        }
+
+        DB::beginTransaction();
+        try {
+            $scheduledCount = 0;
+            $trashRequests = TrashRequest::whereIn('request_id', $validated['request_ids'])
+                ->whereIn('status', [
+                    TrashRequestStateMachine::STATUS_PENDING,
+                    TrashRequestStateMachine::STATUS_ASSIGNED,
+                    TrashRequestStateMachine::STATUS_WAITING_ADMIN
+                ])
+                ->get();
+
+            foreach ($trashRequests as $trashRequest) {
+                // Tạo lịch thu gom
+                $schedule = CollectionSchedule::create([
+                    'staff_id' => $validated['staff_id'],
+                    'scheduled_date' => $validated['scheduled_date'],
+                    'status' => 'pending',
+                ]);
+
+                // Cập nhật trạng thái yêu cầu thành assigned và gán staff
+                $trashRequest->assigned_staff_id = $validated['staff_id'];
+                $trashRequest->status = TrashRequestStateMachine::STATUS_ASSIGNED;
+                $trashRequest->assigned_at = now();
+                $trashRequest->save();
+
+                $scheduledCount++;
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.trash-requests.index')
+                ->with('success', "Đã chia lịch thành công cho {$scheduledCount} yêu cầu thu gom rác.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return back()->with('error', 'Có lỗi xảy ra khi chia lịch: ' . $e->getMessage())->withInput();
+        }
     }
 }
