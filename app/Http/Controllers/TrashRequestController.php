@@ -8,6 +8,7 @@ use App\Models\CollectionSchedule;
 use App\Services\TrashRequestStateMachine;
 use App\Services\TrashRequestAutoAssignService;
 use App\Services\TrashRequestNotificationService;
+use App\Services\StaffAreaAssignmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -456,10 +457,23 @@ class TrashRequestController extends Controller
                 ->with('error', 'Không tìm thấy yêu cầu hợp lệ để chia lịch.');
         }
 
-        // Lấy danh sách staff
+        // Tự động phân công nhân viên cho từng yêu cầu dựa trên location
+        $assignments = [];
+        $unassignedRequests = [];
+        
+        foreach ($trashRequests as $trashRequest) {
+            $staff = StaffAreaAssignmentService::findStaffByLocation($trashRequest->location);
+            if ($staff) {
+                $assignments[$trashRequest->request_id] = $staff;
+            } else {
+                $unassignedRequests[] = $trashRequest;
+            }
+        }
+
+        // Lấy danh sách tất cả staff để admin có thể chọn thủ công cho các yêu cầu chưa được gán
         $staffs = User::where('role', 'staff')->get();
 
-        return view('admin.trash-requests.bulk-schedule', compact('trashRequests', 'staffs'));
+        return view('admin.trash-requests.bulk-schedule', compact('trashRequests', 'staffs', 'assignments', 'unassignedRequests'));
     }
 
     /**
@@ -476,21 +490,14 @@ class TrashRequestController extends Controller
         $validated = $request->validate([
             'request_ids' => 'required|array',
             'request_ids.*' => 'exists:trash_requests,request_id',
-            'staff_id' => 'required|exists:users,user_id',
             'scheduled_date' => 'required|date|after_or_equal:today',
+            'staff_assignments' => 'nullable|array', // Staff assignments cho các yêu cầu chưa được gán tự động
+            'staff_assignments.*' => 'exists:users,user_id',
         ], [
             'request_ids.required' => 'Vui lòng chọn ít nhất một yêu cầu.',
-            'staff_id.required' => 'Vui lòng chọn nhân viên.',
-            'staff_id.exists' => 'Nhân viên không tồn tại.',
             'scheduled_date.required' => 'Vui lòng chọn ngày thu gom.',
             'scheduled_date.after_or_equal' => 'Ngày thu gom phải từ hôm nay trở đi.',
         ]);
-
-        // Kiểm tra staff có phải là staff không
-        $staff = User::findOrFail($validated['staff_id']);
-        if (!$staff->isStaff()) {
-            return back()->withErrors(['staff_id' => 'Người được chọn không phải là nhân viên.'])->withInput();
-        }
 
         DB::beginTransaction();
         try {
@@ -504,15 +511,28 @@ class TrashRequestController extends Controller
                 ->get();
 
             foreach ($trashRequests as $trashRequest) {
+                // Tự động tìm nhân viên phù hợp dựa trên location
+                $staff = StaffAreaAssignmentService::findStaffByLocation($trashRequest->location);
+                
+                // Nếu không tìm thấy tự động, sử dụng staff được gán thủ công từ form
+                if (!$staff && isset($validated['staff_assignments'][$trashRequest->request_id])) {
+                    $staff = User::find($validated['staff_assignments'][$trashRequest->request_id]);
+                }
+                
+                // Nếu vẫn không có staff, bỏ qua yêu cầu này
+                if (!$staff || !$staff->isStaff()) {
+                    continue;
+                }
+
                 // Tạo lịch thu gom
                 $schedule = CollectionSchedule::create([
-                    'staff_id' => $validated['staff_id'],
+                    'staff_id' => $staff->user_id,
                     'scheduled_date' => $validated['scheduled_date'],
                     'status' => 'pending',
                 ]);
 
                 // Cập nhật trạng thái yêu cầu thành assigned và gán staff
-                $trashRequest->assigned_staff_id = $validated['staff_id'];
+                $trashRequest->assigned_staff_id = $staff->user_id;
                 $trashRequest->status = TrashRequestStateMachine::STATUS_ASSIGNED;
                 $trashRequest->assigned_at = now();
                 $trashRequest->save();
@@ -521,6 +541,10 @@ class TrashRequestController extends Controller
             }
 
             DB::commit();
+
+            if ($scheduledCount === 0) {
+                return back()->with('error', 'Không thể chia lịch cho bất kỳ yêu cầu nào. Vui lòng kiểm tra lại phân công nhân viên theo khu vực.')->withInput();
+            }
 
             return redirect()->route('admin.trash-requests.index')
                 ->with('success', "Đã chia lịch thành công cho {$scheduledCount} yêu cầu thu gom rác.");

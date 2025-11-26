@@ -29,6 +29,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'role',
+        'assigned_area',
         'auth_provider',
         'provider_id',
     ];

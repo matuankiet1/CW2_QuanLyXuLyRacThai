@@ -37,16 +37,37 @@
                             <th class="px-4 py-2 text-left font-semibold">Địa điểm</th>
                             <th class="px-4 py-2 text-left font-semibold">Loại rác</th>
                             <th class="px-4 py-2 text-left font-semibold">Người gửi</th>
+                            <th class="px-4 py-2 text-left font-semibold">Nhân viên được gán</th>
                             <th class="px-4 py-2 text-left font-semibold">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($trashRequests as $index => $request)
-                            <tr class="border-b">
+                            @php
+                                $assignedStaff = $assignments[$request->request_id] ?? null;
+                                $isUnassigned = !$assignedStaff;
+                            @endphp
+                            <tr class="border-b {{ $isUnassigned ? 'bg-yellow-50' : '' }}">
                                 <td class="px-4 py-2">{{ $index + 1 }}</td>
                                 <td class="px-4 py-2">{{ $request->location }}</td>
                                 <td class="px-4 py-2">{{ $request->type }}</td>
                                 <td class="px-4 py-2">{{ $request->student->name }}</td>
+                                <td class="px-4 py-2">
+                                    @if($assignedStaff)
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-green-700 font-medium">
+                                                <i class="fas fa-check-circle mr-1"></i>{{ $assignedStaff->name }}
+                                            </span>
+                                            @if($assignedStaff->assigned_area)
+                                                <span class="text-xs text-gray-500">({{ $assignedStaff->assigned_area }})</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="text-yellow-700">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i>Chưa có nhân viên phù hợp
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-2">
                                     @php
                                         $statusTexts = [
@@ -78,24 +99,49 @@
                     <input type="hidden" name="request_ids[]" value="{{ $request->request_id }}">
                 @endforeach
 
-                {{-- Staff Selection --}}
-                <div class="mb-6">
-                    <label for="staff_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-user-tie mr-2"></i>Chọn nhân viên <span class="text-red-500">*</span>
-                    </label>
-                    <select name="staff_id" id="staff_id" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 @error('staff_id') border-red-500 @enderror">
-                        <option value="">-- Chọn nhân viên --</option>
-                        @foreach($staffs as $staff)
-                            <option value="{{ $staff->user_id }}" {{ old('staff_id') == $staff->user_id ? 'selected' : '' }}>
-                                {{ $staff->name }} ({{ $staff->email }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('staff_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                {{-- Staff Assignments for Unassigned Requests --}}
+                @if(count($unassignedRequests) > 0)
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <h4 class="font-semibold text-yellow-800 mb-3">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Các yêu cầu chưa được gán nhân viên tự động ({{ count($unassignedRequests) }})
+                        </h4>
+                        <p class="text-sm text-yellow-700 mb-4">
+                            Vui lòng chọn nhân viên thủ công cho các yêu cầu sau:
+                        </p>
+                        <div class="space-y-3">
+                            @foreach($unassignedRequests as $request)
+                                <div class="bg-white p-3 rounded border border-yellow-300">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div>
+                                            <span class="font-medium">{{ $request->location }}</span>
+                                            <span class="text-sm text-gray-500 ml-2">- {{ $request->student->name }}</span>
+                                        </div>
+                                    </div>
+                                    <select name="staff_assignments[{{ $request->request_id }}]" 
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                                        <option value="">-- Chọn nhân viên --</option>
+                                        @foreach($staffs as $staff)
+                                            <option value="{{ $staff->user_id }}">
+                                                {{ $staff->name }} 
+                                                @if($staff->assigned_area)
+                                                    ({{ $staff->assigned_area }})
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p class="text-green-800">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Tất cả yêu cầu đã được tự động gán nhân viên phù hợp!
+                        </p>
+                    </div>
+                @endif
 
                 {{-- Scheduled Date --}}
                 <div class="mb-6">
