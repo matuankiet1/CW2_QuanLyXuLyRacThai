@@ -42,7 +42,7 @@ class TrashRequestController extends Controller
         }
 
         $status = $request->input('status', 'all');
-        $query = TrashRequest::forStudent($user->user_id);
+        $query = $user->trashRequests();
 
         if ($status !== 'all') {
             $query->where('status', $status);
@@ -149,12 +149,11 @@ class TrashRequestController extends Controller
         }
 
         $status = $request->input('status', 'all');
-        
-        // Admin xem tất cả, Staff chỉ xem được gán cho mình
-        if ($user->isAdmin()) {
-            $query = TrashRequest::with(['student', 'assignedStaff']);
-        } else {
-            $query = TrashRequest::forStaff($user->user_id);
+        $query = TrashRequest::with(['student', 'assignedStaff']);
+
+        // Staff chỉ xem nhiệm vụ được gán cho mình, Admin xem tất cả
+        if ($user->isStaff()) {
+            $query->where('assigned_staff_id', $user->user_id);
         }
 
         if ($status !== 'all') {
