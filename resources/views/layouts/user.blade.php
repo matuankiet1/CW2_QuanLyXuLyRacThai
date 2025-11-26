@@ -301,10 +301,18 @@
                         <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
                             <i class="fas fa-calendar-alt me-1"></i>Sự kiện
                         </a>
-                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item"
-                            title="Báo cáo rác thải">
-                            <i class="fas fa-trash-alt me-1"></i>Thu gom rác
-                        </a>
+                        @auth
+                            @if(auth()->user()->isStudent())
+                                <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item" title="Yêu cầu thu gom">
+                                    <i class="fas fa-trash-alt me-1"></i>Yêu cầu thu gom
+                                </a>
+                            @endif
+                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item" title="Nhiệm vụ thu gom">
+                                    <i class="fas fa-tasks me-1"></i>Nhiệm vụ thu gom
+                                </a>
+                            @endif
+                        @endauth
                         <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
                             <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
                         </a>
@@ -321,20 +329,6 @@
                                 <div id="personalMenuDropdown"
                                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
                                     <div class="py-2">
-                                        @auth
-                                            @if(auth()->user()->isStudent())
-                                                <a href="{{ route('student.trash-requests.index') }}"
-                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
-                                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
-                                                </a>
-                                            @endif
-                                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
-                                                <a href="{{ route('staff.trash-requests.index') }}"
-                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
-                                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
-                                                </a>
-                                            @endif
-                                        @endauth
                                         <a href="{{ route('user.reports.create') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-flag mr-2"></i>Báo cáo
@@ -483,9 +477,18 @@
                     <a href="{{ route('user.events.index') }}" class="nav-link-item">
                         <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
                     </a>
-                    <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
-                        <i class="fa-solid fa-recycle mr-2"></i>Báo cáo thu gom rác
-                    </a>
+                    @auth
+                        @if(auth()->user()->isStudent())
+                            <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item">
+                                <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
+                            </a>
+                        @endif
+                        @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                            <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item">
+                                <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
+                            </a>
+                        @endif
+                    @endauth
                     <a href="{{ route('home.about') }}" class="nav-link-item">
                         <i class="fas fa-info-circle mr-2"></i>Giới thiệu
                     </a>
@@ -496,16 +499,6 @@
                         <!-- Cá nhân Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
-                            @if(auth()->user()->isStudent())
-                                <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item">
-                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
-                                </a>
-                            @endif
-                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
-                                <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item">
-                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
-                                </a>
-                            @endif
                             <a href="{{ route('user.reports.create') }}" class="nav-link-item">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>

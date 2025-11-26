@@ -127,7 +127,7 @@ Route::get('/waste-logs/ai-suggest-waste-classifier', [WasteLogController::class
 Route::get('/waste-logs/get-by-collection-schedules', [WasteLogController::class, 'getByCollectionSchedules'])
     ->name('waste-logs.get-by-collection-schedules');
 Route::resource('waste-logs', WasteLogController::class);
-Route::get('/waste-logs', [WasteLogController::class, 'index'])->name('user.waste-logs.index');
+// Route::get('/waste-logs', [WasteLogController::class, 'index'])->name('user.waste-logs.index'); // Đã được tạo bởi Route::resource
 
 //--------------------------------------- ADMIN ROUTES (Chỉ admin mới truy cập được) -------------------------------------//
 Route::middleware('admin')->group(function () {
