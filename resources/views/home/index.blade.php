@@ -157,7 +157,7 @@
             <div class="col-lg-3 col-md-6">
                 <div class="stats-card">
                     <div class="stats-number">{{ $stats['upcoming_schedules'] }}</div>
-                    <h6 class="text-muted">Sắp tới</h6>
+                    <h6 class="text-muted">Sự kiện sắp tới</h6>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">

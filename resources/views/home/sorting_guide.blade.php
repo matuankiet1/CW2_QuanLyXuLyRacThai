@@ -1,4 +1,4 @@
-@extends('layouts.staff')
+@extends('layouts.user')
 
 @section('title', 'Hướng dẫn phân loại rác')
 

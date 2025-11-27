@@ -321,6 +321,20 @@
                                 <div id="personalMenuDropdown"
                                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
                                     <div class="py-2">
+                                        @auth
+                                            @if(auth()->user()->isStudent())
+                                                <a href="{{ route('student.trash-requests.index') }}"
+                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
+                                                </a>
+                                            @endif  
+                                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                                <a href="{{ route('staff.trash-requests.index') }}"
+                                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
+                                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
+                                                </a>
+                                            @endif
+                                        @endauth
                                         <a href="{{ route('user.reports.create') }}"
                                             class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                             <i class="fas fa-flag mr-2"></i>Báo cáo
@@ -390,6 +404,9 @@
                                 </div>
                             </div>
                         @endauth
+                        <a href="{{ route('home.sorting_guide') }}" class="nav-link-item">
+                            <i class="fas fa-recycle mr-1"></i>Phân loại rác
+                        </a>
                     </nav>
                 </div>
 
@@ -479,6 +496,16 @@
                         <!-- Cá nhân Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
+                            @if(auth()->user()->isStudent())
+                                <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item">
+                                    <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
+                                </a>
+                            @endif
+                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item">
+                                    <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
+                                </a>
+                            @endif
                             <a href="{{ route('user.reports.create') }}" class="nav-link-item">
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>
@@ -548,9 +575,11 @@
                     <p class="mb-3">Hệ thống quản lý xử lý rác thải thông minh, hỗ trợ theo dõi, thu gom và phân loại
                         rác thải một cách hiệu quả. Ứng dụng công nghệ để giảm thiểu ô nhiễm, tối ưu quy trình vận hành
                         và xây dựng một môi trường sống xanh – sạch – bền vững.</p>
-                    {{-- <p>EcoWaste là nền tảng hỗ trợ quản lý, theo dõi và tối ưu hóa toàn bộ quy trình thu gom – phân loại
+                    {{-- <p>EcoWaste là nền tảng hỗ trợ quản lý, theo dõi và tối ưu hóa toàn bộ quy trình thu gom – phân
+                        loại
                         – xử lý rác thải. Hệ thống giúp tiết kiệm thời gian, nâng cao hiệu suất công việc, cung cấp dữ
-                        liệu trực quan và góp phần bảo vệ môi trường thông qua các giải pháp công nghệ thông minh.</p> --}}
+                        liệu trực quan và góp phần bảo vệ môi trường thông qua các giải pháp công nghệ thông minh.</p>
+                    --}}
 
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
@@ -608,12 +637,12 @@
 
     <!-- Mobile Menu Toggle Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mobileMenu = document.getElementById('mobileMenu');
 
             if (mobileMenuToggle && mobileMenu) {
-                mobileMenuToggle.addEventListener('click', function() {
+                mobileMenuToggle.addEventListener('click', function () {
                     mobileMenu.classList.toggle('hidden');
                 });
             }
@@ -623,7 +652,7 @@
             const userMenuDropdown = document.getElementById('userMenuDropdown');
 
             if (userMenuToggle && userMenuDropdown) {
-                userMenuToggle.addEventListener('click', function(e) {
+                userMenuToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const isVisible = !userMenuDropdown.classList.contains('invisible');
 
@@ -635,7 +664,7 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (!userMenuToggle.contains(e.target) && !userMenuDropdown.contains(e.target)) {
                         userMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
@@ -647,7 +676,7 @@
             const personalMenuDropdown = document.getElementById('personalMenuDropdown');
 
             if (personalMenuToggle && personalMenuDropdown) {
-                personalMenuToggle.addEventListener('click', function(e) {
+                personalMenuToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const isVisible = !personalMenuDropdown.classList.contains('invisible');
 
@@ -668,9 +697,9 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e
-                            .target)) {
+                        .target)) {
                         personalMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -681,7 +710,7 @@
             const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
 
             if (notificationMenuToggle && notificationMenuDropdown) {
-                notificationMenuToggle.addEventListener('click', function(e) {
+                notificationMenuToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const isVisible = !notificationMenuDropdown.classList.contains('invisible');
 
@@ -701,9 +730,9 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e
-                            .target)) {
+                        .target)) {
                         notificationMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -712,7 +741,7 @@
             // Logout confirmation
             const logoutForm = document.getElementById('logoutForm');
             if (logoutForm) {
-                logoutForm.addEventListener('submit', function(e) {
+                logoutForm.addEventListener('submit', function (e) {
                     if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                         e.preventDefault();
                         return false;

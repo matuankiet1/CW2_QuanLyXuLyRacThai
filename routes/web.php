@@ -3,6 +3,7 @@ use App\Http\Controllers\StaffHomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BannerController;
@@ -21,9 +22,13 @@ use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
+use App\Http\Controllers\TrashRequestController;
 use App\Http\Controllers\ChatbotController;
 use App\Models\Banner;
 
+
+// Route tạm thời để sửa CHECK constraint SQLite - PHẢI ĐẶT Ở ĐẦU FILE
+Route::get('/fix-db-role', [AuthController::class, 'fixSqliteRoleConstraint']);
 
 // Route để đánh dấu báo cáo đã đọc
 Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
@@ -37,6 +42,7 @@ Route::post('/reports/user-reports/{id}/mark-read', function ($id) {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+Route::get('/guide', [HomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
 
 //------------------------------------ STAFF HOME -------------------------------------//
 Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
@@ -190,6 +196,50 @@ Route::middleware('admin')->group(function () {
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
     Route::get('/notifications/{id}/download', [NotificationController::class, 'downloadAttachment'])->name('admin.notifications.download');
 
+    // Trash Requests (Admin)
+    Route::prefix('trash-requests')->name('admin.trash-requests.')->group(function () {
+        Route::get('/', [TrashRequestController::class, 'adminIndex'])->name('index');
+        Route::get('/{id}', [TrashRequestController::class, 'adminShow'])->name('show');
+        Route::post('/{id}/approve', [TrashRequestController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [TrashRequestController::class, 'reject'])->name('reject');
+    });
+
+    // Collection Schedules (Admin - moved from manager routes)
+    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
+        ->name('admin.collection-schedules.search');
+
+    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
+        ->name('admin.collection-schedules.deleteMultiple');
+
+    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
+        ->name('admin.collection-schedules.export-excel');
+
+    Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
+        ->name('admin.collection-schedules.update-status');
+
+    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
+        'index' => 'admin.collection-schedules.index',
+        'store' => 'admin.collection-schedules.store',
+        'edit' => 'admin.collection-schedules.edit',
+        'update' => 'admin.collection-schedules.update',
+        'destroy' => 'admin.collection-schedules.destroy',
+    ]);
+
+    // Events (Admin - moved from manager routes)
+    Route::prefix('admin/events')->name('admin.events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/', [EventController::class, 'store'])->name('store');
+        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [EventController::class, 'update'])->name('update');
+        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [EventController::class, 'export'])->name('export');
+
+        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
+        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
+        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
+    });
+
 });
 
 //--------------------------------------- USER NOTIFICATIONS (Sinh viên) -------------------------------------//
@@ -222,90 +272,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/collection_schedules', [HomeController::class, 'collection_schedules'])->name('user.collection_schedules.index');
 });
 
-//--------------------------------------- MANAGER ROUTES (Quản lý + Admin) -------------------------------------//
-Route::middleware('manager')->group(function () {
-    Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
-
-    Route::get('collection-schedules/search', [CollectionScheduleController::class, 'search'])
-        ->name('admin.collection-schedules.search');
-
-    Route::delete('collection-schedules/delete-multiple', [CollectionScheduleController::class, 'destroyMultiple'])
-        ->name('admin.collection-schedules.deleteMultiple');
-
-    Route::get('/collection-schedules/export-excel', [CollectionScheduleController::class, 'exportExcel'])
-        ->name('admin.collection-schedules.export-excel');
-
-    Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
-        ->name('admin.collection-schedules.update-status');
-
-    Route::get('/collection-schedules/get-waste-logs/{id}', [CollectionScheduleController::class, 'getWasteLogs'])
-        ->name('admin.collection-schedules.get-waste-logs');
-
-    Route::resource('collection-schedules', CollectionScheduleController::class)->names([
-        'index' => 'admin.collection-schedules.index',
-        'store' => 'admin.collection-schedules.store',
-        'edit' => 'admin.collection-schedules.edit',
-        'update' => 'admin.collection-schedules.update',
-        'destroy' => 'admin.collection-schedules.destroy',
-    ]);
-
-    Route::prefix('admin/events')->name('admin.events.')->group(function () {
-        Route::get('/', [EventController::class, 'index'])->name('index');
-        Route::get('/create', [EventController::class, 'create'])->name('create');
-        Route::post('/', [EventController::class, 'store'])->name('store');
-        Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
-        Route::put('/{event}', [EventController::class, 'update'])->name('update');
-        Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
-        Route::get('/export', [EventController::class, 'export'])->name('export');
-
-        Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
-        Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
-        Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
-
-
-        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
-            ->name('participants'); // ✅ Thêm route index cho view quản lý
-
-        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
-            ->name('participants.confirm');
-
-        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
-            ->name('participants.attend');
-
-        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
-            ->name('participants.pending');
-
-        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
-            ->name('pending'); // ✅ Thêm route index cho view quản lý
-
-        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
-            ->name('participants.bulk-confirm');
-
-        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
-            ->name('participants.bulk-attend');
-
-        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
-            ->name('participants.export');
-
-        Route::post('/events/{event}/register', [EventParticipantController::class, 'register'])
-            ->name('user.events.register')
-            ->middleware('auth'); // Chỉ cho user đã đăng nhập
-    });
-
-    Route::get('/manager/collection-reports', [CollectionReportController::class, 'managerIndex'])->name('manager.collection-reports.index');
-    Route::post('/manager/collection-reports/{report}/approve', [CollectionReportController::class, 'approve'])->name('manager.collection-reports.approve');
-});
-
+//--------------------------------------- STAFF ROUTES -------------------------------------//
 Route::middleware('staff')->group(function () {
     Route::get('/staff/dashboard', [DashboardController::class, 'staff'])->name('staff.dashboard');
+
+    // Trash Requests (Staff)
+    Route::prefix('staff/trash-requests')->name('staff.trash-requests.')->group(function () {
+        Route::get('/', [TrashRequestController::class, 'staffIndex'])->name('index');
+        Route::get('/{id}', [TrashRequestController::class, 'staffShow'])->name('show');
+        Route::get('/{id}/edit', [TrashRequestController::class, 'staffEdit'])->name('edit');
+        Route::put('/{id}', [TrashRequestController::class, 'staffUpdate'])->name('update');
+    });
 
     Route::get('/staff/collection-reports', [CollectionReportController::class, 'staffIndex'])->name('staff.collection-reports.index');
     Route::get('/staff/collection-reports/{schedule}/create', [CollectionReportController::class, 'staffCreate'])->name('staff.collection-reports.create');
     Route::post('/staff/collection-reports/{schedule}', [CollectionReportController::class, 'staffStore'])->name('staff.collection-reports.store');
 });
 
+//--------------------------------------- STUDENT ROUTES -------------------------------------//
 Route::middleware('student')->group(function () {
     Route::get('/student/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
+
+    // Trash Requests (Student)
+    Route::prefix('student/trash-requests')->name('student.trash-requests.')->group(function () {
+        Route::get('/', [TrashRequestController::class, 'studentIndex'])->name('index');
+        Route::get('/create', [TrashRequestController::class, 'create'])->name('create');
+        Route::post('/', [TrashRequestController::class, 'store'])->name('store');
+        Route::get('/{id}', [TrashRequestController::class, 'studentShow'])->name('show');
+    });
 });
 
 
@@ -343,7 +337,7 @@ Route::get('/banner-img/{filename}', function ($filename) {
     
     if (!file_exists($path)) {
         // Log lỗi để debug
-        \Log::error("Banner image not found: " . $path);
+        Log::error("Banner image not found: " . $path);
         abort(404);
     }
     
