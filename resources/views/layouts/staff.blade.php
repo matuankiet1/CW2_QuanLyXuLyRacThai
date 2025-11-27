@@ -425,10 +425,10 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5>Liên kết</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ route('home') }}">Trang chủ</a></li>
-                        <li class="mb-2"><a href="{{ route('user.posts.home') }}">Bài viết</a></li>
-                        <li class="mb-2"><a href="{{ route('home.about') }}">Giới thiệu</a></li>
-                        <li class="mb-2"><a href="{{ route('home.contact') }}">Liên hệ</a></li>
+                        <li class="mb-2"><a href="{{ route('staff.home.index') }}">Trang chủ</a></li>
+                        <li class="mb-2"><a href="{{ route('staff.posts.home') }}">Bài viết</a></li>
+                        <li class="mb-2"><a href="{{ route('staff.home.about') }}">Giới thiệu</a></li>
+                        <li class="mb-2"><a href="{{ route('staff.home.contact') }}">Liên hệ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
