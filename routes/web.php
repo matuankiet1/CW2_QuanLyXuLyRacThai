@@ -24,6 +24,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
 use App\Http\Controllers\TrashRequestController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ShareSocialController;
 use App\Models\Banner;
 
 
@@ -304,6 +305,17 @@ Route::middleware('student')->group(function () {
         Route::post('/', [TrashRequestController::class, 'store'])->name('store');
         Route::get('/{id}', [TrashRequestController::class, 'studentShow'])->name('show');
     });
+
+    // Share Social (Student)
+    Route::prefix('student/share')->name('student.share-')->group(function () {
+        Route::get('/achievements', [ShareSocialController::class, 'showSharePage'])->name('achievements');
+        Route::get('/{platform}', [ShareSocialController::class, 'shareToPlatform'])->name('platform');
+    });
+});
+
+//--------------------------------------- API ROUTES -------------------------------------//
+Route::prefix('api')->name('api.')->middleware('auth')->group(function () {
+    Route::get('/student/achievements', [ShareSocialController::class, 'getAchievements'])->name('student.achievements');
 });
 
 
