@@ -327,7 +327,7 @@
                                                     class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                                     <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
                                                 </a>
-                                            @endif
+                                            @endif  
                                             @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
                                                 <a href="{{ route('staff.trash-requests.index') }}"
                                                     class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">

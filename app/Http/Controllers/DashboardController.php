@@ -27,7 +27,7 @@ class DashboardController extends Controller
         $wasteStatistics = $this->getWasteStatistics($request, $year);
 
         $wasteClassification = $this->getWasteClassification();
-        
+
         // Nếu là request AJAX (JS fetch) -> trả JSON
         if ($request->ajax()) {
             return response()->json($wasteStatistics);
@@ -55,13 +55,16 @@ class DashboardController extends Controller
 
     public function student()
     {
-        $upcomingEvents = Event::where('status', 'upcoming')
-            ->orderBy('event_start_date', 'asc')
-            ->limit(5)
-            ->get();
+        $now = now();
 
-        return view('dashboard.student', compact('upcomingEvents'));
+        $registeringEvents = Event::where('register_date', '<', $now)
+            ->where('register_end_date', '>', $now)
+            ->get();
+        
+        $registeringEventsCount = $registeringEvents -> count();
+        return view('dashboard.student', compact('registeringEvents', 'registeringEventsCount'));
     }
+
 
     // Thống kê rác thải theo tháng dựa vào năm mà người dùng chọn
     public function getWasteStatistics(Request $request, $y)
