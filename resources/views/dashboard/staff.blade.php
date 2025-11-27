@@ -12,7 +12,8 @@
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Sự kiện được phân công</h2>
-                <a href="{{ route('user.waste-logs.index') }}" class="text-sm text-blue-600 hover:underline">Báo cáo thu gom</a>
+                <a href="{{ route('staff.collection_schedules.index') }}" class="text-sm text-blue-600 hover:underline">Báo
+                    cáo thu gom</a>
             </div>
 
             <div class="overflow-x-auto" id="tableContainer">
@@ -86,7 +87,6 @@
                 </table>
 
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="font-semibold text-gray-900 mb-3">Tác vụ nhanh</h3>
@@ -105,4 +105,6 @@
                 </div>
             </div>
         </div>
+    </div>
+    
 @endsection

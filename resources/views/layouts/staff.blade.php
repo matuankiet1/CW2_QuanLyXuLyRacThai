@@ -324,11 +324,15 @@
                                     </a>
                                     <a href="{{ route('staff.statistics.index') }}"
                                         class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg mx-1">
-                                        <i class="fas fa-chart-line mr-2"></i>Thống kê
+                                        <i class="fas fa-chart-line     mr-2"></i>Thống kê
                                     </a>
                                 </div>
                             </div>
                         </div>
+                        <a href="{{ route('staff.home.sorting_guide') }}" class="nav-link-item">
+                            <i class="fas fa-recycle mr-1"></i>Phân loại rác
+                        </a>
+
                     </nav>
                 </div>
 
@@ -387,11 +391,11 @@
                         hệ</a>
                     <div class="border-t border-white/20 pt-2 mt-2">
                         <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
-                        <a href="{{ route('user.reports.create') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.reports.create') }}" class="nav-link-item"><i
                                 class="fas fa-flag mr-2"></i>Báo cáo</a>
-                        <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.waste-logs.index') }}" class="nav-link-item"><i
                                 class="fas fa-file-alt mr-2"></i>Báo cáo thu gom</a>
-                        <a href="{{ route('user.statistics.index') }}" class="nav-link-item"><i
+                        <a href="{{ route('staff.statistics.index') }}" class="nav-link-item"><i
                                 class="fas fa-chart-line mr-2"></i>Thống kê</a>
                     </div>
                 </div>

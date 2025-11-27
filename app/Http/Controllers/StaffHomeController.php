@@ -32,18 +32,44 @@ class StaffHomeController extends Controller
             ->get();
 
         // Lấy banner mới nhất
-        $banners = Banner::orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
-
-        // Thống kê nhanh
         $stats = [
-            'total_posts' => Post::where('status', 'published')->count(),
+            'total_posts' => Post::count(),
             'total_schedules' => CollectionSchedule::count(),
             'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
         ];
 
-        return view('staff.home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
+        $latestPosts = Post::latest()->take(3)->get();
+        $upcomingSchedules = CollectionSchedule::where('scheduled_date', '>=', now())
+            ->orderBy('scheduled_date')
+            ->take(3)
+            ->get();
+
+        // // Phân loại banner theo vị trí
+        // $banners = Banner::where('status', 1)->orderBy('created_at', 'desc')->get();
+
+        // $topBanners = Banner::where('position', 'top')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        // $sidebarBanners = Banner::where('position', 'sidebar')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        // $footerBanners = Banner::where('position', 'footer')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        return view('staff.home.index', compact(
+            'stats',
+            'latestPosts',
+            'upcomingSchedules',
+            // 'topBanners',
+            // 'sidebarBanners',
+            // 'footerBanners'
+        ));
     }
 
     public function about()
@@ -56,28 +82,95 @@ class StaffHomeController extends Controller
         return view('staff.home.contact');
     }
 
-    public function collection_schedules()
+    public function collection_schedule(Request $request)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
+
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
-        // dd( $collectionSchedules);
-        $isSearch = false;
-        return view('staff.collection_schedules.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+
+        $search = $request->input('search');
+        $sort = $request->input('sort'); // Lấy giá trị dropdown sắp xếp
+        $statusFilter = $request->input('status');
+
+
+
+        // Bắt đầu query builder
+        $collectionSchedules = CollectionSchedule::with('staff');
+
+        if ($statusFilter && $statusFilter !== 'all') {
+            $collectionSchedules = $collectionSchedules->where('status', $statusFilter);
+        }
+
+        // Tìm kiếm
+        if ($search) {
+            $collectionSchedules = $collectionSchedules->where(function ($query) use ($search) {
+                $query->where('schedule_id', 'like', "%$search%")
+                    ->orWhereHas('staff', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%");
+                    });
+            });
+            $isSearching = true;
+        } else {
+            $isSearching = false;
+        }
+
+        // Sắp xếp
+        switch ($sort) {
+            case 'id_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+                break;
+            case 'id_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'desc');
+                break;
+            case 'date_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'asc');
+                break;
+            case 'date_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'desc');
+                break;
+            default:
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+        }
+
+        // Lấy kết quả
+        $collectionSchedules = $collectionSchedules->paginate(10)->appends(request()->query());
+
+        return view('staff.collection_schedules.index', compact(
+            'wasteTypes',
+            'wasteLogs',
+            'collectionSchedules',
+            'isSearching',
+            'search',
+            'sort'
+        ));
     }
 
-    public function postHome()
-    {
-        // Lấy danh sách bài viết đã publish (trạng thái = published)
-        $posts = Post::where('status', 'published')
-            ->orderBy('published_at', 'desc')
-            ->paginate(6); // chia trang 6 bài mỗi trang
 
-        return view('staff.posts.home', compact('posts'));
+
+
+    public function postHome(Request $request)
+    {
+        $search = $request->input('search');
+
+        // Query chính
+        $posts = Post::where('status', 'published');
+
+        // Tìm kiếm
+        if ($search) {
+            $posts->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('author', 'like', "%$search%")
+                    ->orWhere('excerpt', 'like', "%$search%");
+            });
+        }
+
+        // Sắp xếp + phân trang
+        $posts = $posts->orderBy('published_at', 'desc')->paginate(6);
+
+        return view('staff.posts.home', compact('posts', 'search'));
     }
     public function postShow($slug)
     {
@@ -179,18 +272,71 @@ class StaffHomeController extends Controller
         return view('staff.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
     }
 
-     public function wasteLog()
+    public function wasteLog(Request $request)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
+
+        $userId = auth()->id(); // nhân viên hiện tại
+
         $wasteTypes = WasteType::pluck('name', 'id');
-        $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
-        // dd( $collectionSchedules);
-        $isSearch = false;
-        return view('staff.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+
+        $search = $request->input('search');
+        $sort = $request->input('sort');
+        $statusFilter = $request->input('status');
+
+        // Lấy lịch thu gom của nhân viên hiện tại
+        $collectionSchedules = CollectionSchedule::with('staff')
+            ->where('staff_id', $userId);
+
+        // Lọc theo trạng thái nếu có
+        if ($statusFilter && $statusFilter !== 'all') {
+            $collectionSchedules = $collectionSchedules->where('status', $statusFilter);
+        }
+
+        // Tìm kiếm
+        if ($search) {
+            $collectionSchedules = $collectionSchedules->where(function ($query) use ($search) {
+                $query->where('schedule_id', 'like', "%$search%")
+                    ->orWhereHas('staff', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%");
+                    });
+            });
+            $isSearching = true;
+        } else {
+            $isSearching = false;
+        }
+
+        // Sắp xếp
+        switch ($sort) {
+            case 'id_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+                break;
+            case 'id_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'desc');
+                break;
+            case 'date_asc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'asc');
+                break;
+            case 'date_desc':
+                $collectionSchedules = $collectionSchedules->orderBy('scheduled_date', 'desc');
+                break;
+            default:
+                $collectionSchedules = $collectionSchedules->orderBy('schedule_id', 'asc');
+        }
+
+        // Phân trang 7 lịch mỗi trang
+        $collectionSchedules = $collectionSchedules->paginate(7)->withQueryString();
+
+        return view('staff.waste-logs.index', compact(
+            'wasteTypes',
+            'collectionSchedules',
+            'search',
+            'sort',
+            'statusFilter',
+            'isSearching'
+        ));
     }
 
     public function statistic()
@@ -209,17 +355,17 @@ class StaffHomeController extends Controller
         // 2. Tính lượng rác đã phân loại
         // Lấy các collection schedules mà user là staff
         $schedules = CollectionSchedule::where('staff_id', $userId)->pluck('schedule_id');
-        
+
         // Khởi tạo giá trị mặc định
-        $wasteLogsStats = (object)[
+        $wasteLogsStats = (object) [
             'total_logs' => 0,
             'total_weight' => 0,
             'waste_types_count' => 0
         ];
-        
+
         $wasteByType = collect();
         $monthlyStats = collect();
-        
+
         // Chỉ tính toán nếu user có schedules
         if ($schedules->count() > 0) {
             // Đếm số lượng waste logs và tổng trọng lượng
@@ -266,8 +412,59 @@ class StaffHomeController extends Controller
         ));
     }
 
-     public function createReport()
+    public function createReport()
     {
         return view('staff.reports.create');
     }
+
+    public function history(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $user_id = auth()->id();
+        $wasteTypes = WasteType::pluck('name', 'id');
+
+        // Kiểm tra xem có schedule_id trong query string k hông
+        $scheduleId = $request->query('schedule_id');
+
+        // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
+        $query = WasteLog::query()->with(['collectionSchedule.staff', 'confirmedBy', 'collectionSchedule']);
+
+        if ($scheduleId) {
+            $query->where('schedule_id', $scheduleId);
+            $isSearch = true;
+        } else {
+            $isSearch = false;
+        }
+
+        // 🔍 Nếu có lọc theo trạng thái
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%");        // tìm theo ID của WasteLog
+            });
+        }
+
+
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        // Lấy tất cả lịch thu gom (dùng cho dropdown hoặc hiển thị)
+        $collectionSchedules = CollectionSchedule::with('staff')->orderBy('schedule_id', 'asc')->get();
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('staff.waste-logs.history', compact('logs', 'search', 'status', 'wasteTypes', 'collectionSchedules', 'isSearch'));
+    }
+
+    public function wasteSortingGuide()
+    {
+        return view('staff.home.sorting_guide');
+    }
+
 }

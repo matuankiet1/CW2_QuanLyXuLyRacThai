@@ -1,4 +1,7 @@
 @php
+    // Tính số yêu cầu đang chờ duyệt
+    //$waitingTrashRequestsCount = \App\Models\TrashRequest::where('status', 'waiting_admin')->count();
+    
     // Default menu items - can be overridden by views
     $menuItems = $menuItems ?? [
         [
@@ -45,6 +48,17 @@
                     'route' => 'admin.collection-schedules.index',
                     'active' => request()->routeIs('admin.collection-schedules.*'),
                 ],
+                // array_merge([
+                //     'label' => 'Yêu cầu thu gom',
+                //     'icon' => 'fa-trash-alt',
+                //     'route' => 'admin.trash-requests.index',
+                //     'active' => request()->routeIs('admin.trash-requests.*'),
+                // ], $waitingTrashRequestsCount > 0 ? [
+                //     'badge' => [
+                //         'text' => $waitingTrashRequestsCount > 9 ? '9+' : $waitingTrashRequestsCount,
+                //         'class' => 'bg-orange-500 text-white',
+                //     ],
+                // ] : []),
                 [
                     'label' => 'Sự kiện',
                     'icon' => 'fa-calendar-check',
@@ -56,6 +70,12 @@
                     'icon' => 'fa-image',
                     'route' => 'admin.banners.index',
                     'active' => request()->routeIs('admin.banners.*'),
+                ],
+                [
+                    'label' => 'Phản hồi',
+                    'icon' => 'fa-comment-dots',
+                    'route' => 'admin.feedback.index',
+                    'active' => request()->routeIs('admin.feedback.*'),
                 ],
             ],
         ],
@@ -69,11 +89,18 @@
                     'active' => request()->routeIs('admin.reports.*'),
                 ],
                 [
+                    'label' => 'Báo cáo thu gom rác',
+                    'icon' => 'fa-user-shield',
+                    'route' => 'admin.waste_logs.index',
+                    'active' => request()->routeIs('admin.roles.*'),
+                ],
+                [
                     'label' => 'Phân quyền',
                     'icon' => 'fa-user-shield',
                     'route' => 'admin.roles.index',
                     'active' => request()->routeIs('admin.roles.*'),
                 ],
+                
             ],
         ],
         [

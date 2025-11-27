@@ -12,7 +12,9 @@ return new class extends Migration {
     {
         Schema::create('collection_schedules', function (Blueprint $table) {
             $table->id('schedule_id');
-            $table->foreignId('staff_id')->constrained('users');
+            $table->foreignId('staff_id')
+                ->constrained('users', 'user_id')
+                ->cascadeOnDelete();
             $table->dateTime('scheduled_date');
             $table->string('status', 50)->default('Chưa thực hiện');
             $table->dateTime('completed_at')->nullable();

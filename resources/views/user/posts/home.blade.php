@@ -11,7 +11,7 @@
                 <input type="text" 
                        name="search" 
                        value="{{ $search ?? '' }}" 
-                       placeholder="Tìm kiếm sự kiện..." 
+                       placeholder="Tìm kiếm bài viết..." 
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
             </div>
             
