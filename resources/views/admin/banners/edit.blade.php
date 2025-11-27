@@ -1,5 +1,7 @@
 @extends('layouts.admin-with-sidebar')
 
+@section('title', 'Chỉnh sửa banner - Admin')
+
 @section('content')
 <div class="p-6">
     <!-- Header -->
@@ -39,16 +41,30 @@
     <!-- Hiển thị ảnh hiện tại (nếu có) -->
     @if($banner->image)
         <div class="mb-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Ảnh hiện tại:</p>
-            <div class="current-image-container">
-                <img src="{{ asset('storage/' . $banner->image) }}" 
+        <p class="text-sm font-medium text-gray-700 mb-2">Ảnh hiện tại:</p>
+        <div class="current-image-container">
+            @php
+                $filename = basename($banner->image);
+                $storagePath = storage_path('app/public/banners/' . $filename);
+                $fileExists = file_exists($storagePath);
+            @endphp
+            
+            @if($fileExists)
+                <img src="{{ route('banner.image', $filename) }}" 
                      alt="{{ $banner->title }}" 
                      class="current-image">
                 <div class="current-image-overlay">
                     <span class="current-image-text">Ảnh hiện tại</span>
                 </div>
-            </div>
+            @else
+                <div class="bg-red-100 p-4 rounded-lg text-center">
+                    <span class="text-red-600 text-sm">Ảnh không tồn tại</span>
+                    <br>
+                    <span class="text-gray-500 text-xs">{{ $filename }}</span>
+                </div>
+            @endif
         </div>
+    </div>
     @endif
     
     <!-- Custom File Upload Area -->

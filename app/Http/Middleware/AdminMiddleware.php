@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\RoleRedirector;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,8 @@ class AdminMiddleware
 
         // Kiểm tra xem user có phải admin không
         if (auth()->user()->role !== 'admin') {
-            return redirect()->route('posts.home')->with('error', 'Bạn không có quyền truy cập trang này.');
+            return redirect()->route(RoleRedirector::homeRoute(auth()->user()->role))
+                ->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
         return $next($request);

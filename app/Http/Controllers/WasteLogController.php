@@ -7,6 +7,7 @@ use App\Models\CollectionSchedule;
 use App\Models\WasteType;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -21,13 +22,14 @@ class WasteLogController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->user()->user_id;
+        $user_id = auth()->id();
         $wasteTypes = WasteType::pluck('name', 'id');
         $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::where('staff_id', $user_id)->get();
+        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'asc')->get();
+
         // dd( $collectionSchedules);
         $isSearch = false;
-        return view('admin.waste_logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+        return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
     }
 
     /**
@@ -36,40 +38,74 @@ class WasteLogController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'waste_type' => 'required|array|min:1',
-            'waste_type.*' => 'required|integer|exists:waste_types,id',
+            'schedule_id' => 'required|exists:collection_schedules,schedule_id',
 
-            'waste_weight' => 'required|array|min:1',
-            'waste_weight.*' => 'required|numeric|min:0.1',
+            'waste_type' => 'nullable|array|min:1',
+            'waste_type.*' => 'nullable|integer|exists:waste_types,id',
+
+            'waste_weight' => 'nullable|array|min:1',
+            'waste_weight.*' => 'nullable|numeric|min:0.1',
 
             'waste_image' => 'nullable|array',
             'waste_image.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            'old_waste_image' => 'array',
+            'old_waste_image.*' => 'nullable|string|max:255',
         ]);
 
-        // if ($request->hasFile('image')) {
-        //     $validated['image'] = $request->file('image')->store('waste_logs', 'public');
-        // }
+        $scheduleId = $validated['schedule_id'];
 
         DB::beginTransaction();
 
         try {
-            // Lặp qua từng dòng input để tạo chi tiết rác
-            foreach ($validated['wasteType'] as $i => $wasteTypeId) {
+            // 1. Xóa toàn bộ waste_logs cũ của schedule này
+            WasteLog::where('schedule_id', $scheduleId)->get()->each->delete();
+            // 2. Kiểm tra user có truyền dữ liệu không
+            $hasNewData =
+                isset($validated['waste_type']) &&
+                collect($validated['waste_type'])
+                    ->filter(fn($v) => !empty($v))
+                    ->isNotEmpty();
+
+
+            if (!$hasNewData) {
+                DB::commit();
+
+                return redirect()
+                    ->back()
+                    ->with('status', [
+                        'type' => 'success',
+                        'message' => 'Đã xóa toàn bộ dữ liệu báo cáo rác thải cho lịch thu gom này.',
+                    ]);
+            }
+            // 3. Lặp qua từng dòng input để tạo chi tiết báo cáo thu gom rác
+            foreach ($validated['waste_type'] as $i => $wasteTypeId) {
                 $data = [
-                    'schedule_id' => (int) $request->input('schedule_id'),
+                    'schedule_id' => (int) $scheduleId,
                     'waste_type_id' => $wasteTypeId,
                     'waste_weight' => $validated['waste_weight'][$i],
                 ];
 
+                $imagePath = $request->input('old_waste_image.' . $i);
+
                 if ($request->hasFile('waste_image') && isset($request->file('waste_image')[$i])) {
                     $file = $request->file('waste_image')[$i];
-                    $data['waste_image'] = $file->store('waste_logs/' . (int) $request->input('schedule_id'), 'public');
+                    $wasteTypeName = WasteType::find($wasteTypeId)?->name ?? 'unknown';
+
+                    $timestamp = now()->format('Y-m-d_H-i-s');
+                    $slug = Str::slug($wasteTypeName, '-');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = "{$timestamp}_{$slug}.{$extension}";
+
+                    $folder = 'waste_logs/' . (int) $request->input('schedule_id');
+
+                    $imagePath = $file->storeAs($folder, $filename, 'public');
                 }
+
+                $data['waste_image'] = $imagePath;
 
                 WasteLog::create($data);
             }
-            // dd('abc');
-
 
             DB::commit();
 
@@ -77,7 +113,7 @@ class WasteLogController extends Controller
                 ->back()
                 ->with('status', [
                     'type' => 'success',
-                    'message' => 'Thêm báo cáo thu gom rác thành công!',
+                    'message' => 'Báo cáo thu gom rác thành công!',
                 ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -150,4 +186,7 @@ class WasteLogController extends Controller
         }
         return response()->json($result);
     }
+
+    
+
 }

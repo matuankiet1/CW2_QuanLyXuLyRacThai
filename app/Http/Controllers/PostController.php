@@ -75,14 +75,69 @@ class PostController extends Controller
 
         // 1️⃣ Xác thực dữ liệu
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'excerpt' => 'required|string',
-            'content' => 'required|string',
-            'post_categories' => 'required|string',
-            'status' => 'required|string|in:draft,published,archived',
-            'published_at' => 'nullable|date',
-            'image' => 'nullable|string|max:255', // ảnh chọn sẵn (URL hoặc path)
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(?!\s*$).+$/', // Không cho phép toàn khoảng trắng
+            ],
+            'author' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\pL\s\.]+$/u', // Chỉ cho phép chữ cái, khoảng trắng và dấu gạch
+            ],
+            'excerpt' => [
+                'required',
+                'string',
+                'max:500',
+                'regex:/^(?!\s*$).+$/',
+            ],
+            'content' => [
+                'required',
+                'string',
+                'min:20', // Tối thiểu 20 ký tự nội dung
+            ],
+            'post_categories' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[\pL\s,]+$/u', // Chỉ chữ và dấu phẩy, nếu lưu dạng text
+            ],
+            'status' => [
+                'required',
+                'string',
+                'in:draft,published,archived',
+            ],
+            'published_at' => [
+                'nullable',
+                'date',
+                'after_or_equal:today', // Ngày xuất bản phải từ hôm nay trở đi (nếu có)
+            ],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,gif,webp', // ✅ Giới hạn định dạng
+                'max:2048', // ✅ Giới hạn kích thước file (tính bằng KB, ở đây là 2MB)
+            ],
+        ], [
+            'title.required' => 'Tiêu đề không được để trống hoặc toàn khoảng trắng.',
+            'title.regex' => 'Tiêu đề không hợp lệ.',
+            'author.required' => 'Tên tác giả không được để trống.',
+            'author.regex' => 'Tên tác giả chỉ được chứa chữ cái, khoảng trắng hoặc dấu chấm.',
+            'excerpt.required' => 'Mô tả ngắn không được để trống.',
+            'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
+            'content.required' => 'Nội dung không được để trống.',
+            'content.min' => 'Nội dung phải có ít nhất 20 ký tự.',
+            'post_categories.required' => 'Danh mục bài viết không được để trống.',
+            'post_categories.regex' => 'Danh mục chỉ được chứa chữ cái và dấu phẩy.',
+            'status.required' => 'Trạng thái là bắt buộc.',
+            'status.in' => 'Trạng thái không hợp lệ.',
+            'published_at.date' => 'Ngày xuất bản không hợp lệ.',
+            'published_at.after_or_equal' => 'Ngày xuất bản không thể nhỏ hơn hôm nay.',
+            'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
+            'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
+            'image.max' => 'Ảnh không được vượt quá 2MB.',
         ]);
 
         // 2️⃣ Tạo slug tự động và xử lý trùng
@@ -96,6 +151,19 @@ class PostController extends Controller
 
         $validated['slug'] = $slug;
 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+
+            // Lưu vào public/images/posts
+            $file->move(public_path('images/posts'), $fileName);
+
+            // Lưu đường dẫn tương đối trong DB
+            $validated['image'] = 'images/posts/' . $fileName;
+        }
+
+
         // 3️⃣ Tạo bài viết
         $post = \App\Models\Post::create($validated);
 
@@ -104,6 +172,7 @@ class PostController extends Controller
             ->route('admin.posts.index')
             ->with('success', 'Bài viết đã được thêm thành công!');
     }
+
 
     /**
      * Hiển thị form chỉnh sửa bài viết
@@ -116,25 +185,131 @@ class PostController extends Controller
     /**
      * Cập nhật bài viết
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, \App\Models\Post $post)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'required|string',
-            'content' => 'required|string',
-            'post_categories' => 'required|string',
-            'image' => 'nullable|string|max:255',
-            'author' => 'required|string|max:255',
-            'status' => 'required|in:draft,published,archived',
-            'published_at' => 'nullable|date',
-        ]);
+        try {
+            // 1️⃣ Ghi log để debug
+            \Log::info('update() đang chạy', $request->all());
 
-        $post = Post::findOrFail($id);
-        $post->update($data);
+            // 2️⃣ Xác thực dữ liệu đầu vào
+            $validated = $request->validate([
+                'title' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'regex:/^(?!\s*$).+$/',
+                ],
+                'author' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'regex:/^[\pL\s\.]+$/u',
+                ],
+                'excerpt' => [
+                    'required',
+                    'string',
+                    'max:500',
+                    'regex:/^(?!\s*$).+$/',
+                ],
+                'content' => [
+                    'required',
+                    'string',
+                    'min:20',
+                ],
+                'post_categories' => [
+                    'required',
+                    'string',
+                    'max:100',
+                    'regex:/^[\pL\s,]+$/u',
+                ],
+                'status' => [
+                    'required',
+                    'string',
+                    'in:draft,published,archived',
+                ],
+                'published_at' => [
+                    'nullable',
+                    'date',
+                    'after_or_equal:today',
+                ],
+                'image' => [
+                    'nullable',
+                    'image',
+                    'mimes:jpg,jpeg,png,gif,webp',
+                    'max:2048',
+                ],
+            ], [
+                'title.required' => 'Tiêu đề không được để trống hoặc toàn khoảng trắng.',
+                'title.regex' => 'Tiêu đề không hợp lệ.',
+                'author.required' => 'Tên tác giả không được để trống.',
+                'author.regex' => 'Tên tác giả chỉ được chứa chữ cái, khoảng trắng hoặc dấu chấm.',
+                'excerpt.required' => 'Mô tả ngắn không được để trống.',
+                'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
+                'content.required' => 'Nội dung không được để trống.',
+                'content.min' => 'Nội dung phải có ít nhất 20 ký tự.',
+                'post_categories.required' => 'Danh mục bài viết không được để trống.',
+                'post_categories.regex' => 'Danh mục chỉ được chứa chữ cái và dấu phẩy.',
+                'status.required' => 'Trạng thái là bắt buộc.',
+                'status.in' => 'Trạng thái không hợp lệ.',
+                'published_at.date' => 'Ngày xuất bản không hợp lệ.',
+                'published_at.after_or_equal' => 'Ngày xuất bản không thể nhỏ hơn hôm nay.',
+                'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
+                'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
+                'image.max' => 'Ảnh không được vượt quá 2MB.',
+            ]);
 
-        return redirect()->route('admin.posts.index')
-            ->with('success', 'Cập nhật bài viết thành công!');
+            // 3️⃣ Cập nhật slug (nếu tiêu đề thay đổi)
+            if ($validated['title'] !== $post->title) {
+                $slug = \Str::slug($validated['title']);
+                $originalSlug = $slug;
+                $count = 1;
+
+                while (\App\Models\Post::where('slug', $slug)->where('id', '!=', $post->id)->exists()) {
+                    $slug = $originalSlug . '-' . $count++;
+                }
+
+                $validated['slug'] = $slug;
+            }
+
+            // 4️⃣ Nếu có upload ảnh mới thì xử lý thay thế
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time() . '-' . \Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+
+                // Tạo thư mục nếu chưa có
+                $destination = public_path('images/posts');
+                if (!file_exists($destination)) {
+                    mkdir($destination, 0755, true);
+                }
+
+                // Lưu file mới
+                $file->move($destination, $fileName);
+                $validated['image'] = 'images/posts/' . $fileName;
+
+                // Xóa ảnh cũ nếu có
+                if ($post->image && file_exists(public_path($post->image))) {
+                    unlink(public_path($post->image));
+                }
+            }
+
+            // 5️⃣ Cập nhật bài viết
+            $post->update($validated);
+
+            // 6️⃣ Trả về với thông báo thành công
+            return redirect()
+                ->route('admin.posts.index')
+                ->with('success', 'Cập nhật bài viết thành công!');
+
+        } catch (\Exception $e) {
+            // 7️⃣ Ghi log lỗi và trả thông báo
+            \Log::error('Lỗi khi cập nhật bài viết: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->with('error', 'Đã xảy ra lỗi khi cập nhật bài viết. Vui lòng thử lại!');
+        }
     }
+
 
     public function destroy(Post $post)
     {

@@ -1,5 +1,7 @@
 @extends('layouts.admin-with-sidebar')
 
+@section('title', 'Quản lý banners - Admin')
+
 @section('content')
 <!-- ✅ Thông báo thành công / lỗi -->
 @if (session('success') || session('error'))
@@ -110,7 +112,23 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="h-16 w-40 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
                                     @if($banner->image)
-                                        <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="h-full w-full object-cover">
+                                        @php
+                // Chỉ lấy tên file từ đường dẫn trong database
+                $filename = basename($banner->image);
+                $storagePath = storage_path('app/public/banners/' . $filename);
+                $fileExists = file_exists($storagePath);
+            @endphp
+            
+            @if($fileExists)
+                <img src="{{ route('banner.image', $filename) }}" 
+                     alt="{{ $banner->title }}" 
+                     class="h-full w-full object-cover">
+            @else
+                <div class="text-center p-2">
+                    <span class="text-red-500 text-xs block">❌ Ảnh lỗi</span>
+                    <span class="text-gray-400 text-xs">{{ $filename }}</span>
+                </div>
+            @endif
                                     @else
                                         <span class="text-gray-500 text-xs">Chưa có ảnh</span>
                                     @endif

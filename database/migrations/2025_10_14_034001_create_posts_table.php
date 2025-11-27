@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->enum('status', ['draft', 'published','archived'])->default('draft');
             $table->date('published_at')->nullable();
+            $table->unsignedBigInteger('post_views')->default(0);
             $table->timestamps();
         });
     }
