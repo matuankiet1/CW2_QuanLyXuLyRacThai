@@ -151,14 +151,26 @@ class StaffHomeController extends Controller
 
 
 
-    public function postHome()
+    public function postHome(Request $request)
     {
-        // Lấy danh sách bài viết đã publish (trạng thái = published)
-        $posts = Post::where('status', 'published')
-            ->orderBy('published_at', 'desc')
-            ->paginate(6); // chia trang 6 bài mỗi trang
+        $search = $request->input('search');
 
-        return view('staff.posts.home', compact('posts'));
+        // Query chính
+        $posts = Post::where('status', 'published');
+
+        // Tìm kiếm
+        if ($search) {
+            $posts->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('author', 'like', "%$search%")
+                    ->orWhere('excerpt', 'like', "%$search%");
+            });
+        }
+
+        // Sắp xếp + phân trang
+        $posts = $posts->orderBy('published_at', 'desc')->paginate(6);
+
+        return view('staff.posts.home', compact('posts', 'search'));
     }
     public function postShow($slug)
     {
@@ -433,7 +445,8 @@ class StaffHomeController extends Controller
         return view('staff.waste-logs.history', compact('logs', 'search', 'status'));
     }
 
-    public function wasteSortingGuide(){
+    public function wasteSortingGuide()
+    {
         return view('staff.home.sorting_guide');
     }
 
