@@ -186,6 +186,9 @@ Route::middleware('admin')->group(function () {
         Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
 
         Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
+        Route::post('waste_logs/{wasteLog}/confirm', [WasteLogController::class, 'confirm'])
+    ->name('waste_logs.confirm');
+
 
     });
 

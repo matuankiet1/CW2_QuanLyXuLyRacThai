@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WasteLog;
 use App\Models\CollectionSchedule;
 use App\Models\WasteType;
+use App\Models\User;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -25,14 +26,13 @@ class WasteLogController extends Controller
 
         $user_id = auth()->id();
 
-        // Lấy tất cả các staff
         $wasteTypes = WasteType::pluck('name', 'id');
 
         // Kiểm tra xem có schedule_id trong query string không
         $scheduleId = $request->query('schedule_id');
 
         // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
-        $query = WasteLog::query()->with('collectionSchedule.staff');
+        $query = WasteLog::query()->with(['collectionSchedule.staff', 'confirmedBy']);
 
         if ($scheduleId) {
             $query->where('schedule_id', $scheduleId);
@@ -206,6 +206,14 @@ class WasteLogController extends Controller
         return response()->json($result);
     }
 
+    public function confirm(WasteLog $wasteLog)
+    {
+        $wasteLog->status = 'Đã xác nhận';
+        $wasteLog->confirmed_by = auth()->id(); // lưu ID của admin xác nhận
+        $wasteLog->confirmed_at = now();
+        $wasteLog->save();
 
+        return redirect()->back()->with('success', 'Bản ghi đã được xác nhận!');
+    }
 
 }

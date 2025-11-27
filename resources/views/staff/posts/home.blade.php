@@ -2,7 +2,9 @@
 
 @section('content')
     <div class="container py-5">
-        <h1 class="fw-bold mb-5 text-center">📰 Bài viết mới nhất</h1>
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">📰 Bài viết mới nhất</h1>
+        </div>
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <form method="GET" action="{{ route('user.posts.home') }}" class="flex flex-col md:flex-row gap-4">
                 {{-- Tìm kiếm --}}
