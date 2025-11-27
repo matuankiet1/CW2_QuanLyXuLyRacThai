@@ -113,17 +113,26 @@
                                 <td class="px-4 py-3">{{ $log->note ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ optional($log->collectionSchedule->staff)->name ?? 'System' }}</td>
                                 <td class="px-4 py-3">{{ optional($log->created_at)->format('d/m/Y H:i') }}</td>
-                                <td class="px-4 py-3">
-                                    <form
-                                        action="{{ route('admin.waste_logs.confirm', [$collection_schedule->id, $staff->user_id]) }}"
-                                        method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit"
-                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Xác
-                                            nhận</button>
-                                    </form>
+                                <td class="px-4 py-3 text-right">
+                                    @if($log->status != 'Đã xác nhận')
+                                        <form action="{{ route('admin.waste_logs.confirm', $log->id) }}" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            <button type="submit"
+                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm">
+                                                Xác nhận
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-green-600 font-semibold">Đã xác nhận</span>
+                                        <br>
+                                        <small class="text-gray-500">
+                                            bởi {{ optional($log->confirmedBy)->name ?? 'System' }} <br>
+                                            {{ optional($log->confirmed_at)->format('d/m/Y H:i') }}
+                                        </small>
+                                    @endif
                                 </td>
+
                             </tr>
                         @empty
                             <tr>

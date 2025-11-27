@@ -421,8 +421,21 @@ class StaffHomeController extends Controller
     {
         $search = $request->input('search');
         $status = $request->input('status', 'all');
+        $user_id = auth()->id();
+        $wasteTypes = WasteType::pluck('name', 'id');
 
-        $query = WasteLog::with(['schedule']);
+        // Kiểm tra xem có schedule_id trong query string k hông
+        $scheduleId = $request->query('schedule_id');
+
+        // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
+        $query = WasteLog::query()->with(['collectionSchedule.staff', 'confirmedBy', 'collectionSchedule']);
+
+        if ($scheduleId) {
+            $query->where('schedule_id', $scheduleId);
+            $isSearch = true;
+        } else {
+            $isSearch = false;
+        }
 
         // 🔍 Nếu có lọc theo trạng thái
         if ($status !== 'all') {
@@ -432,17 +445,21 @@ class StaffHomeController extends Controller
         // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->whereHas('schedule', function ($s) use ($search) {
-                    $s->where('route_name', 'like', "%$search%")
-                        ->orWhere('id', 'like', "%$search%");
-                })
-                    ->orWhere('note', 'like', "%$search%");
+                $q->where('id', 'like', "%$search%");        // tìm theo ID của WasteLog
             });
         }
 
+
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        // Lấy tất cả lịch thu gom (dùng cho dropdown hoặc hiển thị)
+        $collectionSchedules = CollectionSchedule::with('staff')->orderBy('schedule_id', 'asc')->get();
+
         $logs = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('staff.waste-logs.history', compact('logs', 'search', 'status'));
+        return view('staff.waste-logs.history', compact('logs', 'search', 'status', 'wasteTypes', 'collectionSchedules', 'isSearch'));
     }
 
     public function wasteSortingGuide()

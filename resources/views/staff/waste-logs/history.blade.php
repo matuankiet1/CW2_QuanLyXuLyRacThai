@@ -1,4 +1,4 @@
-@extends('layouts.user')
+@extends('layouts.staff')
 
 @section('title', 'Lịch sử báo cáo')
 
@@ -22,9 +22,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
             </svg>
-            <input type="text" name="search" value="{{ $search }}" placeholder="Tìm theo tuyến đường, ID lịch, ghi chú..."
+            <input type="text" name="search" value="{{ $search }}" placeholder="Tìm theo ID lịch, ghi chú..."
                 class="w-full pl-11 pr-3 py-2 rounded-xl border border-gray-300 
-                       focus:ring-2 focus:ring-green-400 outline-none transition">
+                           focus:ring-2 focus:ring-green-400 outline-none transition">
         </form>
 
         {{-- Nếu không có báo cáo --}}
@@ -49,18 +49,21 @@
                     </div>
 
                     <p class="text-sm text-gray-600">
-                        <strong>Tuyến:</strong> {{ $log->schedule->route_name ?? '—' }}
+                        <strong>Tên:</strong> {{ $log->collectionSchedule->staff->name ?? '—' }}
                     </p>
 
                     <p class="text-sm text-gray-600">
-                        <strong>ID lịch:</strong> {{ $log->schedule->id }}
+                        <strong>ID lịch:</strong> {{ $log->collectionSchedule->schedule_id }}
                     </p>
 
                     <p class="text-sm text-gray-600">
-                        <strong>Thời gian hoàn thành:</strong>
-                        {{ $log->completed_at ? $log->completed_at->format('d/m/Y H:i') : '—' }}
+                        <strong>Đã xác nhận vào lúc:</strong>
+                        {{ $log->status === 'Đã xác nhận' ? optional($log->confirmed_at)->format('d/m/Y H:i') : '—' }}
                     </p>
-
+                    <p class="text-sm text-gray-600">
+                        <strong>Tổng lượng rác thu gom:</strong>
+                            {{ number_format(\App\Models\WasteLog::sum('waste_weight'), 2) }}
+                    </p>
                     @if ($log->note)
                         <p class="text-sm text-gray-600 mt-2">
                             <strong>Ghi chú:</strong> {{ $log->note }}
