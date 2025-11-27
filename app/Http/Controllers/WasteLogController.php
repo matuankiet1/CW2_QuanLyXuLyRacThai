@@ -17,20 +17,39 @@ class WasteLogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
-        $wasteTypes = WasteType::pluck('name', 'id');
-        $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'asc')->get();
 
-        // dd( $collectionSchedules);
-        $isSearch = false;
-        return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+        $user_id = auth()->id();
+
+        // Lấy tất cả các staff
+        $wasteTypes = WasteType::pluck('name', 'id');
+
+        // Kiểm tra xem có schedule_id trong query string không
+        $scheduleId = $request->query('schedule_id');
+
+        // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
+        $query = WasteLog::query()->with('collectionSchedule.staff');
+
+        if ($scheduleId) {
+            $query->where('schedule_id', $scheduleId);
+            $isSearch = true;
+        } else {
+            $isSearch = false;
+        }
+
+        $wasteLogs = $query->paginate(7);
+
+        // Lấy tất cả lịch thu gom (dùng cho dropdown hoặc hiển thị)
+        $collectionSchedules = CollectionSchedule::with('staff')->orderBy('schedule_id', 'asc')->get();
+
+        return view('admin.waste_logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
     }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -187,6 +206,6 @@ class WasteLogController extends Controller
         return response()->json($result);
     }
 
-    
+
 
 }

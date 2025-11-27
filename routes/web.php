@@ -56,7 +56,7 @@ Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(fun
     Route::get('/posts/{post}', [StaffHomeController::class, 'postShow'])->name('posts.show');
     Route::get('/collection_schedules', [StaffHomeController::class, 'collection_schedule'])->name('collection_schedules.index');
     Route::get('/waste-logs', [StaffHomeController::class, 'wasteLog'])->name('waste-logs.index');
-    Route::get('/waste-logs/store', [WasteLogController::class, 'store'])->name('waste-logs.store');
+    Route::post('/waste-logs/store', [WasteLogController::class, 'store'])->name('waste-logs.store');
     Route::get('/waste-logs/history', [StaffHomeController::class, 'history'])->name('waste-logs.history');
     Route::get('/statistics', [StaffHomeController::class, 'statistic'])->name('statistics.index');
     Route::get('/reports', [StaffHomeController::class, 'createReport'])->name('reports.create');
@@ -185,7 +185,7 @@ Route::middleware('admin')->group(function () {
         Route::delete('permissions/{permission}', [App\Http\Controllers\PermissionController::class, 'destroy'])->name('permissions.destroy');
         Route::post('permissions/update-role-permissions', [App\Http\Controllers\PermissionController::class, 'updateRolePermissions'])->name('permissions.update-role-permissions');
 
-        Route::get('collection_reports', [WasteLogController::class, 'wasteReport'])->name('collection_reports.index');
+        Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
 
     });
 
