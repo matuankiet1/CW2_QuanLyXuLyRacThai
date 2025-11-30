@@ -20,10 +20,28 @@ class CollectionScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
+        $query = $this->applyFillter($request);
         $isSearch = false;
         $isFilter = false;
 
+        if ($query) {
+            $isFilter = true;
+        } else {
+            $query->orderByDesc('schedule_id');
+        }
+
+        $collectionSchedules = $query
+            ->select('collection_schedules.*')
+            ->paginate(7)
+            // GIỮ LẠI TẤT CẢ THAM SỐ QUERY HIỆN CÓ (trừ page)
+            ->appends($request->except('page'));
+
+        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'isFilter'));
+    }
+
+    public function applyFillter(Request $request)
+    {
+        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
         // 1. Sắp xếp theo nhân viên
         if ($request->radioFilterStaff === 'asc') {
             $query->leftJoin('users', 'collection_schedules.staff_id', '=', 'users.user_id')
@@ -54,27 +72,7 @@ class CollectionScheduleController extends Controller
             $query->where('status', 'Chưa thực hiện');
         }
 
-        if ($request->hasAny(['radioFilterStaff', 'radioFilterScheduledDate', 'radioFilterCompletedAt', 'radioFilterStatus'])) {
-            $isFilter = true;
-        } else {
-            $query->orderByDesc('schedule_id');
-        }
-
-        $collectionSchedules = $query
-            ->select('collection_schedules.*')
-            ->paginate(7)
-            // GIỮ LẠI TẤT CẢ THAM SỐ QUERY HIỆN CÓ (trừ page)
-            ->appends($request->except('page'));
-
-        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'isFilter'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $query;
     }
 
     /**
@@ -235,7 +233,7 @@ class CollectionScheduleController extends Controller
         $q = $request->input('q');
         $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy', 'report'])
             ->whereHas('staff', function ($query) use ($q) {
-            $query->where('name', 'like', '%' . $q . '%');
+                $query->where('name', 'like', '%' . $q . '%');
             })
             ->orWhere('scheduled_date', 'like', '%' . $q . '%')
             ->orderBy('schedule_id', 'desc')
@@ -246,9 +244,20 @@ class CollectionScheduleController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $q = $request->input('q');
-        $fileName = 'Tất cả lịch thu gom.xlsx';
-        return Excel::download(new CollectionScheduleExport($q), $fileName);
+        $query = $this->applyFillter($request);
+
+        // Lấy toàn bộ dữ liệu (không phân trang)
+        $rows = $query->get([
+            'collection_schedules.schedule_id',
+            'collection_schedules.staff_id',
+            'collection_schedules.scheduled_date',
+            'collection_schedules.created_at',
+            'collection_schedules.status',
+        ]);
+
+        $fileName = 'Lịch thu gom rác.xlsx';
+
+        return Excel::download(new CollectionScheduleExport($rows), $fileName);
     }
 
     /**

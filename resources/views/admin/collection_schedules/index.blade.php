@@ -68,7 +68,7 @@
                             Xóa tất cả
                         </button>
 
-                        <a href="{{ route('admin.collection-schedules.export-excel', ['q' => request('q')]) }}"
+                        <a href="{{ route('admin.collection-schedules.export-excel', request()->query()) }}"
                             class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
                             Xuất file excel
                         </a>
@@ -303,7 +303,8 @@
                         </div>
 
                         <div class="waste-logs">
-                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline">Xem lượng rác đã thu
+                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline hidden"
+                                data-schedule-id="">Xem lượng rác đã thu
                                 gom</button>
                         </div>
 
@@ -484,14 +485,26 @@
 
         const filterForm = document.getElementById('filterForm');
 
+        let outsideClickHandler = null;
+
         function openModal(modal, modalBox) {
             modal.classList.remove('hidden');
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
                 modal.classList.add('opacity-100');
+
                 modalBox.classList.remove('opacity-0', 'translate-y-5', 'scale-95');
                 modalBox.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-            }, 10);
+            });
+
+            // Đăng ký sự kiện click ra ngoài
+            outsideClickHandler = (e) => {
+                if (!modalBox.contains(e.target)) {
+                    closeModal(modal, modalBox);
+                }
+            };
+
+            document.addEventListener('mousedown', outsideClickHandler);
         }
 
         function closeModal(modal, modalBox) {
@@ -499,7 +512,20 @@
             modalBox.classList.add('opacity-0', 'translate-y-5', 'scale-95');
             modal.classList.remove('opacity-100');
             modal.classList.add('opacity-0');
+
+            // Remove listener click ra ngoài
+            if (outsideClickHandler) {
+                document.removeEventListener('mousedown', outsideClickHandler);
+                outsideClickHandler = null;
+            }
+
             setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function closeModalOnClickOutside(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
         }
 
         // Auto-open modal if there are errors or show_modal session
@@ -562,7 +588,11 @@
                         .toISOString().split('T')[0] : '';
                     selectStatus.value = data[0].status;
                     statusHidden.value = data[0].status;
-                    document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0].schedule_id;
+                    if (data[1].length > 0) {
+                        document.querySelector('.btnShowWasteLogs').classList.remove('hidden');
+                        document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0]
+                            .schedule_id;
+                    }
                 }
 
                 titleModal.textContent = 'Chỉnh sửa lịch thu gom';
@@ -585,16 +615,17 @@
 
         document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
             const id = this.dataset.scheduleId;
+            this.classList.add('hidden');
             const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
             const data = await res.json();
-            let logsMessage = 'Lượng rác đã thu gom:\n';
+            let logsMessage = document.createElement('p') //'Lượng rác đã thu gom:\n';
             data.forEach(log => {
-                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
+                logsMessage.innerHTML += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
             });
             console.log(logsMessage);
 
-            document.querySelector('.waste-logs').innerText = logsMessage;
-            
+            document.querySelector('.waste-logs').appendChild = logsMessage;
+
         });
 
         function displayCompletedAtField(show) {

@@ -40,16 +40,16 @@
                     'active' => request()->routeIs('admin.posts.*'),
                 ],
                 [
-                    'label' => 'Lịch thu gom',
-                    'icon' => 'fa-calendar-alt',
-                    'route' => 'admin.collection-schedules.index',
-                    'active' => request()->routeIs('admin.collection-schedules.*'),
-                ],
-                [
                     'label' => 'Sự kiện',
                     'icon' => 'fa-calendar-check',
                     'route' => 'admin.events.index',
                     'active' => request()->routeIs('admin.events.*'),
+                ],
+                [
+                    'label' => 'Lịch thu gom rác',
+                    'icon' => 'fa-calendar-alt',
+                    'route' => 'admin.collection-schedules.index',
+                    'active' => request()->routeIs('admin.collection-schedules.*'),
                 ],
                 [
                     'label' => 'Banner',
@@ -86,7 +86,6 @@
                     'route' => 'admin.roles.index',
                     'active' => request()->routeIs('admin.roles.*'),
                 ],
-                
             ],
         ],
         [
