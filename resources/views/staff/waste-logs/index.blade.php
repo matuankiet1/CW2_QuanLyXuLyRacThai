@@ -176,7 +176,7 @@
             </div>
             <div id="aiHint" class="text-sm text-gray-600 mt-1 px-7"></div>
             <div class="px-8 overflow-y-auto overscroll-contain min-h-0">
-                <form id="formModal" class="mt-3 space-y-4" action="{{ route('waste-logs.store') }}" method="POST"
+                <form id="formModal" class="mt-3 space-y-4" action="{{ route('staff.waste-logs.store') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" value="" name="schedule_id" id="schedule_id">

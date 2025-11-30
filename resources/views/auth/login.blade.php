@@ -34,7 +34,7 @@
                     <label for="email" class="text-sm font-medium text-gray-700">Email: <span
                             class="text-red-500">*</span></label>
                     <input id="email" name="email" type="email" placeholder="admin@school.edu"
-                        value="{{ old('email') }}" {{-- Giữ lại email đã nhập nếu có lỗi --}} required
+                        value="{{ old('email') }}" {{-- Giữ lại email đã nhập nếu có lỗi --}} required autofocus
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
                     @error('email')
                         {{-- Hiển thị lỗi validation cho email --}}

@@ -50,7 +50,7 @@ class NotificationController extends Controller
             'content' => 'required|string',
             'type' => 'required|in:announcement,academic,event,urgent',
             'send_to_type' => 'required|in:all,role,user',
-            'target_role' => 'nullable|required_if:send_to_type,role|in:admin,manager,staff,student',
+            'target_role' => 'nullable|required_if:send_to_type,role|in:admin,staff,student',
             'user_ids' => 'nullable|required_if:send_to_type,user|array',
             'user_ids.*' => 'exists:users,user_id',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240', // 10MB max
