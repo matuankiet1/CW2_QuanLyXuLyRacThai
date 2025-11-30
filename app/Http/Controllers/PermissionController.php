@@ -15,7 +15,7 @@ class PermissionController extends Controller
     public function index()
     {
         $permissions = Permission::orderBy('category')->orderBy('name')->get()->groupBy('category');
-        $roles = ['admin', 'manager', 'staff', 'student'];
+        $roles = ['admin', 'staff', 'student'];
         
         // Lấy permissions của từng role
         $rolePermissions = [];
@@ -34,7 +34,7 @@ class PermissionController extends Controller
     public function updateRolePermissions(Request $request)
     {
         $request->validate([
-            'role' => ['required', 'in:admin,manager,staff,student'],
+            'role' => ['required', 'in:admin,staff,student'],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['exists:permissions,id'],
         ]);

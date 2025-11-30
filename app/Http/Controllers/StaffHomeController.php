@@ -33,50 +33,43 @@ class StaffHomeController extends Controller
 
         // Lấy banner mới nhất
         $stats = [
-        'total_posts' => Post::count(),
-        'total_schedules' => Schedule::count(),
-        'upcoming_schedules' => Schedule::where('date', '>=', now())->count(),
-    ];
-
-    $latestPosts = Post::latest()->take(3)->get();
-    $upcomingSchedules = Schedule::where('date', '>=', now())
-                                ->orderBy('date')
-                                ->take(3)
-                                ->get();
-
-    // Phân loại banner theo vị trí
-    $topBanners = Banner::where('position', 'top')
-                        ->where('status', 1)
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-
-    $sidebarBanners = Banner::where('position', 'sidebar')
-                           ->where('status', 1)
-                           ->orderBy('created_at', 'desc')
-                           ->get();
-
-    $footerBanners = Banner::where('position', 'footer')
-                          ->where('status', 1)
-                          ->orderBy('created_at', 'desc')
-                          ->get();
-
-    return view('staff.home', compact(
-        'stats', 
-        'latestPosts', 
-        'upcomingSchedules',
-        'topBanners',
-        'sidebarBanners', 
-        'footerBanners'
-    ));
-
-        // Thống kê nhanh
-        $stats = [
-            'total_posts' => Post::where('status', 'published')->count(),
+            'total_posts' => Post::count(),
             'total_schedules' => CollectionSchedule::count(),
             'upcoming_schedules' => CollectionSchedule::where('scheduled_date', '>=', now())->count(),
         ];
 
-        return view('staff.home.index', compact('latestPosts', 'upcomingSchedules', 'banners', 'stats'));
+        $latestPosts = Post::latest()->take(3)->get();
+        $upcomingSchedules = CollectionSchedule::where('scheduled_date', '>=', now())
+            ->orderBy('scheduled_date')
+            ->take(3)
+            ->get();
+
+        // // Phân loại banner theo vị trí
+        // $banners = Banner::where('status', 1)->orderBy('created_at', 'desc')->get();
+
+        // $topBanners = Banner::where('position', 'top')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        // $sidebarBanners = Banner::where('position', 'sidebar')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        // $footerBanners = Banner::where('position', 'footer')
+        //     ->where('status', 1)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        return view('staff.home.index', compact(
+            'stats',
+            'latestPosts',
+            'upcomingSchedules',
+            // 'topBanners',
+            // 'sidebarBanners',
+            // 'footerBanners'
+        ));
     }
 
     public function about()
@@ -155,17 +148,29 @@ class StaffHomeController extends Controller
         ));
     }
 
-   
 
 
-    public function postHome()
+
+    public function postHome(Request $request)
     {
-        // Lấy danh sách bài viết đã publish (trạng thái = published)
-        $posts = Post::where('status', 'published')
-            ->orderBy('published_at', 'desc')
-            ->paginate(6); // chia trang 6 bài mỗi trang
+        $search = $request->input('search');
 
-        return view('staff.posts.home', compact('posts'));
+        // Query chính
+        $posts = Post::where('status', 'published');
+
+        // Tìm kiếm
+        if ($search) {
+            $posts->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('author', 'like', "%$search%")
+                    ->orWhere('excerpt', 'like', "%$search%");
+            });
+        }
+
+        // Sắp xếp + phân trang
+        $posts = $posts->orderBy('published_at', 'desc')->paginate(6);
+
+        return view('staff.posts.home', compact('posts', 'search'));
     }
     public function postShow($slug)
     {
@@ -294,8 +299,13 @@ class StaffHomeController extends Controller
         if ($search) {
             $collectionSchedules = $collectionSchedules->where(function ($query) use ($search) {
                 $query->where('schedule_id', 'like', "%$search%")
-                    ->orWhereHas('staff', fn($q) => $q->where('name', 'like', "%$search%"));
+                    ->orWhereHas('staff', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%");
+                    });
             });
+            $isSearching = true;
+        } else {
+            $isSearching = false;
         }
 
         // Sắp xếp
@@ -324,7 +334,8 @@ class StaffHomeController extends Controller
             'collectionSchedules',
             'search',
             'sort',
-            'statusFilter'
+            'statusFilter',
+            'isSearching'
         ));
     }
 
@@ -405,4 +416,55 @@ class StaffHomeController extends Controller
     {
         return view('staff.reports.create');
     }
+
+    public function history(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $user_id = auth()->id();
+        $wasteTypes = WasteType::pluck('name', 'id');
+
+        // Kiểm tra xem có schedule_id trong query string k hông
+        $scheduleId = $request->query('schedule_id');
+
+        // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
+        $query = WasteLog::query()->with(['collectionSchedule.staff', 'confirmedBy', 'collectionSchedule']);
+
+        if ($scheduleId) {
+            $query->where('schedule_id', $scheduleId);
+            $isSearch = true;
+        } else {
+            $isSearch = false;
+        }
+
+        // 🔍 Nếu có lọc theo trạng thái
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // 🔍 Tìm kiếm theo tên tuyến / id lịch / ghi chú
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%");        // tìm theo ID của WasteLog
+            });
+        }
+
+
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        // Lấy tất cả lịch thu gom (dùng cho dropdown hoặc hiển thị)
+        $collectionSchedules = CollectionSchedule::with('staff')->orderBy('schedule_id', 'asc')->get();
+
+        $logs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('staff.waste-logs.history', compact('logs', 'search', 'status', 'wasteTypes', 'collectionSchedules', 'isSearch'));
+    }
+
+    public function wasteSortingGuide()
+    {
+        return view('staff.home.sorting_guide');
+    }
+
 }

@@ -129,7 +129,7 @@ class UserEventController extends Controller
             'event' => $event
         ]);
     }
-
+    
     /**
      * Đăng ký tham gia sự kiện
      * Route: POST /events/{id}/register

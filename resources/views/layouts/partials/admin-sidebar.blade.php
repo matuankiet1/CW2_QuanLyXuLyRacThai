@@ -1,4 +1,7 @@
 @php
+    // Tính số yêu cầu đang chờ duyệt
+    //$waitingTrashRequestsCount = \App\Models\TrashRequest::where('status', 'waiting_admin')->count();
+    
     // Default menu items - can be overridden by views
     $menuItems = $menuItems ?? [
         [
@@ -40,6 +43,23 @@
                     'active' => request()->routeIs('admin.posts.*'),
                 ],
                 [
+                    'label' => 'Lịch thu gom',
+                    'icon' => 'fa-calendar-alt',
+                    'route' => 'admin.collection-schedules.index',
+                    'active' => request()->routeIs('admin.collection-schedules.*'),
+                ],
+                // array_merge([
+                //     'label' => 'Yêu cầu thu gom',
+                //     'icon' => 'fa-trash-alt',
+                //     'route' => 'admin.trash-requests.index',
+                //     'active' => request()->routeIs('admin.trash-requests.*'),
+                // ], $waitingTrashRequestsCount > 0 ? [
+                //     'badge' => [
+                //         'text' => $waitingTrashRequestsCount > 9 ? '9+' : $waitingTrashRequestsCount,
+                //         'class' => 'bg-orange-500 text-white',
+                //     ],
+                // ] : []),
+                [
                     'label' => 'Sự kiện',
                     'icon' => 'fa-calendar-check',
                     'route' => 'admin.events.index',
@@ -77,7 +97,7 @@
                 [
                     'label' => 'Báo cáo thu gom rác',
                     'icon' => 'fa-user-shield',
-                    'route' => 'admin.collection_reports.index',
+                    'route' => 'admin.waste_logs.index',
                     'active' => request()->routeIs('admin.roles.*'),
                 ],
                 [
