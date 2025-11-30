@@ -42,12 +42,6 @@
                     'route' => 'admin.posts.index',
                     'active' => request()->routeIs('admin.posts.*'),
                 ],
-                [
-                    'label' => 'Lịch thu gom',
-                    'icon' => 'fa-calendar-alt',
-                    'route' => 'admin.collection-schedules.index',
-                    'active' => request()->routeIs('admin.collection-schedules.*'),
-                ],
                 // array_merge([
                 //     'label' => 'Yêu cầu thu gom',
                 //     'icon' => 'fa-trash-alt',

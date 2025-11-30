@@ -298,29 +298,29 @@
                 <div class="hidden lg:flex items-center justify-center flex-1 min-w-0 px-1">
                     <nav class="flex items-center gap-0.5 justify-center w-full">
                         <a href="{{ route('home') }}" class="nav-link-item  {{ Request::is('/') ? 'nav-link-item-active' : '' }}" title="Trang chủ">
-                            <i class="fas fa-home mr-1"></i><span>Trang chủ</span>
+                            <i class="fas fa-home mr-2"></i><span>Trang chủ</span>
                         </a>
                         <a href="{{ route('user.posts.home') }}" class="nav-link-item {{ Request::is('posts*') ? 'nav-link-item-active' : '' }}" title="Bài viết">
-                            <i class="fas fa-newspaper mr-1"></i><span>Bài viết</span>
+                            <i class="fas fa-newspaper mr-2"></i><span>Bài viết</span>
                         </a>
                         <a href="{{ route('user.events.index') }}" class="nav-link-item {{ Request::is('events*') ? 'nav-link-item-active' : '' }}" title="Sự kiện">
-                            <i class="fas fa-calendar-alt me-1"></i>Sự kiện
+                            <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
                         </a>
                         <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item {{ Request::is('collection_schedules*') ? 'nav-link-item-active' : '' }}"
                             title="Báo cáo rác thải">
-                            <i class="fas fa-trash-alt me-1"></i>Thu gom rác
+                            <i class="fas fa-trash-alt mr-2"></i>Thu gom rác
                         </a>
                         <a href="{{ route('home.about') }}" class="nav-link-item {{ Request::is('about') ? 'nav-link-item-active' : '' }}" title="Giới thiệu">
-                            <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
+                            <i class="fas fa-info-circle mr-2"></i><span>Giới thiệu</span>
                         </a>
                         <a href="{{ route('home.contact') }}" class="nav-link-item {{ Request::is('contact') ? 'nav-link-item-active' : '' }}" title="Liên hệ">
-                            <i class="fas fa-envelope mr-1"></i><span>Liên hệ</span>
+                            <i class="fas fa-envelope mr-2"></i><span>Liên hệ</span>
                         </a>
                         @auth
                             <!-- Cá nhân Dropdown -->
                             <div class="relative">
                                 <button id="personalMenuToggle" class="nav-link-item flex items-center">
-                                    <i class="fas fa-user mr-1"></i><span>Cá nhân</span>
+                                    <i class="fas fa-user mr-2"></i><span>Cá nhân</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
                                 <div id="personalMenuDropdown"
@@ -461,10 +461,10 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}" class="nav-link-item">
-                            <i class="fas fa-sign-in-alt mr-1"></i>Đăng nhập
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
                         </a>
                         <a href="{{ route('register') }}" class="nav-link-item bg-white/20 hover:bg-white/30">
-                            <i class="fas fa-user-plus mr-1"></i>Đăng ký
+                            <i class="fas fa-user-plus mr-2"></i>Đăng ký
                         </a>
                     @endauth
 

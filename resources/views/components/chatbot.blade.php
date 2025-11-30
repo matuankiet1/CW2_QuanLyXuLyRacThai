@@ -133,9 +133,7 @@
             @if (!auth()->check())
                 <p class="text-sm text-white mb-2">
                     Vui lòng <a href="{{ route('login') }}" class="underline text-indigo-400 hover:text-indigo-600">đăng
-                        nhập</a> để sử
-                    dụng
-                    chatbot.
+                        nhập</a> để sử dụng Chatbot AI.
                 </p>
             @else
                 <p class="text-xs text-slate-500 mb-2">
@@ -211,10 +209,13 @@
         // Xử lý form
         const chatArea = document.querySelector('.chat-area');
         const chatbotForm = document.querySelector('#chatbotForm');
+
+        if (!chatbotForm) return;
+
         const chatbotInput = chatbotForm.querySelector('#chatbotInput');
         const chatbotSubmitBtn = chatbotForm.querySelector('button[type="submit"]');
 
-        if (!chatArea || !chatbotForm || !chatbotInput) return;
+        // if (!chatArea || !chatbotForm || !chatbotInput) return;
 
         let chatHistory = [];
         const CHAT_KEY = 'ecowaste_chat_history';
