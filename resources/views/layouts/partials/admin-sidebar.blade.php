@@ -66,6 +66,12 @@
                     'active' => request()->routeIs('admin.events.*'),
                 ],
                 [
+                    'label' => 'Lịch thu gom rác',
+                    'icon' => 'fa-calendar-alt',
+                    'route' => 'admin.collection-schedules.index',
+                    'active' => request()->routeIs('admin.collection-schedules.*'),
+                ],
+                [
                     'label' => 'Banner',
                     'icon' => 'fa-image',
                     'route' => 'admin.banners.index',
@@ -100,7 +106,6 @@
                     'route' => 'admin.roles.index',
                     'active' => request()->routeIs('admin.roles.*'),
                 ],
-                
             ],
         ],
         [

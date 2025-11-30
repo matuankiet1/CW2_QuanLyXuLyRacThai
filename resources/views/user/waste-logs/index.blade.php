@@ -30,7 +30,7 @@
     </style>
 
     <div class="container max-w-7xl mx-auto pt-5">
-        @if ($collectionSchedules->isEmpty() && $isSearching == false)
+        @if ($collectionSchedules->isEmpty() && $isSearch == false)
             <div class="bg-yellow-100 p-6 rounded-xl shadow-sm border border-gray-200">
                 <p>Không có lịch thu gom nào cần báo cáo.</p>
             </div>

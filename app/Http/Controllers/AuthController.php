@@ -137,7 +137,7 @@ class AuthController extends Controller
             $socialUser = Socialite::driver($provider)->user();
         } catch (ClientException $e) {
             // dd($e->getMessage(), $e);
-            
+
             return redirect()->route('login')->with('status', [
                 'type' => 'error',
                 'message' => 'Đăng nhập ' . ucfirst($provider) . ' thất bại, vui lòng thử lại.',
@@ -407,25 +407,20 @@ class AuthController extends Controller
     public function changePassword(Request $request)
     {
         $user = Auth::user();
-        
         if (!$user) {
             return redirect()->route('login')->with('status', [
                 'type' => 'error',
                 'message' => 'Vui lòng đăng nhập để tiếp tục.'
             ]);
         }
-        
-        $request->validate([
-            'current_password' => ['required'],
+
+        $request->validateWithBag('form_change_password', [
+            'current_password' => ['required', 'current_password'],
             'new_password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
-        ], [
-            'new_password.mixed_case' => 'Mật khẩu phải chứa ít nhất 1 chữ hoa và 1 chữ thường.',
-            'new_password.numbers' => 'Mật khẩu phải chứa ít nhất 1 chữ số.',
-            'new_password.symbols' => 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt.',
         ]);
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.'], 'form_change_password');
         }
 
         $user->password = Hash::make($request->new_password);
@@ -435,6 +430,7 @@ class AuthController extends Controller
             'type' => 'success',
             'message' => 'Đổi mật khẩu thành công!'
         ]);
+
     }
 
     public function searchUsers(Request $request)
@@ -459,13 +455,13 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        $request->validate([
+        $request->validateWithBag('form_profile', [
             'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
             'phone' => ['nullable', 'string', 'max:15', 'regex:/^[0-9+\-\s()]+$/'],
         ], [
-            'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
-            'phone.regex' => 'Số điện thoại không đúng định dạng.',
+            'name.regex' => 'Full name must contain only letters and spaces.',
+            'phone.regex' => 'Phone number is not in correct format.',
         ]);
 
         if ($user) {
@@ -474,7 +470,10 @@ class AuthController extends Controller
             $user->phone = $request->phone ? trim($request->phone) : null;
             $user->save();
         } else {
-            return view('login');
+            return view('login')->with('status', [
+                'type' => 'error',
+                'message' => 'Vui lòng đăng nhập để tiếp tục.'
+            ]);
         }
 
         return back()->with('status', [

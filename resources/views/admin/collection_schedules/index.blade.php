@@ -66,7 +66,7 @@
                             Xóa tất cả
                         </button>
 
-                        <a href="{{ route('admin.collection-schedules.export-excel', ['q' => request('q')]) }}"
+                        <a href="{{ route('admin.collection-schedules.export-excel', request()->query()) }}"
                             class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
                             Xuất file excel
                         </a>
@@ -535,18 +535,103 @@
                     resetForm(form);
                     titleModal.textContent = 'Thêm lịch thu gom mới';
 
-                    form.action = "/collection-schedules";
+                <!-- Footer -->
+                <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+                    <button id="resetFilter"
+                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition cursor-pointer">
+                        Đặt lại
+                    </button>
+                    <button type="submit" id="applyFilter"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer">
+                        Áp dụng
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                    // Xóa input hidden _method nếu có
-                    const methodInput = form.querySelector('input[name="_method"]');
-                    if (methodInput) methodInput.remove();
+    <div id="collectionScheduleState" data-open-modal="{{ session('show_modal') || $errors->any() ? 'true' : 'false' }}"
+        class="hidden"></div>
 
-                    displayCompletedAtField(false);
-                    displayStatusField(false);
-                    displayWasteLogs(false);
+    <script>
+        // Modal logic
+        const stateElement = document.getElementById('collectionScheduleState');
+        const shouldShowModal = stateElement ? stateElement.dataset.openModal === 'true' : false;
 
-                    openModal(modal, modalBox);
-                });
+        const modal = document.getElementById('modal');
+        const modalBox = document.getElementById('modalBox');
+        const openBtn = document.querySelectorAll('.openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmModalBox = document.getElementById('confirmModalBox');
+        const editBtn = document.querySelectorAll('.editBtn');
+        const deleteBtn = document.querySelectorAll('.deleteBtn');
+        const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
+        const cancelConfirmModalBtn = document.getElementById('cancelConfirmModalBtn');
+
+        const form = modalBox.querySelector('form');
+        const inputName = document.getElementById('inputName');
+        const inputScheduledDate = document.getElementById('inputScheduledDate');
+        const inputCompletedAt = document.getElementById('inputCompletedAt');
+        const selectStatus = document.getElementById('selectStatus');
+        const statusHidden = document.getElementById('statusHidden');
+
+        const titleModal = document.querySelector('.titleModal');
+
+        const btnDeleteAll = document.getElementById('btnDeleteAll');
+
+        const filterForm = document.getElementById('filterForm');
+
+        let outsideClickHandler = null;
+
+        function openModal(modal, modalBox) {
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+
+                modalBox.classList.remove('opacity-0', 'translate-y-5', 'scale-95');
+                modalBox.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+            });
+
+            // Đăng ký sự kiện click ra ngoài
+            outsideClickHandler = (e) => {
+                if (!modalBox.contains(e.target)) {
+                    closeModal(modal, modalBox);
+                }
+            };
+
+            document.addEventListener('mousedown', outsideClickHandler);
+        }
+
+        function closeModal(modal, modalBox) {
+            modalBox.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+            modalBox.classList.add('opacity-0', 'translate-y-5', 'scale-95');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+
+            // Remove listener click ra ngoài
+            if (outsideClickHandler) {
+                document.removeEventListener('mousedown', outsideClickHandler);
+                outsideClickHandler = null;
+            }
+
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function closeModalOnClickOutside(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Auto-open modal if there are errors or show_modal session
+        if (shouldShowModal) {
+            document.addEventListener('DOMContentLoaded', function() {
+                openModal(modal, modalBox);
             });
 
             closeBtn.addEventListener('click', function () {
@@ -619,6 +704,33 @@
                 } else {
                     completedAtField.classList.add('hidden');
                 }
+                form.insertAdjacentHTML('beforeend', `
+                    <input type="hidden" name="_method" value="PUT">
+                `);
+            });
+        });
+
+        document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
+            const id = this.dataset.scheduleId;
+            this.classList.add('hidden');
+            const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
+            const data = await res.json();
+            let logsMessage = document.createElement('p') //'Lượng rác đã thu gom:\n';
+            data.forEach(log => {
+                logsMessage.innerHTML += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
+            });
+            console.log(logsMessage);
+
+            document.querySelector('.waste-logs').appendChild = logsMessage;
+
+        });
+
+        function displayCompletedAtField(show) {
+            const completedAtField = document.querySelector('.completed-at-field');
+            if (show) {
+                completedAtField.classList.remove('hidden');
+            } else {
+                completedAtField.classList.add('hidden');
             }
 
             function displayStatusField(show) {
