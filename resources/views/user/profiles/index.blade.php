@@ -31,7 +31,7 @@
                     <label for="name" class="text-gray-500">Họ và tên</label>
                     <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="name">{{ $user->name }}</span>
-                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" data-original="{{ $user->name }}"
                         class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
                     @error('name', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
@@ -41,7 +41,7 @@
                     <label for="email" class="text-gray-500">Email</label>
                     <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="email">{{ $user->email }}</span>
-                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" data-original="{{ $user->email }}"
                         class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
                     @error('email', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
@@ -51,7 +51,7 @@
                     <label for="phone" class="text-gray-500">Số điện thoại</label>
                     <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="phone">{{ $user->phone }}</span>
-                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}"
+                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" data-original="{{ $user->phone }}"
                         class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
                     @error('phone', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
@@ -82,10 +82,13 @@
                     không
                     thể đổi mật khẩu tại đây.</p>
             @else
-                <button type="button" id="btnShowFormChangePassword" class="text-blue-600 underline {{ $errors->form_change_password->any() ? 'hidden' : '' }}">Đổi mật khẩu</button>
+                <button type="button" id="btnShowFormChangePassword"
+                    class="text-blue-600 underline {{ $errors->form_change_password->any() ? 'hidden' : '' }}">Đổi mật
+                    khẩu</button>
             @endif
 
-            <form action="{{ route('change_password') }}" method="POST" id="formChangePassword" class="{{ $errors->form_change_password->any() ? '' : 'hidden' }}">
+            <form action="{{ route('change_password') }}" method="POST" id="formChangePassword"
+                class="{{ $errors->form_change_password->any() ? '' : 'hidden' }}">
                 @csrf
                 <div class="mt-5">
                     <label for="current_password" class="text-sm font-medium text-gray-700">Mật khẩu hiện tại: <span
@@ -234,6 +237,7 @@
             const arrFieldEdit = document.querySelectorAll('.field-edit');
 
             btnEditInfo.addEventListener('click', function() {
+                resetToOriginalValues();
                 arrFieldView.forEach(el => {
                     el.classList.add('hidden');
                 });
@@ -246,7 +250,7 @@
 
             btnCancel.addEventListener('click', function() {
                 profileForm.reset();
-                
+
                 arrFieldView.forEach(el => {
                     el.classList.remove('hidden');
                 });
@@ -261,6 +265,12 @@
                     el.classList.add('hidden');
                 });
             });
+
+            function resetToOriginalValues() {
+                profileForm.querySelectorAll('[data-original]').forEach(input => {
+                    input.value = input.dataset.original;
+                });
+            }
 
             // Mở modal chỉnh sửa avatar
             const btnOpenModalAvatar = document.getElementById('btnOpenModalAvatar');
@@ -382,9 +392,9 @@
                     btnShowFormChangePassword.classList.remove("hidden");
 
                     // Ẩn các errors message của validator
-                document.querySelectorAll('.password-error').forEach(el => {
-                    el.classList.add('hidden');
-                });
+                    document.querySelectorAll('.password-error').forEach(el => {
+                        el.classList.add('hidden');
+                    });
                 });
             }
 

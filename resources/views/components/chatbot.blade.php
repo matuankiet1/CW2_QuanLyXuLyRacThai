@@ -220,7 +220,6 @@
         let chatHistory = [];
         const CHAT_KEY = 'ecowaste_chat_history';
 
-        setFirstLocaltimeOfBot();
         loadHistory();
 
         chatbotInput.addEventListener('input', function() {
@@ -395,7 +394,7 @@
             // Build nội dung
             const lines = [];
 
-            console.log(data);
+            // console.log(data);
 
             if (data.item_name) {
                 lines.push(`

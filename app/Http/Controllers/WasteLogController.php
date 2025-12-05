@@ -68,7 +68,7 @@ class WasteLogController extends Controller
             'waste_image' => 'nullable|array',
             'waste_image.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
-            'old_waste_image' => 'array',
+            'old_waste_image' => 'nullable|array',
             'old_waste_image.*' => 'nullable|string|max:255',
         ]);
 
