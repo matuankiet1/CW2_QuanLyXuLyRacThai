@@ -184,6 +184,8 @@ Route::middleware('admin')->group(function () {
         Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
         Route::post('waste_logs/{wasteLog}/confirm', [WasteLogController::class, 'confirm'])
     ->name('waste_logs.confirm');
+            Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
+
 
 
     });
@@ -229,6 +231,7 @@ Route::middleware('admin')->group(function () {
     Route::prefix('admin/events')->name('admin.events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::get('/participants', [EventParticipantController::class, 'index'])->name('participants');
         Route::post('/', [EventController::class, 'store'])->name('store');
         Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
         Route::put('/{event}', [EventController::class, 'update'])->name('update');
