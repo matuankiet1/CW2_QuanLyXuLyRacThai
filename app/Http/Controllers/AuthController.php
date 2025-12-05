@@ -270,7 +270,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         // Start lại session để đảm bảo token mới được tạo
         $request->session()->start();
-        return redirect()->route('/')->with('status', [
+        return redirect()->route('home')->with('status', [
             'type' => 'success',
             'message' => 'Log out successfully!'
         ]);

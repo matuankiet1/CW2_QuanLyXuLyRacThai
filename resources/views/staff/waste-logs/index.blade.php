@@ -1,6 +1,6 @@
 @extends('layouts.staff')
 
-@section('title', 'Lịch thu gom')
+@section('title', 'Báo cáo thu gom rác')
 
 @section('content')
     <div class="p-6 space-y-6 max-w-7xl mx-auto">
@@ -10,8 +10,8 @@
                 <input type="hidden" name="status" value="{{ request('status') }}">
                 <input type="hidden" name="sort" value="{{ request('sort') }}">
                 <div class="relative w-full flex items-center">
-                    <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor">
+                    <svg class="absolute left-3 w-5 h-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="m21 21-4.35-4.35m1.1-4.4a7.75 7.75 0 1 1-15.5 0 7.75 7.75 0 0 1 15.5 0Z" />
                     </svg>
@@ -72,11 +72,13 @@
                                 <td class="py-3 px-4">{{ $schedule->completed_at?->format('d/m/Y') ?? '-' }}</td>
                                 <td class="py-3 px-4">
                                     @if ($schedule->status == 'Chưa thực hiện')
-                                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
+                                        <span
+                                            class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
                                             {{ $schedule->status }}
                                         </span>
                                     @elseif ($schedule->status == 'Đã hoàn thành')
-                                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                        <span
+                                            class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
                                             {{ $schedule->status }}
                                         </span>
                                     @else
@@ -87,7 +89,8 @@
                                 </td>
                                 <td class="py-3 px-4 text-center">
                                     <div class="flex items-center justify-center">
-                                        <button data-id="{{ $schedule->schedule_id }}" class="addWasteLogBtn group inline-flex items-center justify-center 
+                                        <button data-id="{{ $schedule->schedule_id }}"
+                                            class="addWasteLogBtn group inline-flex items-center justify-center 
                                                                    rounded-xl mx-1 p-2 cursor-pointer
                                                                    transition-all duration-200
                                                                    hover:bg-emerald-200 hover:shadow-md hover:scale-105"
@@ -106,8 +109,8 @@
                                             class="editWasteLogBtn group inline-flex items-center justify-center 
                                                                                        rounded-xl mx-1 p-2 cursor-pointer
                                                                                        transition-all duration-200
-                                                                                       hover:bg-amber-200 hover:shadow-md hover:scale-105" data-modal="edit"
-                                            aria-label="Chỉnh sửa">
+                                                                                       hover:bg-amber-200 hover:shadow-md hover:scale-105"
+                                            data-modal="edit" aria-label="Chỉnh sửa">
 
                                             <svg class="w-5 h-5 text-[#254434] transition-all duration-200 
                                                                                             group-hover:text-amber-600 group-hover:scale-110"
@@ -164,8 +167,9 @@
                 <input id="itemName"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
                     placeholder="Túi nilon, vỏ chuối, pin...">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="#000000"
-                    fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                    color="#000000" fill="none"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                     <path
                         d="M10 7L9.48415 8.39405C8.80774 10.222 8.46953 11.136 7.80278 11.8028C7.13603 12.4695 6.22204 12.8077 4.39405 13.4842L3 14L4.39405 14.5158C6.22204 15.1923 7.13603 15.5305 7.80278 16.1972C8.46953 16.864 8.80774 17.778 9.48415 19.6059L10 21L10.5158 19.6059C11.1923 17.778 11.5305 16.864 12.1972 16.1972C12.864 15.5305 13.778 15.1923 15.6059 14.5158L17 14L15.6059 13.4842C13.778 12.8077 12.864 12.4695 12.1972 11.8028C11.5305 11.136 11.1923 10.222 10.5158 8.39405L10 7Z"
                         stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
@@ -176,59 +180,73 @@
             </div>
             <div id="aiHint" class="text-sm text-gray-600 mt-1 px-7"></div>
             <div class="px-8 overflow-y-auto overscroll-contain min-h-0">
-                <form id="formModal" class="mt-3 space-y-4" action="{{ route('staff.waste-logs.store') }}" method="POST"
-                    enctype="multipart/form-data">
+                <form id="formModal" class="mt-3 space-y-4" action="{{ route('staff.waste-logs.store') }}"
+                    method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" value="" name="schedule_id" id="schedule_id">
+                    @php
+                        $oldTypes = old('waste_type', []);
+                        $oldWeights = old('waste_weight', []);
+                        $oldImages = old('old_waste_image', []);
+                        $rowCount = max(1, count($oldTypes)); // ít nhất 1 dòng
+                    @endphp
                     <div id="wasteFieldsWrapper">
-                        <div class="grid grid-cols-3 border border-gray-300 rounded-lg p-4 gap-4 mt-3 waste-item relative">
-                            {{-- Input ẩn dùng để lưu image_path cũ --}}
-                            <input type="hidden" value="" name="old_waste_image[]">
-                            <div class="flex flex-col items-start gap-1">
-                                <label class="block text-sm font-medium text-gray-700">Loại rác:</label>
-                                <select name="waste_type[]"
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                                    <option value="" selected disabled>-- Chọn loại rác --</option>
-                                    @foreach ($wasteTypes as $id => $name)
-                                        <option value="{{ $id }}">{{ $name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('wasteType')
-                                    <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        @for ($i = 0; $i < $rowCount; $i++)
+                            <div
+                                class="grid grid-cols-3 border border-gray-300 rounded-lg p-4 gap-4 mt-3 waste-item relative">
+                                {{-- Input ẩn dùng để lưu image_path cũ --}}
+                                <input type="hidden" value="" name="old_waste_image[]">
+                                <div class="flex flex-col items-start gap-1">
+                                    <label class="block text-sm font-medium text-gray-700">Loại rác:</label>
+                                    <select name="waste_type[]"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+                                        <option value="" selected disabled>-- Chọn loại rác --</option>
+                                        @foreach ($wasteTypes as $id => $name)
+                                            <option value="{{ $id }}"
+                                                {{ isset($oldTypes[$i]) && $oldTypes[$i] == $id ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error("waste_type.$i")
+                                        <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="flex flex-col items-start gap-1">
-                                <label class="block text-sm font-medium text-gray-700">Khối lượng:</label>
-                                <input type="text" name="waste_weight[]" autocomplete="off"
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                                @error('waste_weight')
-                                    <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="flex flex-col items-start gap-1">
+                                    <label class="block text-sm font-medium text-gray-700">Khối lượng:</label>
+                                    <input type="text" name="waste_weight[]" autocomplete="off"
+                                        value="{{ $oldWeights[$i] ?? '' }}"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+                                    @error("waste_weight.$i")
+                                        <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="flex flex-col items-start gap-1">
-                                <label class="block text-sm font-medium text-gray-700">Hình ảnh:</label>
-                                <input type="file" name="waste_image[]" accept="image/*"
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
-                                <p class="waste_image_file_name text-sm flex justify-center items-center" title="">
-                                </p>
-                                @error('waste_image')
-                                    <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="flex flex-col items-start gap-1">
+                                    <label class="block text-sm font-medium text-gray-700">Hình ảnh:</label>
+                                    <input type="file" name="waste_image[]" accept="image/*"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+                                    <p class="waste_image_file_name text-sm flex justify-center items-center"
+                                        title="">
+                                    </p>
+                                    @error("waste_image.$i")
+                                        <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <!-- Nút xoá -->
-                            <button type="button"
-                                class="deleteRowBtn absolute -right-8 top-1/2 -translate-y-1/2 
+                                <!-- Nút xoá -->
+                                <button type="button"
+                                    class="deleteRowBtn absolute -right-8 top-1/2 -translate-y-1/2 
                                                                                 text-red-600 hover:text-white 
                                                                                 bg-gray-200 hover:bg-red-500 
                                                                                 font-bold text-lg 
                                                                                 w-6 h-6 flex items-center justify-center 
                                                                                 rounded-full shadow hidden transition cursor-pointer">
-                                ×
-                            </button>
-                        </div>
+                                    ×
+                                </button>
+                            </div>
+                        @endfor
                     </div>
 
                 </form>
@@ -297,12 +315,14 @@
                 <!-- Bộ lọc theo nhân viên -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện:</label>
-                    <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff1" value="asc">
+                    <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff1"
+                        value="asc">
                     <label class="form-check-label" for="radioFilterStaff1">
                         A - Z
                     </label>
                     <br>
-                    <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff2" value="desc">
+                    <input type="radio" class="w-4 h-4" name="radioFilterStaff" id="radioFilterStaff2"
+                        value="desc">
                     <label class="form-check-label" for="radioFilterStaff2">
                         Z - A
                     </label>
@@ -374,7 +394,8 @@
 
     <div id="imgModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60">
         <div class="relative max-w-[90vw] max-h-[90vh]">
-            <img id="imgModalImg" src="" alt="Preview" class="max-w-[90vw] max-h-[90vh] rounded shadow-lg object-contain">
+            <img id="imgModalImg" src="" alt="Preview"
+                class="max-w-[90vw] max-h-[90vh] rounded shadow-lg object-contain">
             <button type="button" id="imgModalClose"
                 class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow cursor-pointer">
                 x
@@ -440,7 +461,7 @@
         });
 
         addBtn.forEach(btn => {
-            btn.addEventListener('click', async function () {
+            btn.addEventListener('click', async function() {
                 resetForm(form);
 
                 const scheduleId = this.getAttribute('data-id');
@@ -464,7 +485,7 @@
                             .waste_image) {
                             newRow.querySelector('input[name="old_waste_image[]"]').value =
                                 waste_log
-                                    .waste_image;
+                                .waste_image;
                             const fileName = getFileNameFromPath(waste_log.waste_image);
                             const shortFileName = shortenFileName(fileName);
                             // console.log(shortFileName);
@@ -485,7 +506,7 @@
         });
 
         editBtn.forEach(btn => {
-            btn.addEventListener('click', function () {
+            btn.addEventListener('click', function() {
                 openEditWasteLogModal(this.getAttribute('data-id'));
 
             });
@@ -524,13 +545,13 @@
             openModal(modal, modalBox);
         }
 
-        closeBtn.addEventListener('click', function () {
+        closeBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
             clearValidationState(form);
             resetForm(form);
         });
 
-        cancelBtn.addEventListener('click', function () {
+        cancelBtn.addEventListener('click', function() {
             closeModal(modal, modalBox);
             clearValidationState(form);
             resetForm(form);
@@ -586,7 +607,7 @@
             }, 400);
         });
 
-        addWasteRowBtn.addEventListener('click', function () {
+        addWasteRowBtn.addEventListener('click', function() {
             const newRow = makeRow(false);
             wrapper.appendChild(newRow);
             refreshWasteTypeOptions();
@@ -607,7 +628,7 @@
         }
 
         // lắng nghe sự kiện xoá bằng event delegation
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (e.target.classList.contains('deleteRowBtn')) {
                 const row = e.target.closest('.waste-item');
                 row.remove();
@@ -676,7 +697,7 @@
         }
 
         previewBtn.forEach(btn => {
-            btn.addEventListener('click', function () {
+            btn.addEventListener('click', function() {
                 console.log('clicked');
 
                 const url = this.dataset.url;

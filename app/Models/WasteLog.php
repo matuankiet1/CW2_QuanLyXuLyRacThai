@@ -19,11 +19,11 @@ class WasteLog extends Model
 
     protected static function booted()
     {
-        static::deleting(function ($log) {
-            if ($log->waste_image) {
-                Storage::disk('public')->delete($log->waste_image);
-            }
-        });
+        // static::deleting(function ($log) {
+        //     if ($log->waste_image) {
+        //         Storage::disk('public')->delete($log->waste_image);
+        //     }
+        // });
     }
 
     protected $casts = [
