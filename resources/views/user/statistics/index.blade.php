@@ -144,8 +144,14 @@
             </div>
         </div>
 
-        {{-- Nút quay lại --}}
-        <div class="mt-8 text-center">
+        {{-- Nút chia sẻ và quay lại --}}
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            @if(auth()->user()->isStudent())
+                <a href="{{ route('student.share-achievements') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">
+                    <i class="fas fa-share-alt mr-2"></i>
+                    Chia sẻ thành tích lên mạng xã hội
+                </a>
+            @endif
             <a href="{{ route('home') }}" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Quay lại trang chủ
