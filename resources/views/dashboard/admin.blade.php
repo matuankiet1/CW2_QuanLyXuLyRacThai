@@ -26,7 +26,7 @@
                         <span class="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">↑ 8.3%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Tổng rác thu gom tháng này</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">534 <span class="text-lg text-gray-500">kg</span></h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalWastes }} <span class="text-lg text-gray-500">kg</span></h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 8.3% so với tháng trước</p>
                 </div>
             </div>
