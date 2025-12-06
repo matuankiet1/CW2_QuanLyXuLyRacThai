@@ -60,7 +60,7 @@ class Event extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
-            ->withPivot('status', 'registered_at', 'confirmed_at', 'attended_at')
+            ->withPivot('status', 'student_id', 'student_class', 'registered_at', 'confirmed_at', 'attended_at')
             ->withTimestamps()
             ->using(EventUser::class);
     }
@@ -172,6 +172,11 @@ class Event extends Model
         }
 
         return 'Đang xử lý';
+    }
+
+    public function getAttendParticipantsCountAttribute()
+    {
+        return $this->participants()->where('status', 'attended')->count();
     }
 
 }

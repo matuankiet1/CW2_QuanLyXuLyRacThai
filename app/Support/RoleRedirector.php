@@ -11,7 +11,6 @@ class RoleRedirector
     {
         return match ($role) {
             'admin' => 'admin.home',
-            'manager' => 'manager.dashboard',
             'staff' => 'staff.dashboard',
             'student' => 'student.dashboard',
             default => 'home',

@@ -54,12 +54,6 @@
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                     @error('location') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Người tham gia</label>
-                                    <input type="text" name="participants" value="{{ old('participants') }}" required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                    @error('participants') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
-                                </div>
                             </div>
 
                             <div class="mb-3 mt-3">
@@ -67,16 +61,6 @@
                                 <input type="text" name="description" value="{{ old('description') }}" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md">
                                 @error('description') <div class="text-red-500 text-sm">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="block text-sm font-medium mb-1">Trạng thái</label>
-                                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                    <option value="upcoming" {{ old('status') == 'upcoming' ? 'selected' : '' }}>Sắp diễn ra
-                                    </option>
-                                    <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Đã kết thúc
-                                    </option>
-                                </select>
                             </div>
 
                             <div class="mb-4">

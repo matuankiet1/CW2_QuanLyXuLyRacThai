@@ -17,11 +17,10 @@ class RoleController extends Controller
     {
         $users = User::orderBy('created_at', 'desc')->paginate(10);
         $adminCount = User::where('role', 'admin')->count();
-        $managerCount = User::where('role', 'manager')->count();
         $staffCount = User::where('role', 'staff')->count();
         $studentCount = User::where('role', 'student')->count();
         
-        return view('admin.roles.index', compact('users', 'adminCount', 'managerCount', 'staffCount', 'studentCount'));
+        return view('admin.roles.index', compact('users', 'adminCount', 'staffCount', 'studentCount'));
     }
 
     /**
@@ -30,7 +29,7 @@ class RoleController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => ['required', 'in:admin,manager,staff,student'],
+            'role' => ['required', 'in:admin,staff,student'],
         ]);
         
         // Kiểm tra quyền: chỉ admin mới có thể thay đổi role

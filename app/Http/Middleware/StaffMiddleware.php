@@ -11,7 +11,7 @@ class StaffMiddleware
 {
     /**
      * Handle an incoming request.
-     * Chỉ cho phép admin, manager và staff truy cập
+     * Chỉ cho phép admin và staff truy cập
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,7 +20,7 @@ class StaffMiddleware
         }
 
         $user = auth()->user();
-        if (!in_array($user->role, ['admin', 'manager', 'staff'])) {
+        if (!in_array($user->role, ['admin', 'staff'])) {
             return redirect()->route(RoleRedirector::homeRoute($user->role))
                 ->with('error', 'Bạn không có quyền truy cập trang này.');
         }
