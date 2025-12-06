@@ -1,5 +1,12 @@
 @extends('layouts.admin-with-sidebar')
-
+<script>
+    @if (session('error'))
+        alert("{{ session('error') }}");
+    @endif
+    @if (session('success'))
+        alert("{{ session('success') }}");
+    @endif
+</script>
 @section('content')
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
