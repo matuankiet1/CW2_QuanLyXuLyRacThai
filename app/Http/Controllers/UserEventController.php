@@ -82,7 +82,6 @@ class UserEventController extends Controller
     }
 
 
-
     /**
      * Hiển thị chi tiết sự kiện
      * Route: GET /events/{id}
@@ -114,6 +113,8 @@ class UserEventController extends Controller
         return view('user.events.show', compact('event', 'userRegistration', 'isRegistered', 'registrationStats'));
     }
 
+    
+
     public function showRegisterForm($id)
     {
         $event = Event::findOrFail($id);
@@ -128,8 +129,7 @@ class UserEventController extends Controller
             'event' => $event
         ]);
     }
-
-
+    
     /**
      * Đăng ký tham gia sự kiện
      * Route: POST /events/{id}/register

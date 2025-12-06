@@ -15,11 +15,11 @@
 
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Sự kiện sắp diễn ra</h2>
+                    <h2 class="h5 mb-0">Sự kiện đang trong thời gian đăng ký</h2>
                     <a href="{{ route('user.events.index') }}" class="btn btn-outline-success btn-sm">Xem tất cả</a>
                 </div>
                 <div class="card-body">
-                    @forelse($upcomingEvents as $event)
+                    @forelse($registeringEvents as $event)
                         <div class="border rounded-3 p-3 mb-3">
                             <div class="d-flex flex-column flex-md-row justify-content-between">
                                 <div>
