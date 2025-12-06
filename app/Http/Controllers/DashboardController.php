@@ -23,6 +23,8 @@ class DashboardController extends Controller
             ->distinct('user_id')
             ->count('user_id');
 
+        $totalWastes = WasteLog::sum('waste_weight');
+
         // Nếu user không chọn năm -> lấy năm hiện tại
         $year = $request['year'];
         if (!$year) {
@@ -38,7 +40,7 @@ class DashboardController extends Controller
             return response()->json($wasteStatistics);
         }
 
-        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification', 'totalStudents'));
+        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification', 'totalStudents', 'totalWastes'));
     }
 
     // Manager method đã bị xóa vì role manager không còn tồn tại
