@@ -228,10 +228,9 @@ Route::middleware('admin')->group(function () {
     ]);
 
     // Events (Admin - moved from manager routes)
-    Route::prefix('admin/events')->name('admin.events.')->group(function () {
+   Route::prefix('admin/events')->name('admin.events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('/create', [EventController::class, 'create'])->name('create');
-        Route::get('/participants', [EventParticipantController::class, 'index'])->name('participants');
         Route::post('/', [EventController::class, 'store'])->name('store');
         Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
         Route::put('/{event}', [EventController::class, 'update'])->name('update');
@@ -241,7 +240,31 @@ Route::middleware('admin')->group(function () {
         Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
         Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
         Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
-    });
+
+
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
+            ->name('participants'); // ✅ Thêm route index cho view quản lý
+
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
+            ->name('participants.confirm');
+
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
+            ->name('participants.attend');
+
+        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
+            ->name('participants.pending');
+
+        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
+            ->name('pending'); // ✅ Thêm route index cho view quản lý
+
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
+            ->name('participants.bulk-confirm');
+
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
+            ->name('participants.bulk-attend');
+
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
+            ->name('participants.export');
 
 });
 
