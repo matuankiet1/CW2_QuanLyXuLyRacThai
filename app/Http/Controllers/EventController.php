@@ -163,7 +163,7 @@ class EventController extends Controller
         Log::info('Cập nhật sự kiện ID: ' . $event->id, $request->all());
 
         $data = $request->validate([
-            'title' => 'required|string|max:100',
+            'title' => 'required|string|max:255',
             'register_date' => 'required|date',
             'register_end_date' => 'required|date|',
             'event_start_date' => 'required|date|',
@@ -175,7 +175,7 @@ class EventController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề sự kiện.',
-            'title.max' => 'Tên sự kiện không được vượt quá 100 ký tự.',
+            'title.max' => 'Tên sự kiện không được vượt quá 255 ký tự.',
             'register_date.required' => 'Vui lòng chọn ngày bắt đầu đăng ký.',
             'register_end_date.required' => 'Vui lòng chọn ngày kết thúc đăng ký.',
             'event_start_date.required' => 'Vui lòng chọn ngày bắt đầu sự kiện.',
@@ -220,9 +220,17 @@ class EventController extends Controller
 
 
     // ✅ Xóa sự kiện
-    public function destroy(Event $event)
+    public function destroy($id)
     {
+        $event = Event::find($id);
+
+        if (!$event) {
+            return redirect()->route('admin.events.index')
+                ->with('error', 'Sự kiện không tồn tại hoặc đã bị xoá.');
+        }
+
         $event->delete();
+
         return redirect()->back()->with('success', 'Xóa sự kiện thành công!');
     }
 
