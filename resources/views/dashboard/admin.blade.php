@@ -41,7 +41,7 @@
                         <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">↑ 12.8%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sinh viên tham gia</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">167</h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalStudents }}</h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 12.8% so với tháng trước</p>
                 </div>
             </div>

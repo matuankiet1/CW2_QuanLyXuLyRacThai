@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CollectionSchedule;
 use App\Models\Event;
+use App\Models\EventUser;
 use App\Models\WasteLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         $upcomingEventsCount = Event::whereMonth('register_date', now()->month)->count();
+
+        $totalStudents = EventUser::where('status', 'attended')
+            ->distinct('user_id')
+            ->count('user_id');
 
         // Nếu user không chọn năm -> lấy năm hiện tại
         $year = $request['year'];
@@ -33,7 +38,7 @@ class DashboardController extends Controller
             return response()->json($wasteStatistics);
         }
 
-        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification'));
+        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification', 'totalStudents'));
     }
 
     // Manager method đã bị xóa vì role manager không còn tồn tại
