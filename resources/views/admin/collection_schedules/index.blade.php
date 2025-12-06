@@ -68,7 +68,7 @@
                             Xóa tất cả
                         </button>
 
-                        <a href="{{ route('admin.collection-schedules.export-excel', ['q' => request('q')]) }}"
+                        <a href="{{ route('admin.collection-schedules.export-excel', request()->query()) }}"
                             class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
                             Xuất file excel
                         </a>
@@ -302,10 +302,11 @@
                             @enderror
                         </div>
 
-                        <div class="waste-logs">
-                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline">Xem lượng rác đã thu
+                        {{-- <div class="waste-logs">
+                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline">Xem lượng rác
+                                đã thu
                                 gom</button>
-                        </div>
+                        </div> --}}
 
                         <div class="flex justify-end gap-3 pt-3">
                             <button type="button" id="cancelBtn"
@@ -484,6 +485,8 @@
 
         const filterForm = document.getElementById('filterForm');
 
+        let outsideClickHandler = null;
+
         function openModal(modal, modalBox) {
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -492,6 +495,15 @@
                 modalBox.classList.remove('opacity-0', 'translate-y-5', 'scale-95');
                 modalBox.classList.add('opacity-100', 'translate-y-0', 'scale-100');
             }, 10);
+
+            // Đăng ký sự kiện click  bên ngoài để đóng modal
+            outsideClickHandler = (e) => {
+                if (!modalBox.contains(e.target)) {
+                    closeModal(modal, modalBox);
+                }
+            };
+
+            document.addEventListener('mousedown', outsideClickHandler);
         }
 
         function closeModal(modal, modalBox) {
@@ -500,6 +512,9 @@
             modal.classList.remove('opacity-100');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
+
+            // Hủy đăng ký sự kiện click bên ngoài khi đóng modal
+            document.removeEventListener('mousedown', outsideClickHandler);
         }
 
         // Auto-open modal if there are errors or show_modal session
@@ -528,7 +543,7 @@
 
                 displayCompletedAtField(false);
                 displayStatusField(false);
-                displayWasteLogs(false);
+                // displayWasteLogs(false);
 
                 openModal(modal, modalBox);
             });
@@ -562,13 +577,14 @@
                         .toISOString().split('T')[0] : '';
                     selectStatus.value = data[0].status;
                     statusHidden.value = data[0].status;
-                    document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0].schedule_id;
+                    // document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0]
+                    //     .schedule_id;
                 }
 
                 titleModal.textContent = 'Chỉnh sửa lịch thu gom';
                 displayCompletedAtField(true);
                 displayStatusField(true);
-                displayWasteLogs(true);
+                // displayWasteLogs(true);
 
                 openModal(modal, modalBox);
 
@@ -583,19 +599,19 @@
             });
         });
 
-        document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
-            const id = this.dataset.scheduleId;
-            const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
-            const data = await res.json();
-            let logsMessage = 'Lượng rác đã thu gom:\n';
-            data.forEach(log => {
-                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
-            });
-            console.log(logsMessage);
+        // document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
+        //     const id = this.dataset.scheduleId;
+        //     const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
+        //     const data = await res.json();
+        //     let logsMessage = 'Lượng rác đã thu gom:\n';
+        //     data.forEach(log => {
+        //         logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
+        //     });
+        //     console.log(logsMessage);
 
-            document.querySelector('.waste-logs').innerText = logsMessage;
-            
-        });
+        //     document.querySelector('.waste-logs').innerText = logsMessage;
+
+        // });
 
         function displayCompletedAtField(show) {
             const completedAtField = document.querySelector('.completed-at-field');
@@ -615,14 +631,14 @@
             }
         }
 
-        function displayWasteLogs(show) {
-            const wasteLogs = document.querySelector('.waste-logs');
-            if (show) {
-                wasteLogs.classList.remove('hidden');
-            } else {
-                wasteLogs.classList.add('hidden');
-            }
-        }
+        // function displayWasteLogs(show) {
+        //     const wasteLogs = document.querySelector('.waste-logs');
+        //     if (show) {
+        //         wasteLogs.classList.remove('hidden');
+        //     } else {
+        //         wasteLogs.classList.add('hidden');
+        //     }
+        // }
 
         selectStatus.addEventListener('change', () => {
             statusHidden.value = selectStatus.value;

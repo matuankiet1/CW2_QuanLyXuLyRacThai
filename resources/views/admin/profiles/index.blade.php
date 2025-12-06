@@ -21,7 +21,7 @@
 
         <div class="border border-gray-300 rounded-xl mt-5 p-5 bg-white shadow-md relative">
             <button id="btnEditInfo"
-                class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200 {{ $errors->any() ? 'hidden' : '' }}">
+                class="absolute top-3 right-3 px-4 py-2 border border-gray-300 rounded-3xl text-sm hover:bg-gray-200 {{ $errors->form_profile->any() ? 'hidden' : '' }}">
                 Chỉnh sửa <i class="fa-regular fa-pen-to-square ms-1"></i>
             </button>
             <h1 class="font-semibold">Thông tin cá nhân</h1>
@@ -29,36 +29,36 @@
                 @csrf
                 <div class="mt-5">
                     <label for="name" class="text-gray-500">Họ và tên</label>
-                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                    <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="name">{{ $user->name }}</span>
-                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
-                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
-                    @error('name')
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" data-original="{{ $user->name }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
+                    @error('name', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="mt-5">
                     <label for="email" class="text-gray-500">Email</label>
-                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                    <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="email">{{ $user->email }}</span>
-                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
-                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
-                    @error('email')
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" data-original="{{ $user->email }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
+                    @error('email', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="mt-5">
                     <label for="phone" class="text-gray-500">Số điện thoại</label>
-                    <span class="field-view block mb-4 {{ $errors->any() ? 'hidden' : '' }}"
+                    <span class="field-view block mb-4 {{ $errors->form_profile->any() ? 'hidden' : '' }}"
                         data-field="phone">{{ $user->phone }}</span>
-                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}"
-                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->any() ? '' : 'hidden' }}" />
-                    @error('phone')
+                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" data-original="{{ $user->phone }}"
+                        class="field-edit w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {{ $errors->form_profile->any() ? '' : 'hidden' }}" />
+                    @error('phone', 'form_profile')
                         <p class="text-red-500 text-sm mt-1 profile-error">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="btnActions flex mt-5 gap-3 {{ $errors->any() ? '' : 'hidden' }}">
+                <div class="btnActions flex mt-5 gap-3 {{ $errors->form_profile->any() ? '' : 'hidden' }}">
                     <button type="submit" id="btnSave"
                         class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition">
                         Lưu
@@ -82,10 +82,13 @@
                     không
                     thể đổi mật khẩu tại đây.</p>
             @else
-                <button type="button" id="btnShowFormChangePassword" class="text-blue-600 underline">Đổi mật khẩu</button>
+                <button type="button" id="btnShowFormChangePassword"
+                    class="text-blue-600 underline {{ $errors->form_change_password->any() ? 'hidden' : '' }}">Đổi mật
+                    khẩu</button>
             @endif
 
-            <form action="{{ route('change_password') }}" method="POST" id="formChangePassword" class="hidden">
+            <form action="{{ route('change_password') }}" method="POST" id="formChangePassword"
+                class="{{ $errors->form_change_password->any() ? '' : 'hidden' }}">
                 @csrf
                 <div class="mt-5">
                     <label for="current_password" class="text-sm font-medium text-gray-700">Mật khẩu hiện tại: <span
@@ -93,8 +96,8 @@
                     <div class="relative">
                         <input type="password" id="current_password" name="current_password" placeholder="••••••••" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                        @error('password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @error('current_password', 'form_change_password')
+                            <p class="text-red-500 text-sm mt-1 password-error">{{ $message }}</p>
                         @enderror
                         <button type="button"
                             class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
@@ -109,8 +112,8 @@
                     <div class="relative">
                         <input type="password" id="new_password" name="new_password" placeholder="••••••••" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                        @error('password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @error('new_password', 'form_change_password')
+                            <p class="text-red-500 text-sm mt-1 password-error">{{ $message }}</p>
                         @enderror
                         <button type="button"
                             class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
@@ -126,8 +129,8 @@
                         <input type="password" id="renew_password" name="new_password_confirmation"
                             placeholder="••••••••" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" />
-                        @error('re-password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @error('new_password_confirmation', 'form_change_password')
+                            <p class="text-red-500 text-sm mt-1 password-error">{{ $message }}</p>
                         @enderror
                         <button type="button"
                             class="btnTogglePassword absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
@@ -234,6 +237,7 @@
             const arrFieldEdit = document.querySelectorAll('.field-edit');
 
             btnEditInfo.addEventListener('click', function() {
+                resetToOriginalValues();
                 arrFieldView.forEach(el => {
                     el.classList.add('hidden');
                 });
@@ -256,10 +260,17 @@
                 btnActions.classList.add('hidden');
                 btnEditInfo.classList.remove('hidden');
 
+                // Ẩn các errors message của validator
                 document.querySelectorAll('.profile-error').forEach(el => {
                     el.classList.add('hidden');
                 });
             });
+
+            function resetToOriginalValues() {
+                profileForm.querySelectorAll('[data-original]').forEach(input => {
+                    input.value = input.dataset.original;
+                });
+            }
 
             // Mở modal chỉnh sửa avatar
             const btnOpenModalAvatar = document.getElementById('btnOpenModalAvatar');
@@ -376,8 +387,14 @@
 
             if (btnCancelChangePassword) {
                 btnCancelChangePassword.addEventListener("click", function() {
+                    formChangePassword.reset();
                     formChangePassword.classList.add("hidden");
                     btnShowFormChangePassword.classList.remove("hidden");
+
+                    // Ẩn các errors message của validator
+                    document.querySelectorAll('.password-error').forEach(el => {
+                        el.classList.add('hidden');
+                    });
                 });
             }
 

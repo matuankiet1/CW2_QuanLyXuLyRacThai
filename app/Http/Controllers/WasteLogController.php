@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WasteLog;
 use App\Models\CollectionSchedule;
 use App\Models\WasteType;
+use App\Models\User;
 use App\Services\GeminiWasteClassifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,20 +18,38 @@ class WasteLogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user_id = auth()->id();
-        $wasteTypes = WasteType::pluck('name', 'id');
-        $wasteLogs = WasteLog::paginate(7);
-        $collectionSchedules = CollectionSchedule::orderBy('schedule_id', 'asc')->get();
 
-        // dd( $collectionSchedules);
-        $isSearch = false;
-        return view('user.waste-logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
+        $user_id = auth()->id();
+
+        $wasteTypes = WasteType::pluck('name', 'id');
+
+        // Kiểm tra xem có schedule_id trong query string không
+        $scheduleId = $request->query('schedule_id');
+
+        // Lấy wasteLogs, nếu có schedule_id thì filter theo schedule đó
+        $query = WasteLog::query()->with(['collectionSchedule.staff', 'confirmedBy']);
+
+        if ($scheduleId) {
+            $query->where('schedule_id', $scheduleId);
+            $isSearch = true;
+        } else {
+            $isSearch = false;
+        }
+
+        $wasteLogs = $query->paginate(7);
+
+        // Lấy tất cả lịch thu gom (dùng cho dropdown hoặc hiển thị)
+        $collectionSchedules = CollectionSchedule::with('staff')->orderBy('schedule_id', 'asc')->get();
+
+        return view('admin.waste_logs.index', compact('wasteTypes', 'wasteLogs', 'collectionSchedules', 'isSearch'));
     }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -49,7 +68,7 @@ class WasteLogController extends Controller
             'waste_image' => 'nullable|array',
             'waste_image.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
-            'old_waste_image' => 'array',
+            'old_waste_image' => 'nullable|array',
             'old_waste_image.*' => 'nullable|string|max:255',
         ]);
 
@@ -187,6 +206,14 @@ class WasteLogController extends Controller
         return response()->json($result);
     }
 
-    
+    public function confirm(WasteLog $wasteLog)
+    {
+        $wasteLog->status = 'Đã xác nhận';
+        $wasteLog->confirmed_by = auth()->id(); // lưu ID của admin xác nhận
+        $wasteLog->confirmed_at = now();
+        $wasteLog->save();
+
+        return redirect()->back()->with('success', 'Bản ghi đã được xác nhận!');
+    }
 
 }

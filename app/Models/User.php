@@ -165,6 +165,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Relationship: Danh sách yêu cầu thu gom rác đã gửi (Student)
+     */
+    public function trashRequests()
+    {
+        return $this->hasMany(TrashRequest::class, 'student_id', 'user_id');
+    }
+
+    /**
+     * Relationship: Danh sách yêu cầu thu gom rác được gán xử lý (Staff)
+     */
+    public function assignedTrashRequests()
+    {
+        return $this->hasMany(TrashRequest::class, 'assigned_staff_id', 'user_id');
+    }
+
+    /**
      * ========== ROLE & PERMISSION METHODS ==========
      */
 
@@ -174,14 +190,6 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
-    }
-
-    /**
-     * Kiểm tra user có phải manager không
-     */
-    public function isManager(): bool
-    {
-        return $this->role === 'manager';
     }
 
     /**

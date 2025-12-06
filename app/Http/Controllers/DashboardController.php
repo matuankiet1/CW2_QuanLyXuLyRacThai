@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CollectionSchedule;
 use App\Models\Event;
+use App\Models\EventUser;
 use App\Models\WasteLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,7 +17,11 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $upcomingEventsCount = Event::whereDate('event_start_date', '>=', $today)->count();
+        $upcomingEventsCount = Event::whereMonth('register_date', now()->month)->count();
+
+        $totalStudents = EventUser::where('status', 'attended')
+            ->distinct('user_id')
+            ->count('user_id');
 
         // Nếu user không chọn năm -> lấy năm hiện tại
         $year = $request['year'];
@@ -27,47 +32,44 @@ class DashboardController extends Controller
         $wasteStatistics = $this->getWasteStatistics($request, $year);
 
         $wasteClassification = $this->getWasteClassification();
-        
+
         // Nếu là request AJAX (JS fetch) -> trả JSON
         if ($request->ajax()) {
             return response()->json($wasteStatistics);
         }
 
-        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification'));
+        return view('dashboard.admin', compact('upcomingEventsCount', 'wasteStatistics', 'wasteClassification', 'totalStudents'));
     }
 
-    public function manager()
-    {
-        $upcomingEvents = Event::orderBy('event_start_date', 'asc')
-            ->limit(5)
-            ->get();
-
-        return view('dashboard.manager', compact('upcomingEvents'));
-    }
+    // Manager method đã bị xóa vì role manager không còn tồn tại
+    // Các chức năng của manager đã được chuyển sang admin
 
     public function staff()
     {
         $user = auth()->user();
 
         $collectionSchedules = CollectionSchedule::with('staff')
-            ->where('staff_id', $user->user_id) // chỉ lấy lịch của nhân viên hiện tại
+            ->where('staff_id', $user->user_id)
             ->orderBy('scheduled_date', 'asc')
             ->get();
 
-        $isSearching = false; // để tránh lỗi Undefined variable
+        $isSearching = false;
 
         return view('dashboard.staff', compact('collectionSchedules', 'isSearching'));
     }
 
     public function student()
     {
-        $upcomingEvents = Event::where('status', 'upcoming')
-            ->orderBy('event_start_date', 'asc')
-            ->limit(5)
+        $now = now();
+
+        $registeringEvents = Event::where('register_date', '<', $now)
+            ->where('register_end_date', '>', $now)
             ->get();
 
-        return view('dashboard.student', compact('upcomingEvents'));
+        $registeringEventsCount = $registeringEvents->count();
+        return view('dashboard.student', compact('registeringEvents', 'registeringEventsCount'));
     }
+
 
     // Thống kê rác thải theo tháng dựa vào năm mà người dùng chọn
     public function getWasteStatistics(Request $request, $y)

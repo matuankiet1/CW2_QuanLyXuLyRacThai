@@ -252,42 +252,6 @@
 </section>
 @endif
 
-<!-- Banners Section -->
-@if($banners->count() > 0)
-<section class="py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Thông báo quan trọng</h2>
-            <p class="section-subtitle">Các thông báo và sự kiện mới nhất</p>
-        </div>
-        
-        <div class="row g-4">
-            @foreach($banners as $banner)
-            <div class="col-lg-4 col-md-6">
-                <div class="banner-slide" style="background-image: url('{{ asset('storage/' . $banner->image) }}')">
-                    <div class="banner-overlay">
-                        <div>
-                            <h5 class="mb-3">{{ $banner->title }}</h5>
-                            @if($banner->description)
-                                <p class="mb-3">{{ Str::limit($banner->description, 100) }}</p>
-                            @endif
-                            @if($banner->link)
-                                <a href="{{ $banner->link }}" class="btn btn-light btn-sm">
-                                    Tìm hiểu thêm
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-
-
 <!-- CTA Section -->
 <section class="py-5 bg-primary text-white">
     <div class="container text-center">
