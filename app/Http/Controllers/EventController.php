@@ -93,31 +93,20 @@ class EventController extends Controller
     {
         Log::info('Dữ liệu gửi lên:', $request->all());
 
-        // 1️⃣ Validate dữ liệu
         $data = $request->validate([
             'title' => 'required|string|max:255',
-
-            // 📅 Ngày sự kiện
             'register_date' => 'required|date|before_or_equal:register_end_date|after_or_equal:today',
             'register_end_date' => 'required|date|after_or_equal:register_date|before_or_equal:event_start_date',
             'event_start_date' => 'required|date|after_or_equal:register_end_date|before_or_equal:event_end_date',
             'event_end_date' => 'required|date|after_or_equal:event_start_date',
-
-            // 🏠 Địa điểm
             'location' => 'required|string|max:255',
-
-            // 👥 Số người tham gia
             'participants' => 'nullable|integer|min:0',
             'capacity' => 'nullable|integer|min:1',
-
-            // 📝 Mô tả
             'description' => 'nullable|string|max:5000',
-
-            // 🖼 Ảnh
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], [
-            // ⚠ Thông báo lỗi tùy chỉnh
             'title.required' => 'Vui lòng nhập tiêu đề sự kiện.',
+            'title.max' => 'Tên sự kiện không được vượt quá 255 ký tự.',
             'register_date.required' => 'Vui lòng chọn ngày bắt đầu đăng ký.',
             'register_end_date.required' => 'Vui lòng chọn ngày kết thúc đăng ký.',
             'event_start_date.required' => 'Vui lòng chọn ngày bắt đầu sự kiện.',
@@ -132,6 +121,7 @@ class EventController extends Controller
             'location.required' => 'Vui lòng nhập địa điểm tổ chức.',
             'participants.integer' => 'Số người tham gia phải là số nguyên.',
             'participants.min' => 'Số người tham gia không được nhỏ hơn 0.',
+            'description.max' => 'Mô tả sự kiện không được vượt quá 5000 ký tự',
             'image.image' => 'Trường hình ảnh phải là tệp ảnh hợp lệ.',
             'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
             'image.max' => 'Kích thước ảnh tối đa là 2MB.',
@@ -162,30 +152,20 @@ class EventController extends Controller
     {
         Log::info('Cập nhật sự kiện ID: ' . $event->id, $request->all());
 
-        // Validate giống hệt store
         $data = $request->validate([
             'title' => 'required|string|max:255',
-
-            // 📅 Ngày sự kiện — giống hệt store
-            'register_date' => 'required|date|before_or_equal:register_end_date|after_or_equal:today',
+            'register_date' => 'required|date|after_or_equal:today',
             'register_end_date' => 'required|date|after_or_equal:register_date|before_or_equal:event_start_date',
             'event_start_date' => 'required|date|after_or_equal:register_end_date|before_or_equal:event_end_date',
             'event_end_date' => 'required|date|after_or_equal:event_start_date',
-
-            // 🏠 Địa điểm
             'location' => 'required|string|max:255',
-
-            // 👥 Số người tham gia
             'participants' => 'nullable|integer|min:0',
             'capacity' => 'nullable|integer|min:1',
-
-            // 📝 Mô tả
             'description' => 'nullable|string|max:5000',
-
-            // 🖼 Ảnh
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề sự kiện.',
+            'title.max' => 'Tên sự kiện không được vượt quá 255 ký tự.',
             'register_date.required' => 'Vui lòng chọn ngày bắt đầu đăng ký.',
             'register_end_date.required' => 'Vui lòng chọn ngày kết thúc đăng ký.',
             'event_start_date.required' => 'Vui lòng chọn ngày bắt đầu sự kiện.',
@@ -198,16 +178,16 @@ class EventController extends Controller
             'event_start_date.before_or_equal' => 'Ngày bắt đầu sự kiện phải trước ngày kết thúc sự kiện.',
             'event_end_date.after_or_equal' => 'Ngày kết thúc sự kiện phải sau hoặc bằng ngày bắt đầu sự kiện.',
             'location.required' => 'Vui lòng nhập địa điểm tổ chức.',
+            'location.max' => 'Địa điểm không được vượt quá 255 ký tự.',
             'participants.integer' => 'Số người tham gia phải là số nguyên.',
             'participants.min' => 'Số người tham gia không được nhỏ hơn 0.',
+            'description.max' => 'Mô tả sự kiện không được vượt quá 5000 ký tự',
             'image.image' => 'Tệp tải lên phải là ảnh hợp lệ.',
             'image.mimes' => 'Ảnh chỉ được phép có định dạng: jpg, jpeg, png, gif, webp.',
             'image.max' => 'Kích thước ảnh tối đa là 2MB.',
         ]);
 
-        // 🖼 Xử lý ảnh giống store
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ nếu tồn tại
             if ($event->image && file_exists(public_path($event->image))) {
                 @unlink(public_path($event->image));
             }
@@ -220,9 +200,6 @@ class EventController extends Controller
             $data['image'] = 'images/events/' . $fileName;
         }
 
-        // ❗ Không cập nhật created_by (chỉ store mới tạo created_by)
-
-        // 💾 Cập nhật sự kiện
         $event->update($data);
 
         return redirect()
@@ -233,9 +210,17 @@ class EventController extends Controller
 
 
     // ✅ Xóa sự kiện
-    public function destroy(Event $event)
+    public function destroy($id)
     {
+        $event = Event::find($id);
+
+        if (!$event) {
+            return redirect()->route('admin.events.index')
+                ->with('error', 'Sự kiện không tồn tại hoặc đã bị xoá.');
+        }
+
         $event->delete();
+
         return redirect()->back()->with('success', 'Xóa sự kiện thành công!');
     }
 

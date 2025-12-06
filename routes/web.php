@@ -184,6 +184,8 @@ Route::middleware('admin')->group(function () {
         Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
         Route::post('waste_logs/{wasteLog}/confirm', [WasteLogController::class, 'confirm'])
             ->name('waste_logs.confirm');
+        Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
+
 
 
     });
@@ -241,6 +243,31 @@ Route::middleware('admin')->group(function () {
         Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
         Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
         Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
+
+
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
+            ->name('participants'); 
+
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
+            ->name('participants.confirm');
+
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
+            ->name('participants.attend');
+
+        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
+            ->name('participants.pending');
+
+        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
+            ->name('pending'); 
+
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
+            ->name('participants.bulk-confirm');
+
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
+            ->name('participants.bulk-attend');
+
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
+            ->name('participants.export');
     });
 
 });
@@ -265,7 +292,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
     Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
-    Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
     Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
         ->name('user.events.registerForm');
 
