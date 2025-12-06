@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        $upcomingEventsCount = Event::whereDate('event_start_date', '>=', $today)->count();
+        $upcomingEventsCount = Event::whereMonth('register_date', now()->month)->count();
 
         // Nếu user không chọn năm -> lấy năm hiện tại
         $year = $request['year'];
@@ -44,11 +44,11 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $collectionSchedules = CollectionSchedule::with('staff')
-            ->where('staff_id', $user->user_id) // chỉ lấy lịch của nhân viên hiện tại
+            ->where('staff_id', $user->user_id)
             ->orderBy('scheduled_date', 'asc')
             ->get();
 
-        $isSearching = false; // để tránh lỗi Undefined variable
+        $isSearching = false;
 
         return view('dashboard.staff', compact('collectionSchedules', 'isSearching'));
     }
@@ -60,8 +60,8 @@ class DashboardController extends Controller
         $registeringEvents = Event::where('register_date', '<', $now)
             ->where('register_end_date', '>', $now)
             ->get();
-        
-        $registeringEventsCount = $registeringEvents -> count();
+
+        $registeringEventsCount = $registeringEvents->count();
         return view('dashboard.student', compact('registeringEvents', 'registeringEventsCount'));
     }
 

@@ -57,7 +57,6 @@
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sự kiện trong tháng</p>
                     <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $upcomingEventsCount }}</h3>
-                    <p class="text-green-600 text-xs font-medium mt-2">↑ 2 sự kiện mới</p>
                 </div>
             </div>
 
