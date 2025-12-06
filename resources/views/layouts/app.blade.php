@@ -1,4 +1,3 @@
-
 {{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -25,15 +24,27 @@
     @vite('resources/js/toast.js')
     {{-- Hiển thị toast (nếu có) --}}
     @if (session('status'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            showToast(
-                "{{ session('status')['type'] }}",
-                "{{ session('status')['message'] }}"
-            );
-        });
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast(
+                    "{{ session('status')['type'] }}",
+                    "{{ session('status')['message'] }}"
+                );
+            });
+        </script>
     @endif
+
+    <script>
+        // Xóa #_=_ do Facebook tự động thêm vào URL
+        if (window.location.hash === '#_=_') {
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState('', document.title, window.location.pathname);
+            } else {
+                // Fallback cho trình duyệt cũ
+                window.location.hash = '';
+            }
+        }
+    </script>
 
 </body>
 
