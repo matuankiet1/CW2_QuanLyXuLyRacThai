@@ -46,7 +46,7 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact')
 Route::get('/guide', [HomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
 
 //------------------------------------ STAFF HOME -------------------------------------//
-Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function () {
     Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
     Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
     Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
@@ -183,7 +183,7 @@ Route::middleware('admin')->group(function () {
 
         Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
         Route::post('waste_logs/{wasteLog}/confirm', [WasteLogController::class, 'confirm'])
-    ->name('waste_logs.confirm');
+            ->name('waste_logs.confirm');
 
 
     });
@@ -216,6 +216,9 @@ Route::middleware('admin')->group(function () {
 
     Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
         ->name('admin.collection-schedules.update-status');
+
+    Route::get('/collection-schedules/get-staffs', [CollectionScheduleController::class, 'getStaffs'])
+        ->name('admin.collection-schedules.get-staffs');
 
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
@@ -345,12 +348,12 @@ Route::middleware('auth')->group(function () {
 // Route phục vụ ảnh banner - FIXED
 Route::get('/banner-img/{filename}', function ($filename) {
     $path = storage_path('app/public/banners/' . $filename);
-    
+
     if (!file_exists($path)) {
         // Log lỗi để debug
         Log::error("Banner image not found: " . $path);
         abort(404);
     }
-    
+
     return response()->file($path);
 })->name('banner.image');

@@ -82,24 +82,38 @@ class CollectionScheduleController extends Controller
     {
         try {
             $validated = $request->validate([
-                'staff_id' => 'required|string|max:255',
-                'scheduled_date' => 'required|date|after_or_equal:now'
+                'staff_id' => 'required|string|max:255|exists:users,user_id',
+                'scheduled_date' => [
+                    'required',
+                    'date',
+                    'after_or_equal:today',
+                    function ($attribute, $value, $fail) {
+                        $max = now()->addMonths(3)->startOfDay();
+                        if (strtotime($value) > $max->timestamp) {
+                            $fail('Ngày thu gom không được vượt quá 3 tháng so với ngày hiện tại.');
+                        }
+                    }
+                ]
             ]);
-            $staff_id = User::where('name', $validated['staff_id'])->value('user_id');
-            if (!$staff_id) {
+            $staff = User::where('name', $request->staff_name)
+                ->where('role', 'staff')
+                ->first();
+            if (!$staff) {
                 return back()->with('status', [
                     'type' => 'error',
                     'message' => 'Không tìm thấy nhân viên!'
                 ])->withInput();
             } else {
-                $validated['staff_id'] = $staff_id;
+                $validated['staff_id'] = $staff->user_id;
                 CollectionSchedule::create($validated);
             }
         } catch (ValidationException $e) {
-            return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
+            return back()->withErrors($e->validator)->withInput()->with('show_modal_add', true);
         }
 
-        $user = User::where('user_id', $validated['staff_id'])->first();
+        $user = User::where('name', $request->staff_name)
+            ->where('role', 'staff')
+            ->first();
 
         if ($user && $user->email) {
             Mail::to($user->email)->queue(new NotificationMail(
@@ -140,29 +154,60 @@ class CollectionScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $staff_name = $request['staff_id'];
-        if ($staff_name) {
-            $staff_id = User::where('name', $staff_name)->value('user_id');
-            if (!$staff_id) {
+        $staff = null;
+        if ($request->staff_name) {
+            $staff = User::where('name', $request->staff_name)
+                ->where('role', 'staff')
+                ->first();
+            if (!$staff) {
                 return back()->with('status', [
                     'type' => 'error',
                     'message' => 'Không tìm thấy nhân viên. Vui lòng thử lại sau!'
                 ])->withInput();
-            } else {
-                $request['staff_id'] = $staff_id;
             }
         }
 
         try {
             $validated = $request->validate([
-                'staff_id' => 'required|exists:users,user_id',
-                'scheduled_date' => 'required|date',
-                'completed_at' => 'nullable|date|after_or_equal:now',
+                'staff_id' => 'required|string|max:255|exists:users,user_id',
+                'scheduled_date' => [
+                    'required',
+                    'date',
+                    function ($attribute, $value, $fail) {
+                        $max = now()->addMonths(3)->startOfDay();
+                        if (strtotime($value) > $max->timestamp) {
+                            $fail('Ngày thu gom không được vượt quá 3 tháng so với ngày hiện tại.');
+                        }
+                    }
+                ],
+                'completed_at' => [
+                    'nullable',
+                    'date',
+                    function ($attribute, $value, $fail) use ($request) {
+                        if (!$value || !$request->scheduled_date)
+                            return;
+
+                        $scheduled = \Carbon\Carbon::parse($request->scheduled_date)->startOfDay();
+                        $completed = \Carbon\Carbon::parse($value)->startOfDay();
+
+                        // Nếu completed_at < scheduled_date
+                        if ($completed->lt($scheduled)) {
+                            return $fail('Ngày hoàn thành phải lớn hơn hoặc bằng ngày thu gom.');
+                        }
+
+                        // Nếu completed_at > scheduled_date + 3 ngày
+                        if ($completed->gt($scheduled->copy()->addDays(3))) {
+                            return $fail('Ngày hoàn thành không được vượt quá 3 ngày so với ngày thu gom.');
+                        }
+                    }
+                ],
                 'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
             ]);
         } catch (ValidationException $e) {
-            return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
+            return back()->withErrors($e->validator)->withInput()->with('show_modal_update', true)->with('schedule_id', $id);
         }
+
+        $validated['staff_id'] = $staff->user_id;
 
         $collectionSchedule = CollectionSchedule::findOrFail($id);
 
@@ -318,6 +363,16 @@ class CollectionScheduleController extends Controller
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getStaffs(Request $request)
+    {
+        $staffs = User::where('role', 'staff')
+            ->where('name', 'like', '%' . $request->input('q') . '%');
+        return response()->json([
+            'id' => $staffs->pluck('user_id'),
+            'name' => $staffs->pluck('name'),
+        ]);
     }
 
 }
