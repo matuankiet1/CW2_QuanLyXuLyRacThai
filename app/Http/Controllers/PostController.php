@@ -97,6 +97,7 @@ class PostController extends Controller
                 'required',
                 'string',
                 'min:20', // Tối thiểu 20 ký tự nội dung
+                'max:5000', // Tối thiểu 20 ký tự nội dung
             ],
             'post_categories' => [
                 'required',
@@ -129,12 +130,13 @@ class PostController extends Controller
             'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
             'content.required' => 'Nội dung không được để trống.',
             'content.min' => 'Nội dung phải có ít nhất 20 ký tự.',
+            'content.max' => 'Nội dung chỉ được tối đa 5000 ký tự.',
             'post_categories.required' => 'Danh mục bài viết không được để trống.',
             'post_categories.regex' => 'Danh mục chỉ được chứa chữ cái và dấu phẩy.',
             'status.required' => 'Trạng thái là bắt buộc.',
             'status.in' => 'Trạng thái không hợp lệ.',
             'published_at.date' => 'Ngày xuất bản không hợp lệ.',
-            'published_at.after_or_equal' => 'Ngày xuất bản không thể nhỏ hơn hôm nay.',
+            'published_at.after_or_equal' => 'Ngày xuất bản phải bắt đầu từ hôm nay.',
             'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
             'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
             'image.max' => 'Ảnh không được vượt quá 2MB.',
@@ -187,8 +189,7 @@ class PostController extends Controller
      */
     public function update(Request $request, \App\Models\Post $post)
     {
-        try {
-            // 1️⃣ Ghi log để debug
+        
             \Log::info('update() đang chạy', $request->all());
             if ($request->updated_at != $post->updated_at) {
                 return back()
@@ -196,7 +197,6 @@ class PostController extends Controller
                     ->withInput();
             }
 
-            // 2️⃣ Xác thực dữ liệu đầu vào
             $validated = $request->validate([
                 'title' => [
                     'required',
@@ -220,6 +220,7 @@ class PostController extends Controller
                     'required',
                     'string',
                     'min:20',
+                    'max:5000'
                 ],
                 'post_categories' => [
                     'required',
@@ -235,7 +236,6 @@ class PostController extends Controller
                 'published_at' => [
                     'nullable',
                     'date',
-                    'after_or_equal:today',
                 ],
                 'image' => [
                     'nullable',
@@ -252,12 +252,12 @@ class PostController extends Controller
                 'excerpt.max' => 'Mô tả ngắn tối đa 500 ký tự.',
                 'content.required' => 'Nội dung không được để trống.',
                 'content.min' => 'Nội dung phải có ít nhất 20 ký tự.',
+                'content.max' => 'Nội dung chỉ được tối đa 5000 ký tự.',
                 'post_categories.required' => 'Danh mục bài viết không được để trống.',
                 'post_categories.regex' => 'Danh mục chỉ được chứa chữ cái và dấu phẩy.',
                 'status.required' => 'Trạng thái là bắt buộc.',
                 'status.in' => 'Trạng thái không hợp lệ.',
                 'published_at.date' => 'Ngày xuất bản không hợp lệ.',
-                'published_at.after_or_equal' => 'Ngày xuất bản không thể nhỏ hơn hôm nay.',
                 'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
                 'image.mimes' => 'Ảnh phải có định dạng jpg, jpeg, png, gif hoặc webp.',
                 'image.max' => 'Ảnh không được vượt quá 2MB.',
@@ -305,14 +305,7 @@ class PostController extends Controller
             return redirect()
                 ->route('admin.posts.index')
                 ->with('success', 'Cập nhật bài viết thành công!');
-
-        } catch (\Exception $e) {
-            // 7️⃣ Ghi log lỗi và trả thông báo
-            \Log::error('Lỗi khi cập nhật bài viết: ' . $e->getMessage());
-            return back()
-                ->withInput()
-                ->with('error', 'Đã xảy ra lỗi khi cập nhật bài viết. Vui lòng thử lại!');
-        }
+        
     }
 
 
