@@ -24,10 +24,12 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $provider = fake()->randomElement(['local', 'google', 'facebook']);
+        $role = fake()->randomElement(['admin', 'staff', 'student']);
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'role' => $role,
             'password' => $provider === 'local' ? Hash::make('password') : '', // chỉ mã hóa nếu là local
             'auth_provider' => $provider,
             'provider_id' => $provider !== 'local' ? fake()->uuid() : null,

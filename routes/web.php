@@ -219,6 +219,9 @@ Route::middleware('admin')->group(function () {
     Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
         ->name('admin.collection-schedules.update-status');
 
+    Route::get('/collection-schedules/get-staffs', [CollectionScheduleController::class, 'getStaffs'])
+        ->name('admin.collection-schedules.get-staffs');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
