@@ -136,8 +136,11 @@ class WasteLogController extends Controller
                 ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
-            // return redirect()->back()->withErrors('Có lỗi xảy ra: ' . $e->getMessage());
+            // dd($e->getMessage());
+            return redirect()->back()->with('status', [
+                    'type' => 'error',
+                    'message' => 'Đã có lỗi xảy ra, vui lòng thử lại và nhập đúng định dạng dữ liệu!',
+                ]);
         }
     }
 
