@@ -177,10 +177,26 @@
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         <div class="flex items-center justify-center">
+                                            {{-- Nút view --}}
+                                            <button data-id="{{ $collectionSchedule->schedule_id }}"
+                                                class="viewBtn group inline-flex items-center justify-center hover:bg-blue-200 rounded-xl mx-1 p-2 transition cursor-pointer"
+                                                data-modal="view" title="Xem chi tiết lịch thu gom">
+
+                                                <i
+                                                    class="fa-regular fa-eye text-[16px] group-hover:text-blue-600 leading-none"></i>
+
+                                                {{-- <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
+                                                    color="#254434" fill="none" stroke="currentColor"
+                                                    aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M16.862 3.487a1.75 1.75 0 0 1 2.476 2.476L8.5 16.8 4 18l1.2-4.5 11.662-10.013Z" />
+                                                </svg> --}}
+                                            </button>
+                                            {{-- Nút edit --}}
                                             <button data-id="{{ $collectionSchedule->schedule_id }}"
                                                 class="editBtn group inline-flex items-center justify-center hover:bg-amber-200 rounded-xl mx-1 p-2 transition cursor-pointer"
-                                                data-modal="edit" aria-label="Chỉnh sửa">
-                                                {{-- Icon chỉnh sửa --}}
+                                                data-modal="edit" title="Chỉnh sửa lịch thu gom">
+
                                                 <svg class="w-5 h-5 group-hover:text-amber-600" viewBox="0 0 24 24"
                                                     color="#254434" fill="none" stroke="currentColor"
                                                     aria-hidden="true">
@@ -189,10 +205,10 @@
                                                 </svg>
                                             </button>
 
+                                            {{-- Nút delete --}}
                                             <button id="{{ $collectionSchedule->schedule_id }}"
                                                 class="deleteBtn group inline-flex items-center justify-center hover:bg-red-200 rounded-xl mx-1 p-2 transition cursor-pointer"
-                                                aria-label="Xóa">
-                                                {{-- Icon xóa --}}
+                                                title="Xóa lịch thu gom">
                                                 <svg class="w-5 h-5 group-hover:text-red-600"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" color="#000"
                                                     fill="none">
@@ -257,12 +273,14 @@
                         <div class="relative">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" id="inputName" name="staff_id"
+                            <input type="text" id="inputName" name="staff_name"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition"
-                                placeholder="Nhập tên nhân viên..." value="{{ old('staff_id') }}" autocomplete="off">
-                            @error('staff_id')
+                                placeholder="Nhập tên nhân viên..." value="{{ old('staff_name') }}" autocomplete="off">
+                            @error('staff_name')
                                 <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
+                            <input type="hidden" name="staff_id" value="{{ old('staff_id') }}"
+                                id="inputHiddenStaffId">
                             <!-- Dropdown suggestions -->
                             <ul id="suggestions"
                                 class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-md mt-1 hidden max-h-48 overflow-y-auto z-10">
@@ -302,11 +320,7 @@
                             @enderror
                         </div>
 
-                        {{-- <div class="waste-logs">
-                            <button type="button" class="btnShowWasteLogs text-blue-700 italic underline">Xem lượng rác
-                                đã thu
-                                gom</button>
-                        </div> --}}
+                        <div class="waste-logs"></div>
 
                         <div class="flex justify-end gap-3 pt-3">
                             <button type="button" id="cancelBtn"
@@ -450,14 +464,36 @@
         </div>
     </div>
 
-    <div id="collectionScheduleState" data-open-modal="{{ session('show_modal') || $errors->any() ? 'true' : 'false' }}"
-        class="hidden"></div>
+    <div id="imgModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60">
+        <div class="relative max-w-[90vw] max-h-[90vh]">
+            <img id="imgModalImg" src="" alt="Preview"
+                class="max-w-[90vw] max-h-[90vh] rounded shadow-lg object-contain">
+            <button type="button" id="imgModalClose" onclick="closeImageModal()"
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow cursor-pointer">
+                x
+            </button>
+        </div>
+    </div>
+
+    @if (session('show_modal_add') && $errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                openAddModal();
+            });
+        </script>
+    @endif
+
+    @if (session('show_modal_update') && $errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const schedule_id = @json(session('schedule_id'));
+                openEditModal(schedule_id);
+            });
+        </script>
+    @endif
 
     <script>
         // Modal logic
-        const stateElement = document.getElementById('collectionScheduleState');
-        const shouldShowModal = stateElement ? stateElement.dataset.openModal === 'true' : false;
-
         const modal = document.getElementById('modal');
         const modalBox = document.getElementById('modalBox');
         const openBtn = document.querySelectorAll('.openModalBtn');
@@ -467,6 +503,7 @@
 
         const confirmModal = document.getElementById('confirmModal');
         const confirmModalBox = document.getElementById('confirmModalBox');
+        const viewBtn = document.querySelectorAll('.viewBtn');
         const editBtn = document.querySelectorAll('.editBtn');
         const deleteBtn = document.querySelectorAll('.deleteBtn');
         const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
@@ -517,13 +554,6 @@
             document.removeEventListener('mousedown', outsideClickHandler);
         }
 
-        // Auto-open modal if there are errors or show_modal session
-        if (shouldShowModal) {
-            document.addEventListener('DOMContentLoaded', function() {
-                openModal(modal, modalBox);
-            });
-        }
-
         modal.addEventListener('click', e => {
             if (e.target === e.currentTarget) closeModal(modal, modalBox);
             clearValidationState(form);
@@ -532,20 +562,7 @@
 
         openBtn.forEach(btn => {
             btn.addEventListener('click', function() {
-                resetForm(form);
-                titleModal.textContent = 'Thêm lịch thu gom mới';
-
-                form.action = "/collection-schedules";
-
-                // Xóa input hidden _method nếu có
-                const methodInput = form.querySelector('input[name="_method"]');
-                if (methodInput) methodInput.remove();
-
-                displayCompletedAtField(false);
-                displayStatusField(false);
-                // displayWasteLogs(false);
-
-                openModal(modal, modalBox);
+                openAddModal();
             });
         });
 
@@ -561,57 +578,132 @@
             resetForm(form);
         });
 
-        // Edit Modal logic
-        editBtn.forEach(button => {
-            button.addEventListener('click', async function() {
+        // View Modal logic
+        viewBtn.forEach(button => {
+            button.addEventListener('click', function() {
                 const id = button.dataset.id;
-                const res = await fetch(`/collection-schedules/${id}`);
-                const data = await res.json();
-                // console.log(data);
-
-                if (data) {
-                    inputName.value = data[0].staff.name;
-                    inputScheduledDate.value = data[0].scheduled_date ? new Date(data[0]
-                        .scheduled_date).toISOString().split('T')[0] : '';
-                    inputCompletedAt.value = data[0].completed_at ? new Date(data[0].completed_at)
-                        .toISOString().split('T')[0] : '';
-                    selectStatus.value = data[0].status;
-                    statusHidden.value = data[0].status;
-                    // document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0]
-                    //     .schedule_id;
-                }
-
-                titleModal.textContent = 'Chỉnh sửa lịch thu gom';
-                displayCompletedAtField(true);
-                displayStatusField(true);
-                // displayWasteLogs(true);
-
-                openModal(modal, modalBox);
-
-                const form = modalBox.querySelector('form');
-                form.action = `/collection-schedules/${id}`;
-                if (form.querySelector('input[name="_method"]')) {
-                    return; // Nếu đã có input hidden _method thì không thêm nữa
-                }
-                form.insertAdjacentHTML('beforeend', `
-                    <input type="hidden" name="_method" value="PUT">
-                `);
+                openViewModal(id);
             });
         });
 
-        // document.querySelector('.btnShowWasteLogs').addEventListener('click', async function() {
-        //     const id = this.dataset.scheduleId;
-        //     const res = await fetch(`/collection-schedules/get-waste-logs/${id}`);
-        //     const data = await res.json();
-        //     let logsMessage = 'Lượng rác đã thu gom:\n';
-        //     data.forEach(log => {
-        //         logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
-        //     });
-        //     console.log(logsMessage);
+        // Edit Modal logic
+        editBtn.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = button.dataset.id;
+                openEditModal(id);
+            });
+        });
 
-        //     document.querySelector('.waste-logs').innerText = logsMessage;
+        function openAddModal() {
+            resetForm(form);
+            titleModal.textContent = 'Thêm lịch thu gom mới';
 
-        // });
+            form.action = "/collection-schedules";
+
+            // Xóa input hidden _method nếu có
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) methodInput.remove();
+
+            displayCompletedAtField(false);
+            displayStatusField(false);
+            // displayWasteLogs(false);
+
+            openModal(modal, modalBox);
+        }
+
+        function openEditModal(id) {
+            fetch(`/collection-schedules/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data) {
+                        console.log(data);
+
+                        inputName.value = data[0].staff.name;
+                        inputScheduledDate.value = data[0].scheduled_date ? new Date(data[0]
+                            .scheduled_date).toISOString().split('T')[0] : '';
+                        inputCompletedAt.value = data[0].completed_at ? new Date(data[0].completed_at)
+                            .toISOString().split('T')[0] : '';
+                        selectStatus.value = data[0].status;
+                        statusHidden.value = data[0].status;
+                        document.querySelector('input[id="inputHiddenStaffId"]').value = data[0].staff_id;
+                    }
+
+                    titleModal.textContent = 'Chỉnh sửa lịch thu gom';
+                    displayCompletedAtField(true);
+                    displayStatusField(true);
+                    // displayWasteLogs(true);
+
+                    openModal(modal, modalBox);
+
+                    const form = modalBox.querySelector('form');
+                    form.action = `/collection-schedules/${id}`;
+                    if (form.querySelector('input[name="_method"]')) {
+                        return; // Nếu đã có input hidden _method thì không thêm nữa
+                    }
+                    form.insertAdjacentHTML('beforeend', `
+                        <input type="hidden" name="_method" value="PUT">
+                    `);
+                });
+        }
+
+        function openViewModal(id) {
+            fetch(`/collection-schedules/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data) {
+                        console.log(data);
+
+                        inputName.value = data[0].staff.name;
+                        inputScheduledDate.value = data[0].scheduled_date ? new Date(data[0]
+                            .scheduled_date).toISOString().split('T')[0] : '';
+                        inputCompletedAt.value = data[0].completed_at ? new Date(data[0].completed_at)
+                            .toISOString().split('T')[0] : '';
+                        selectStatus.value = data[0].status;
+                        statusHidden.value = data[0].status;
+                        // document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0]
+                        //     .schedule_id;
+                        if (data[1].length > 0) {
+                            let logsMessage = 'Lượng rác đã thu gom: <br>';
+                            data[1].forEach(log => {
+                                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg`;
+                                if (log.waste_image) {
+                                    logsMessage +=
+                                        `  <button type="button" class="waste_log_image text-blue-600 underline" onclick="openImageModal('${log.waste_image}')">Xem hình ảnh</button> <br>`;
+                                }
+                            });
+
+                            document.querySelector('.waste-logs').innerHTML = logsMessage;
+
+                        } else {
+                            document.querySelector('.waste-logs').innerText = 'Chưa có lượng rác thu gom.';
+                        }
+                    }
+
+                    titleModal.textContent = 'Xem chi tiết lịch thu gom';
+                    displayCompletedAtField(true);
+                    displayStatusField(true);
+                    // displayWasteLogs(true);
+
+                    openModal(modal, modalBox);
+
+                    const form = modalBox.querySelector('form');
+                    form.action = `/collection-schedules/${id}`;
+                    if (form.querySelector('input[name="_method"]')) {
+                        return; // Nếu đã có input hidden _method thì không thêm nữa
+                    }
+                    form.insertAdjacentHTML('beforeend', `
+                        <input type="hidden" name="_method" value="PUT">
+                    `);
+                });
+
+            setTimeout(() => {
+                modal.querySelectorAll('input, select').forEach(el => {
+                    el.disabled = true;
+                });
+
+                document.querySelector('#modal button[type="submit"]').classList.add('hidden');
+            }, 200);
+        }
 
         function displayCompletedAtField(show) {
             const completedAtField = document.querySelector('.completed-at-field');
@@ -704,23 +796,29 @@
                 return;
             }
 
-            const res = await fetch(`/search-users?q=${encodeURIComponent(keyword)}`);
+            const res = await fetch(`/collection-schedules/get-staffs?q=${encodeURIComponent(keyword)}`);
             const data = await res.json();
-            if (data.length === 0) {
+            if (data['name'].length === 0) {
                 suggestions.innerHTML =
                     '<li class="px-4 py-2 text-gray-500">Không tìm thấy nhân viên</li>';
             } else {
+                // console.log(data);
+
                 suggestions.innerHTML = '';
-                data.forEach(name => {
+                data['name'].forEach(name => {
                     const li = document.createElement('li');
                     li.textContent = name;
                     li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer';
                     li.addEventListener('click', () => {
                         input.value = name;
+                        document.querySelector('input[id="inputHiddenStaffId"]').value =
+                            data['id'][data['name'].indexOf(name)];
                         suggestions.classList.add('hidden');
                     });
                     suggestions.appendChild(li);
                 });
+
+                // document.querySelector('input[id="inputHiddenStaffId"]').value = data[0 + '_id'];
             }
             suggestions.classList.remove('hidden');
         });
@@ -837,6 +935,29 @@
                 }
             });
         });
+
+        function openImageModal(url) {
+            imgModalImg = document.getElementById('imgModalImg');
+            if (!url) return;
+            if (!url.startsWith('http') && !url.startsWith('/storage/')) {
+                url = '/storage/' + url.replace(/^\/?storage\//, '');
+            }
+
+            imgModalImg.src = url;
+            console.log(imgModalImg.src);
+
+            imgModal.classList.remove('hidden');
+            imgModal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeImageModal() {
+            imgModalImg = document.getElementById('imgModalImg');
+            imgModal.classList.add('hidden');
+            imgModal.classList.remove('flex');
+            imgModalImg.src = '';
+            document.body.classList.remove('overflow-hidden');
+        }
     </script>
 
     @vite(['resources/js/checkbox.js'])

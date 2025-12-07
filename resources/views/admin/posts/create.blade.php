@@ -19,6 +19,7 @@
             @csrf
 
             {{-- Tiêu đề --}}
+            
             <div class="mb-4">
                 <label class="block font-medium mb-1">Tiêu đề *</label>
                 <input name="title" value="{{ old('title') }}" required
@@ -121,6 +122,7 @@
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Lưu bài
                     viết</button>
             </div>
+            <input type="hidden" name="form_token" value="{{ Str::uuid() }}">
         </form>
     </div>
 
@@ -136,6 +138,15 @@
                 preview.src = '#';
                 preview.classList.add('hidden');
             }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", function () {
+                const submitButton = form.querySelector("button[type='submit']");
+                submitButton.disabled = true;
+                submitButton.innerText = "Đang lưu...";
+            });
         });
     </script>
 @endsection

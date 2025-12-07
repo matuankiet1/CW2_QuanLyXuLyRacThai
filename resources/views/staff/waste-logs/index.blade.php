@@ -3,6 +3,35 @@
 @section('title', 'Báo cáo thu gom rác')
 
 @section('content')
+
+    <style>
+        .ai-hint .ai-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 100%;
+            margin-left: 6px;
+            min-width: 14rem;
+
+            padding: 6px 10px;
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            font-size: 0.75rem;
+            color: #374151;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, .1);
+
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s ease-out, transform .15s ease-out;
+            z-index: 1050;
+        }
+
+        .ai-hint:hover .ai-tooltip {
+            opacity: 1;
+            transition: all .15s ease-out;
+        }
+    </style>
+
     <div class="p-6 space-y-6 max-w-7xl mx-auto">
         {{-- Thanh tìm kiếm & lọc --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -225,14 +254,23 @@
 
                                 <div class="flex flex-col items-start gap-1">
                                     <label class="block text-sm font-medium text-gray-700">Hình ảnh:</label>
-                                    <input type="file" name="waste_image[]" accept="image/*"
-                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:ring focus:ring-green-200 outline-none transition">
+
+                                    <button type="button"
+                                        class="btn-upload w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+                           border border-green-500 text-sm font-medium
+                           hover:bg-gray-100"
+                                        title="PNG, JPG, JEPG. Tối đa 2MP">Chọn ảnh
+                                    </button>
+
                                     <p class="waste_image_file_name text-sm flex justify-center items-center"
                                         title="">
                                     </p>
                                     @error("waste_image.$i")
                                         <p class="error-text mt-1 text-sm text-red-500">{{ $message }}</p>
                                     @enderror
+                                    {{-- Input upload file ẩn --}}
+                                    <input type="file" name="waste_image[]" accept="image/*"
+                                        class="hidden waste-image-input">
                                 </div>
 
                                 <!-- Nút xoá -->
@@ -557,6 +595,40 @@
             resetForm(form);
         });
 
+        //Click vào nút "Chọn ảnh" -> click vào input file ẩn
+        wrapper.addEventListener('click', function(e) {
+            const uploadBtn = e.target.closest('.btn-upload');
+            if (!uploadBtn) return;
+
+            const row = uploadBtn.closest('.waste-item');
+            if (!row) return;
+
+            const fileInput = row.querySelector('.waste-image-input');
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+
+        // Khi chọn file xong -> cập nhật UI (tên file + preview)
+        wrapper.addEventListener('change', function(e) {
+            if (!e.target.matches('.waste-image-input')) return;
+
+            const fileInput = e.target;
+            const row = fileInput.closest('.waste-item');
+            if (!row) return;
+
+            const fileNameEl = row.querySelector('.waste_image_file_name');
+
+            const file = fileInput.files[0];
+
+            if (file) {
+                // cập nhật tên file
+                if (fileNameEl) {
+                    fileNameEl.textContent = file.name;
+                }
+            }
+        });
+
         function resetForm(form) {
             if (!form) return;
             form.reset();
@@ -711,14 +783,14 @@
         });
 
         function openImageModal(url) {
-
+            console.log(url);
+            
             if (!url) return;
             if (!url.startsWith('http') && !url.startsWith('/storage/')) {
                 url = '/storage/' + url.replace(/^\/?storage\//, '');
             }
 
             imgModalImg.src = url;
-            console.log(imgModalImg.src);
 
             imgModal.classList.remove('hidden');
             imgModal.classList.add('flex');

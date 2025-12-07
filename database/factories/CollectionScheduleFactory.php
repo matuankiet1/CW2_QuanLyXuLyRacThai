@@ -18,7 +18,7 @@ class CollectionScheduleFactory extends Factory
     public function definition(): array
     {
         return [
-            'staff_id' => User::factory(),
+            'staff_id' => User::where('role', 'staff')->inRandomOrder()->value('user_id'),
             'scheduled_date' => $this->faker->dateTimeBetween('now', '+3 month'),
         ];
     }
