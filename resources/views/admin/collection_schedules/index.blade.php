@@ -570,6 +570,11 @@
         openBtn.forEach(btn => {
             btn.addEventListener('click', function() {
                 openAddModal();
+                modal.querySelectorAll('input, select').forEach(el => {
+                    el.disabled = false;
+                });
+                document.querySelector('#modal button[type="submit"]').classList.remove('hidden');
+                document.querySelector('.waste-logs').innerHTML = '';
             });
         });
 
