@@ -311,8 +311,14 @@ class PostController extends Controller
     }
 
 
-    public function destroy(Post $post)
+    public function destroy($id)
     {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return redirect()->route('admin.posts.index')
+                ->with('error', 'Bài viết không tồn tại hoặc đã bị xoá.');
+        }
         $post->delete();
 
         return redirect()->route('admin.posts.index')
