@@ -126,7 +126,6 @@
         </form>
     </div>
 
-    {{-- Script Preview Ảnh --}}
     <script>
         document.getElementById('imageInput').addEventListener('change', function (event) {
             const [file] = event.target.files;
