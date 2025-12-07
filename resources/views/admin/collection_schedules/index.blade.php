@@ -464,6 +464,17 @@
         </div>
     </div>
 
+    <div id="imgModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60">
+        <div class="relative max-w-[90vw] max-h-[90vh]">
+            <img id="imgModalImg" src="" alt="Preview"
+                class="max-w-[90vw] max-h-[90vh] rounded shadow-lg object-contain">
+            <button type="button" id="imgModalClose" onclick="closeImageModal()"
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow cursor-pointer">
+                x
+            </button>
+        </div>
+    </div>
+
     @if (session('show_modal_add') && $errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -640,6 +651,8 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data) {
+                        console.log(data);
+
                         inputName.value = data[0].staff.name;
                         inputScheduledDate.value = data[0].scheduled_date ? new Date(data[0]
                             .scheduled_date).toISOString().split('T')[0] : '';
@@ -650,13 +663,17 @@
                         // document.querySelector('.btnShowWasteLogs').dataset.scheduleId = data[0]
                         //     .schedule_id;
                         if (data[1].length > 0) {
-                            let logsMessage = 'Lượng rác đã thu gom:\n';
+                            let logsMessage = 'Lượng rác đã thu gom: <br>';
                             data[1].forEach(log => {
-                                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg\n`;
+                                logsMessage += `- ${log.waste_type.name}: ${log.waste_weight} kg`;
+                                if (log.waste_image) {
+                                    logsMessage +=
+                                        `  <button type="button" class="waste_log_image text-blue-600 underline" onclick="openImageModal('${log.waste_image}')">Xem hình ảnh</button> <br>`;
+                                }
                             });
-                            console.log(logsMessage);
 
-                            document.querySelector('.waste-logs').innerText = logsMessage;
+                            document.querySelector('.waste-logs').innerHTML = logsMessage;
+
                         } else {
                             document.querySelector('.waste-logs').innerText = 'Chưa có lượng rác thu gom.';
                         }
@@ -918,6 +935,29 @@
                 }
             });
         });
+
+        function openImageModal(url) {
+            imgModalImg = document.getElementById('imgModalImg');
+            if (!url) return;
+            if (!url.startsWith('http') && !url.startsWith('/storage/')) {
+                url = '/storage/' + url.replace(/^\/?storage\//, '');
+            }
+
+            imgModalImg.src = url;
+            console.log(imgModalImg.src);
+
+            imgModal.classList.remove('hidden');
+            imgModal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeImageModal() {
+            imgModalImg = document.getElementById('imgModalImg');
+            imgModal.classList.add('hidden');
+            imgModal.classList.remove('flex');
+            imgModalImg.src = '';
+            document.body.classList.remove('overflow-hidden');
+        }
     </script>
 
     @vite(['resources/js/checkbox.js'])

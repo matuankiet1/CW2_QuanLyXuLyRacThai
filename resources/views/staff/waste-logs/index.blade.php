@@ -626,10 +626,6 @@
                 if (fileNameEl) {
                     fileNameEl.textContent = file.name;
                 }
-
-                // nếu chọn ảnh mới, có thể clear old_waste_image ở dòng đó
-                // const oldInput = row.querySelector('input[name="old_waste_image[]"]');
-                // if (oldInput) oldInput.value = '';
             }
         });
 
@@ -787,14 +783,14 @@
         });
 
         function openImageModal(url) {
-
+            console.log(url);
+            
             if (!url) return;
             if (!url.startsWith('http') && !url.startsWith('/storage/')) {
                 url = '/storage/' + url.replace(/^\/?storage\//, '');
             }
 
             imgModalImg.src = url;
-            console.log(imgModalImg.src);
 
             imgModal.classList.remove('hidden');
             imgModal.classList.add('flex');
