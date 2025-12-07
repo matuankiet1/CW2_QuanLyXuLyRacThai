@@ -522,6 +522,8 @@
 
         const filterForm = document.getElementById('filterForm');
 
+        const imgModal = document.getElementById('imgModal');
+
         let outsideClickHandler = null;
 
         function openModal(modal, modalBox) {
@@ -535,9 +537,14 @@
 
             // Đăng ký sự kiện click  bên ngoài để đóng modal
             outsideClickHandler = (e) => {
-                if (!modalBox.contains(e.target)) {
-                    closeModal(modal, modalBox);
-                }
+                // Nếu click nằm trong modal chính -> Không đóng
+                if (modalBox.contains(e.target)) return;
+
+                // Nếu click nằm trong modal hình ảnh -> Không đóng
+                if (imgModal && imgModal.contains(e.target)) return;
+
+                // Ngược lại → mới đóng modal chính
+                closeModal(modal, modalBox);
             };
 
             document.addEventListener('mousedown', outsideClickHandler);
