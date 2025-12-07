@@ -3,8 +3,6 @@
 @section('content')
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-6">✏️ Chỉnh sửa bài viết</h2>
-
-        {{-- Hiển thị lỗi xác thực --}}
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
                 <ul class="list-disc list-inside">
@@ -18,8 +16,6 @@
         <form method="POST" action="{{ route('admin.posts.update', $post->id) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-
-            {{-- Tiêu đề --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Tiêu đề *</label>
                 <input name="title" value="{{ old('title', $post->title) }}" required
@@ -28,8 +24,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Tác giả --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Tác giả *</label>
                 <input name="author" value="{{ old('author', $post->author) }}" required
@@ -38,8 +32,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Mô tả ngắn --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Mô tả ngắn *</label>
                 <textarea name="excerpt" rows="3" required
@@ -48,8 +40,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Nội dung --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Nội dung *</label>
                 <textarea name="content" rows="6" required
@@ -58,8 +48,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Danh mục --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Danh mục *</label>
                 <select name="post_categories"
@@ -73,8 +61,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Trạng thái --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Trạng thái *</label>
                 <select name="status"
@@ -89,8 +75,6 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
-            {{-- Ngày xuất bản --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Ngày xuất bản</label>
                 <input type="date" name="published_at"
@@ -101,13 +85,10 @@
                 @enderror
             </div>
 
-            {{-- Ảnh bài viết --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1">Ảnh đại diện</label>
                 <input type="file" name="image" id="imageInput" accept="image/*"
                     class="block w-full text-sm text-gray-700 border border-gray-300 rounded p-2 cursor-pointer">
-
-                {{-- Ảnh hiện tại --}}
                 @if ($post->image)
                     <div class="mt-3">
                         <p class="text-sm text-gray-600 mb-1">Ảnh hiện tại:</p>
@@ -115,7 +96,6 @@
                     </div>
                 @endif
 
-                {{-- Ảnh preview khi chọn mới --}}
                 <div class="mt-3">
                     <img id="imagePreview" src="#" alt="Xem trước ảnh mới"
                         class="hidden w-48 h-48 object-cover rounded border">
@@ -126,7 +106,6 @@
                 @enderror
             </div>
 
-            {{-- Nút hành động --}}
             <div class="flex justify-end gap-3 mt-6">
                 <a href="{{ route('admin.posts.index') }}"
                     class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Hủy</a>
