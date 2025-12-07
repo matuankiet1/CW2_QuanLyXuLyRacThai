@@ -26,7 +26,7 @@
                         <span class="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">↑ 8.3%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Tổng rác thu gom tháng này</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">534 <span class="text-lg text-gray-500">kg</span></h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalWastes }} <span class="text-lg text-gray-500">kg</span></h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 8.3% so với tháng trước</p>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                         <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">↑ 12.8%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sinh viên tham gia</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">167</h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalStudents }}</h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 12.8% so với tháng trước</p>
                 </div>
             </div>
@@ -57,7 +57,6 @@
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sự kiện trong tháng</p>
                     <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $upcomingEventsCount }}</h3>
-                    <p class="text-green-600 text-xs font-medium mt-2">↑ 2 sự kiện mới</p>
                 </div>
             </div>
 

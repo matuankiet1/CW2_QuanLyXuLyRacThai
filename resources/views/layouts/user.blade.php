@@ -258,7 +258,12 @@
 
         .nav-link-item:hover {
             color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-link-item-active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -292,43 +297,54 @@
                 <!-- Navigation Links - Center -->
                 <div class="hidden lg:flex items-center justify-center flex-1 min-w-0 px-1">
                     <nav class="flex items-center gap-0.5 justify-center w-full">
-                        <a href="{{ route('home') }}" class="nav-link-item" title="Trang chủ">
-                            <i class="fas fa-home mr-1"></i><span>Trang chủ</span>
+                        <a href="{{ route('home') }}"
+                            class="nav-link-item  {{ Request::is('/') ? 'nav-link-item-active' : '' }}"
+                            title="Trang chủ">
+                            <i class="fas fa-home mr-2"></i><span>Trang chủ</span>
                         </a>
-                        <a href="{{ route('user.posts.home') }}" class="nav-link-item" title="Bài viết">
-                            <i class="fas fa-newspaper mr-1"></i><span>Bài viết</span>
+                        <a href="{{ route('user.posts.home') }}"
+                            class="nav-link-item {{ Request::is('posts*') ? 'nav-link-item-active' : '' }}"
+                            title="Bài viết">
+                            <i class="fas fa-newspaper mr-2"></i><span>Bài viết</span>
                         </a>
-                        <a href="{{ route('user.events.index') }}" class="nav-link-item" title="Sự kiện">
-                            <i class="fas fa-calendar-alt me-1"></i>Sự kiện
+                        <a href="{{ route('user.events.index') }}"
+                            class="nav-link-item {{ Request::is('events*') ? 'nav-link-item-active' : '' }}"
+                            title="Sự kiện">
+                            <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
                         </a>
-                        <a href="{{ route('user.collection_schedules.index') }}" class="nav-link-item"
+                        <a href="{{ route('user.collection_schedules.index') }}"
+                            class="nav-link-item {{ Request::is('collection_schedules*') ? 'nav-link-item-active' : '' }}"
                             title="Báo cáo rác thải">
-                            <i class="fas fa-trash-alt me-1"></i>Thu gom rác
+                            <i class="fas fa-trash-alt mr-2"></i>Thu gom rác
                         </a>
-                        <a href="{{ route('home.about') }}" class="nav-link-item" title="Giới thiệu">
-                            <i class="fas fa-info-circle mr-1"></i><span>Giới thiệu</span>
+                        <a href="{{ route('home.about') }}"
+                            class="nav-link-item {{ Request::is('about') ? 'nav-link-item-active' : '' }}"
+                            title="Giới thiệu">
+                            <i class="fas fa-info-circle mr-2"></i><span>Giới thiệu</span>
                         </a>
-                        <a href="{{ route('home.contact') }}" class="nav-link-item" title="Liên hệ">
-                            <i class="fas fa-envelope mr-1"></i><span>Liên hệ</span>
+                        <a href="{{ route('home.contact') }}"
+                            class="nav-link-item {{ Request::is('contact') ? 'nav-link-item-active' : '' }}"
+                            title="Liên hệ">
+                            <i class="fas fa-envelope mr-2"></i><span>Liên hệ</span>
                         </a>
                         @auth
                             <!-- Cá nhân Dropdown -->
                             <div class="relative">
                                 <button id="personalMenuToggle" class="nav-link-item flex items-center">
-                                    <i class="fas fa-user mr-1"></i><span>Cá nhân</span>
+                                    <i class="fas fa-user mr-2"></i><span>Cá nhân</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
                                 <div id="personalMenuDropdown"
                                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible transition-all duration-200 z-50">
                                     <div class="py-2">
                                         @auth
-                                            @if(auth()->user()->isStudent())
+                                            @if (auth()->user()->isStudent())
                                                 <a href="{{ route('student.trash-requests.index') }}"
                                                     class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                                     <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
                                                 </a>
-                                            @endif  
-                                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                                            @endif
+                                            @if (auth()->user()->isStaff() || auth()->user()->isAdmin())
                                                 <a href="{{ route('staff.trash-requests.index') }}"
                                                     class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition rounded-lg mx-1">
                                                     <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
@@ -415,11 +431,17 @@
                     @auth
                         <div class="relative">
                             <button id="userMenuToggle"
-                                class="flex items-center text-white hover:bg-white/10 rounded-lg px-2 py-1.5 transition whitespace-nowrap">
+                                class="flex items-center text-white rounded-lg px-2 py-1.5 transition whitespace-nowrap nav-link-item">
                                 <div
                                     class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2 shrink-0">
-                                    <span
-                                        class="text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                    @if (auth()->user()->avatar)
+                                        <img class="w-8 h-8 object-cover rounded-full"
+                                            src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar">
+                                    @else
+                                        <span
+                                            class="text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <span class="font-medium hidden xl:block text-sm">{{ auth()->user()->name }}</span>
                                 <i class="fas fa-chevron-down ml-1.5 text-xs hidden xl:block"></i>
@@ -456,10 +478,10 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}" class="nav-link-item">
-                            <i class="fas fa-sign-in-alt mr-1"></i>Đăng nhập
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
                         </a>
                         <a href="{{ route('register') }}" class="nav-link-item bg-white/20 hover:bg-white/30">
-                            <i class="fas fa-user-plus mr-1"></i>Đăng ký
+                            <i class="fas fa-user-plus mr-2"></i>Đăng ký
                         </a>
                     @endauth
 
@@ -474,34 +496,41 @@
             <!-- Mobile Menu -->
             <div id="mobileMenu" class="lg:hidden hidden border-t border-white/20 pb-4">
                 <div class="flex flex-col gap-2 mt-4">
-                    <a href="{{ route('home') }}" class="nav-link-item">
+                    <a href="{{ route('home') }}"
+                        class="nav-link-item {{ Request::is('/') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-home mr-2"></i>Trang chủ
                     </a>
-                    <a href="{{ route('user.posts.home') }}" class="nav-link-item">
+                    <a href="{{ route('user.posts.home') }}"
+                        class="nav-link-item {{ Request::is('posts*') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-newspaper mr-2"></i>Bài viết
                     </a>
-                    <a href="{{ route('user.events.index') }}" class="nav-link-item">
+                    <a href="{{ route('user.events.index') }}"
+                        class="nav-link-item {{ Request::is('events*') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-calendar-alt mr-2"></i>Sự kiện
                     </a>
-                    <a href="{{ route('user.waste-logs.index') }}" class="nav-link-item" title="Báo cáo rác thải">
+                    <a href="{{ route('user.waste-logs.index') }}"
+                        class="nav-link-item {{ Request::is('waste-logs*') ? 'nav-link-item-active' : '' }}"
+                        title="Báo cáo rác thải">
                         <i class="fa-solid fa-recycle mr-2"></i>Báo cáo thu gom rác
                     </a>
-                    <a href="{{ route('home.about') }}" class="nav-link-item">
+                    <a href="{{ route('home.about') }}"
+                        class="nav-link-item {{ Request::is('about') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-info-circle mr-2"></i>Giới thiệu
                     </a>
-                    <a href="{{ route('home.contact') }}" class="nav-link-item">
+                    <a href="{{ route('home.contact') }}"
+                        class="nav-link-item {{ Request::is('contact') ? 'nav-link-item-active' : '' }}">
                         <i class="fas fa-envelope mr-2"></i>Liên hệ
                     </a>
                     @auth
                         <!-- Cá nhân Section -->
                         <div class="border-t border-white/20 pt-2 mt-2">
                             <p class="text-white/70 text-xs font-semibold mb-2 px-2">CÁ NHÂN</p>
-                            @if(auth()->user()->isStudent())
+                            @if (auth()->user()->isStudent())
                                 <a href="{{ route('student.trash-requests.index') }}" class="nav-link-item">
                                     <i class="fas fa-trash-alt mr-2"></i>Yêu cầu thu gom
                                 </a>
                             @endif
-                            @if(auth()->user()->isStaff() || auth()->user()->isAdmin())
+                            @if (auth()->user()->isStaff() || auth()->user()->isAdmin())
                                 <a href="{{ route('staff.trash-requests.index') }}" class="nav-link-item">
                                     <i class="fas fa-tasks mr-2"></i>Nhiệm vụ thu gom
                                 </a>
@@ -510,7 +539,8 @@
                                 <i class="fas fa-flag mr-2"></i>Báo cáo
                             </a>
 
-                            <a href="{{ route('user.statistics.index') }}" class="nav-link-item">
+                            <a href="{{ route('user.statistics.index') }}"
+                                class="nav-link-item {{ Request::is('statistics') ? 'nav-link-item-active' : '' }}">
                                 <i class="fas fa-chart-line mr-2"></i>Thống kê
                             </a>
                         </div>
@@ -607,7 +637,7 @@
                             TP.HCM
                         </li>
                         <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>hethongquanlyxulyracthai@gmail.com</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@ecowaste.com</li>
                     </ul>
                     <div class="d-flex gap-3">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -637,12 +667,12 @@
 
     <!-- Mobile Menu Toggle Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mobileMenu = document.getElementById('mobileMenu');
 
             if (mobileMenuToggle && mobileMenu) {
-                mobileMenuToggle.addEventListener('click', function () {
+                mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
                 });
             }
@@ -652,7 +682,7 @@
             const userMenuDropdown = document.getElementById('userMenuDropdown');
 
             if (userMenuToggle && userMenuDropdown) {
-                userMenuToggle.addEventListener('click', function (e) {
+                userMenuToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isVisible = !userMenuDropdown.classList.contains('invisible');
 
@@ -664,7 +694,7 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function (e) {
+                document.addEventListener('click', function(e) {
                     if (!userMenuToggle.contains(e.target) && !userMenuDropdown.contains(e.target)) {
                         userMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
@@ -676,7 +706,7 @@
             const personalMenuDropdown = document.getElementById('personalMenuDropdown');
 
             if (personalMenuToggle && personalMenuDropdown) {
-                personalMenuToggle.addEventListener('click', function (e) {
+                personalMenuToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isVisible = !personalMenuDropdown.classList.contains('invisible');
 
@@ -697,9 +727,9 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function (e) {
+                document.addEventListener('click', function(e) {
                     if (!personalMenuToggle.contains(e.target) && !personalMenuDropdown.contains(e
-                        .target)) {
+                            .target)) {
                         personalMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -710,7 +740,7 @@
             const notificationMenuDropdown = document.getElementById('notificationMenuDropdown');
 
             if (notificationMenuToggle && notificationMenuDropdown) {
-                notificationMenuToggle.addEventListener('click', function (e) {
+                notificationMenuToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isVisible = !notificationMenuDropdown.classList.contains('invisible');
 
@@ -730,9 +760,9 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function (e) {
+                document.addEventListener('click', function(e) {
                     if (!notificationMenuToggle.contains(e.target) && !notificationMenuDropdown.contains(e
-                        .target)) {
+                            .target)) {
                         notificationMenuDropdown.classList.add('opacity-0', 'invisible');
                     }
                 });
@@ -741,7 +771,7 @@
             // Logout confirmation
             const logoutForm = document.getElementById('logoutForm');
             if (logoutForm) {
-                logoutForm.addEventListener('submit', function (e) {
+                logoutForm.addEventListener('submit', function(e) {
                     if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                         e.preventDefault();
                         return false;

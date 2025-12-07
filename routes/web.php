@@ -24,6 +24,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\UserStatisticsController;
 use App\Http\Controllers\TrashRequestController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ShareSocialController;
 use App\Models\Banner;
 
 
@@ -45,7 +46,7 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact')
 Route::get('/guide', [HomeController::class, 'wasteSortingGuide'])->name('home.sorting_guide');
 
 //------------------------------------ STAFF HOME -------------------------------------//
-Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function() {
+Route::prefix('staff')->name('staff.')->middleware(['auth', 'staff'])->group(function () {
     Route::get('/home', [StaffHomeController::class, 'index'])->name('home.index');
     Route::get('/home/contact', [StaffHomeController::class, 'contact'])->name('home.contact');
     Route::get('/home/about', [StaffHomeController::class, 'about'])->name('home.about');
@@ -74,12 +75,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // Login, register local
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
-Route::post('logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect()->route('login');
-})->name('logout'); // Lê Tâm: Đã có hàm Logout trong Controller, nên chỉ cần Route::post('logout', [AuthController::class, 'logout'])->name('logout'); 
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 
@@ -187,7 +183,9 @@ Route::middleware('admin')->group(function () {
 
         Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
         Route::post('waste_logs/{wasteLog}/confirm', [WasteLogController::class, 'confirm'])
-    ->name('waste_logs.confirm');
+            ->name('waste_logs.confirm');
+        Route::get('waste_logs/', [WasteLogController::class, 'index'])->name('waste_logs.index');
+
 
 
     });
@@ -221,6 +219,9 @@ Route::middleware('admin')->group(function () {
     Route::post('/collection-schedules/{id}/update-status', [CollectionScheduleController::class, 'updateStatus'])
         ->name('admin.collection-schedules.update-status');
 
+    Route::get('/collection-schedules/get-staffs', [CollectionScheduleController::class, 'getStaffs'])
+        ->name('admin.collection-schedules.get-staffs');
+
     Route::resource('collection-schedules', CollectionScheduleController::class)->names([
         'index' => 'admin.collection-schedules.index',
         'store' => 'admin.collection-schedules.store',
@@ -242,6 +243,31 @@ Route::middleware('admin')->group(function () {
         Route::get('/{event}/rewards', [App\Http\Controllers\EventRewardController::class, 'index'])->name('rewards.index');
         Route::patch('/{event}/rewards/{user}', [App\Http\Controllers\EventRewardController::class, 'update'])->name('rewards.update');
         Route::post('/{event}/rewards/bulk-update', [App\Http\Controllers\EventRewardController::class, 'bulkUpdate'])->name('rewards.bulk-update');
+
+
+        Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
+            ->name('participants'); 
+
+        Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
+            ->name('participants.confirm');
+
+        Route::patch('/{event}/participants/{user}/attend', [EventParticipantController::class, 'attend'])
+            ->name('participants.attend');
+
+        Route::get('/{event}/participants/pending', [EventParticipantController::class, 'pending'])
+            ->name('participants.pending');
+
+        Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
+            ->name('pending'); 
+
+        Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
+            ->name('participants.bulk-confirm');
+
+        Route::post('/{event}/participants/bulk-attend', [EventParticipantController::class, 'bulkAttend'])
+            ->name('participants.bulk-attend');
+
+        Route::get('/{event}/participants/export', [EventParticipantController::class, 'export'])
+            ->name('participants.export');
     });
 
 });
@@ -266,7 +292,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
     Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
-    Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
     Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
         ->name('user.events.registerForm');
 
@@ -304,6 +330,17 @@ Route::middleware('student')->group(function () {
         Route::post('/', [TrashRequestController::class, 'store'])->name('store');
         Route::get('/{id}', [TrashRequestController::class, 'studentShow'])->name('show');
     });
+
+    // Share Social (Student)
+    Route::prefix('student/share')->name('student.share-')->group(function () {
+        Route::get('/achievements', [ShareSocialController::class, 'showSharePage'])->name('achievements');
+        Route::get('/{platform}', [ShareSocialController::class, 'shareToPlatform'])->name('platform');
+    });
+});
+
+//--------------------------------------- API ROUTES -------------------------------------//
+Route::prefix('api')->name('api.')->middleware('auth')->group(function () {
+    Route::get('/student/achievements', [ShareSocialController::class, 'getAchievements'])->name('student.achievements');
 });
 
 
@@ -338,12 +375,12 @@ Route::middleware('auth')->group(function () {
 // Route phục vụ ảnh banner - FIXED
 Route::get('/banner-img/{filename}', function ($filename) {
     $path = storage_path('app/public/banners/' . $filename);
-    
+
     if (!file_exists($path)) {
         // Log lỗi để debug
         Log::error("Banner image not found: " . $path);
         abort(404);
     }
-    
+
     return response()->file($path);
 })->name('banner.image');

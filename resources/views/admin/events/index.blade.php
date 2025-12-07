@@ -1,5 +1,12 @@
 @extends('layouts.admin-with-sidebar')
-
+<script>
+    @if (session('error'))
+        alert("{{ session('error') }}");
+    @endif
+    @if (session('success'))
+        alert("{{ session('success') }}");
+    @endif
+</script>
 @section('content')
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -57,7 +64,9 @@
                     </div>
                     <div class="md:col-span-5 flex flex-col md:flex-row gap-2 justify-end">
                         <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Lọc</button>
-                        <a href="{{ route('admin.events.create') }}" class="btn btn-admin">+ Tạo sự kiện mới</a>
+                        <a href="{{ route('admin.events.create') }}"
+                            class="inline-block px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 text-sm">+
+                            Tạo sự kiện mới</a>
                     </div>
                 </form>
             </div>
@@ -112,20 +121,20 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-right">
-                                     @if($event->pending_participants_count > 0)
-                                            <div
-                                                class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-yellow-100 text-yellow-800 font-medium">
-                                                ⚠️ {{ $event->pending_participants_count }} người đang chờ xác nhận 
-                                            </div>
+                                    @if($event->pending_participants_count > 0)
+                                        <div
+                                            class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-yellow-100 text-yellow-800 font-medium">
+                                            ⚠️ {{ $event->pending_participants_count }} người đang chờ xác nhận
+                                        </div>
                                     @endif
                                     @if($event->attending_participants_count > 0)
-                                            <div
-                                                class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
-                                                📝 {{ $event->attending_participants_count }} người đang chờ điểm danh
-                                            </div>
+                                        <div
+                                            class="mt-1 text-xs inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
+                                            📝 {{ $event->attending_participants_count }} người đang chờ điểm danh
+                                        </div>
                                     @endif
                                     <div class="flex gap-2 text-sm justify-end">
-                                       
+
                                         <a href="{{ route('admin.events.participants', $event->id) }}"
                                             class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                                             title="Xem điểm thưởng">

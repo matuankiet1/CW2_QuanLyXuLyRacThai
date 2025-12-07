@@ -367,6 +367,19 @@
     <!-- Sidebar Overlay (Mobile) -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
 
+    @vite('resources/js/toast.js')
+    {{-- Hiển thị toast (nếu có) --}}
+    @if (session('status'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast(
+                    "{{ session('status')['type'] }}",
+                    "{{ session('status')['message'] }}"
+                );
+            });
+        </script>
+    @endif
+
     <!-- Scripts -->
     <script>
         // Sidebar Toggle
