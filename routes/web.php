@@ -243,7 +243,7 @@ Route::middleware('admin')->group(function () {
 
 
         Route::get('/{event}/participants', [EventParticipantController::class, 'index'])
-            ->name('participants'); // ✅ Thêm route index cho view quản lý
+            ->name('participants'); 
 
         Route::patch('/{event}/participants/{user}/confirm', [EventParticipantController::class, 'confirm'])
             ->name('participants.confirm');
@@ -255,7 +255,7 @@ Route::middleware('admin')->group(function () {
             ->name('participants.pending');
 
         Route::get('/{event}/pending', [EventParticipantController::class, 'index'])
-            ->name('pending'); // ✅ Thêm route index cho view quản lý
+            ->name('pending'); 
 
         Route::post('/{event}/participants/bulk-confirm', [EventParticipantController::class, 'bulkConfirm'])
             ->name('participants.bulk-confirm');
@@ -289,7 +289,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events', [UserEventController::class, 'index'])->name('user.events.index');
     Route::get('/events/{id}', [UserEventController::class, 'show'])->name('user.events.show');
     Route::post('/events/{id}/register', [UserEventController::class, 'register'])->name('user.events.register');
-    Route::post('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
+    Route::delete('/events/{id}/cancel', [UserEventController::class, 'cancel'])->name('user.events.cancel');
     Route::get('/events/{id}/register', [UserEventController::class, 'showRegisterForm'])
         ->name('user.events.registerForm');
 
