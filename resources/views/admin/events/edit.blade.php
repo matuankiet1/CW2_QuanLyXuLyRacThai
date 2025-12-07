@@ -104,6 +104,7 @@
                                     class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">⬅️ Quay lại</a>
                                 <button type="submit" class="btn btn-admin">Lưu</button>
                             </div>
+                            <input type="hidden" name="updated_at" value="{{ $event->updated_at }}">
                         </form>
                     </div>
                 </div>

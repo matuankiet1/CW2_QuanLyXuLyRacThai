@@ -151,6 +151,11 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         Log::info('Cập nhật sự kiện ID: ' . $event->id, $request->all());
+        if ($request->updated_at != $event->updated_at) {
+            return back()
+                ->with('error', 'Dữ liệu sự kiện đã được cập nhật ở tab khác. Vui lòng tải lại trang trước khi cập nhật.')
+                ->withInput();
+        }
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
