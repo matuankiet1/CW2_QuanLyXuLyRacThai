@@ -92,7 +92,15 @@ class EventController extends Controller
     public function store(Request $request)
     {
         Log::info('Dữ liệu gửi lên:', $request->all());
+        
+        $formToken = $request->input('form_token');
+        if (session()->has('used_form_tokens.' . $formToken)) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with('error', 'Bạn đã lưu trước đó rồi.');
+        }
 
+        session()->put('used_form_tokens.' . $formToken, true);
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'register_date' => 'required|date|before_or_equal:register_end_date|after_or_equal:today',

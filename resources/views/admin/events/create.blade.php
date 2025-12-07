@@ -84,6 +84,7 @@
                                     class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">⬅️ Quay lại</a>
                                 <button type="submit" class="btn btn-admin">Lưu</button>
                             </div>
+                            <input type="hidden" name="form_token" value="{{ Str::uuid() }}">
                         </form>
                     </div>
                 </div>
@@ -102,6 +103,15 @@
                 preview.src = '#';
                 preview.classList.add('hidden');
             }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", function () {
+                const submitButton = form.querySelector("button[type='submit']");
+                submitButton.disabled = true;
+                submitButton.innerText = "Đang lưu...";
+            });
         });
     </script>
 @endsection
