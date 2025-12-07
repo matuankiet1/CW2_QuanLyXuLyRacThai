@@ -3,6 +3,7 @@
 @section('title', 'Dashboard - Admin')
 
 @section('content')
+{{-- {{ dd(get_defined_vars()) }} --}}
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -25,7 +26,7 @@
                         <span class="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">↑ 8.3%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Tổng rác thu gom tháng này</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">534 <span class="text-lg text-gray-500">kg</span></h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalWastes }} <span class="text-lg text-gray-500">kg</span></h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 8.3% so với tháng trước</p>
                 </div>
             </div>
@@ -40,7 +41,7 @@
                         <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">↑ 12.8%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sinh viên tham gia</p>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-1">167</h3>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $totalStudents }}</h3>
                     <p class="text-green-600 text-xs font-medium mt-2">↑ 12.8% so với tháng trước</p>
                 </div>
             </div>
@@ -56,7 +57,6 @@
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Sự kiện trong tháng</p>
                     <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ $upcomingEventsCount }}</h3>
-                    <p class="text-green-600 text-xs font-medium mt-2">↑ 2 sự kiện mới</p>
                 </div>
             </div>
 
@@ -67,7 +67,8 @@
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-star text-purple-600 text-xl"></i>
                         </div>
-                        <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">↑ 15.4%</span>
+                        <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">↑
+                            15.4%</span>
                     </div>
                     <p class="text-gray-500 text-sm font-medium mb-1">Điểm thưởng phát ra</p>
                     <h3 class="text-3xl font-bold text-gray-900 mb-1">2,850</h3>
@@ -85,7 +86,15 @@
                         <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-chart-line text-green-600"></i>
                         </div>
-                        <h5 class="text-lg font-semibold text-gray-900">Thống kê rác thải theo tháng</h5>
+                        <h5 class="text-lg font-semibold text-gray-900">Thống kê lượng rác thu gom</h5>
+                        <div class="flex ml-auto">
+                            <p class="me-2">Chọn năm</p>
+                            <select name="year" id="year" class="border selectYear">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="p-6">
@@ -153,20 +162,23 @@
                         ];
                     @endphp
                     <div class="space-y-4">
-                        @foreach($topStudents as $index => $student)
+                        @foreach ($topStudents as $index => $student)
                             <div class="flex items-center gap-4">
                                 <div class="flex-shrink-0">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
                                         {{ $index + 1 }}
                                     </div>
                                 </div>
                                 <div class="flex-grow min-w-0">
                                     <div class="font-semibold text-gray-900 truncate">{{ $student['name'] }}</div>
-                                    <div class="text-sm text-gray-500">{{ $student['points'] }} điểm • {{ $student['waste'] }} kg</div>
+                                    <div class="text-sm text-gray-500">{{ $student['points'] }} điểm •
+                                        {{ $student['waste'] }} kg</div>
                                 </div>
                                 <div class="flex-shrink-0 w-24">
                                     <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500" style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
+                                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
+                                            style="width: {{ ($student['points'] / 500) * 100 }}%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -177,219 +189,250 @@
         </div>
     </div>
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Chart colors
-    const primaryColor = '#10b981';
-    const successColor = '#059669';
-    const infoColor = '#34d399';
-    const warningColor = '#f59e0b';
-    const blueColor = '#3b82f6';
-    const purpleColor = '#8b5cf6';
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Chart colors
+                const primaryColor = '#10b981';
+                const successColor = '#059669';
+                const infoColor = '#34d399';
+                const warningColor = '#f59e0b';
+                const blueColor = '#3b82f6';
+                const purpleColor = '#8b5cf6';
 
-    // Thống kê rác thải theo tháng
-    const wasteCtx = document.getElementById('wasteChart');
-    if (wasteCtx) {
-        new Chart(wasteCtx, {
-            type: 'line',
-            data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                datasets: [{
-                    label: 'Rác thu gom (kg)',
-                    data: [420, 480, 510, 490, 520, 534],
-                    borderColor: primaryColor,
-                    backgroundColor: primaryColor + '40',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: primaryColor,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        cornerRadius: 8,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f3f4f6',
-                            lineWidth: 1
-                        },
-                        ticks: {
-                            color: '#6b7280',
-                            font: {
-                                size: 12
+                const wasteCtx = document.getElementById('wasteChart');
+                const selectYear = document.querySelector('.selectYear');
+                let wasteStatisticsChart = null;
+
+                // Thống kê rác thải theo tháng CHO LOAD TRANG LẦN ĐÂY
+                if(!wasteCtx) return
+                wasteStatistics(@json($wasteStatistics));
+                selectYear.value = @json($wasteStatistics).year;
+
+                // Thống kê rác thải theo tháng KHI NGƯỜI DÙNG THAY ĐỔI NĂM
+                selectYear.addEventListener('change', function() {
+                    const year = this.value;
+                    fetch(`{{ route('dashboard.admin') }}?year=${year}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest' // để Laravel nhận diện là AJAX
                             }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#6b7280',
-                            font: {
-                                size: 12
-                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            wasteStatistics(data);
+                        })
+
+                })
+
+                function wasteStatistics(data) {
+                    if (wasteCtx) {
+                        if (!wasteStatisticsChart) {
+                            wasteStatisticsChart = new Chart(wasteCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.labels,
+                                    datasets: [{
+                                        label: 'Rác thu gom (kg)',
+                                        data: data.data,
+                                        borderColor: primaryColor,
+                                        backgroundColor: primaryColor + '40',
+                                        borderWidth: 3,
+                                        tension: 0.4,
+                                        fill: true,
+                                        pointBackgroundColor: primaryColor,
+                                        pointBorderColor: '#fff',
+                                        pointBorderWidth: 2,
+                                        pointRadius: 5,
+                                        pointHoverRadius: 7
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                            padding: 12,
+                                            titleFont: {
+                                                size: 14,
+                                                weight: 'bold'
+                                            },
+                                            bodyFont: {
+                                                size: 13
+                                            },
+                                            cornerRadius: 8,
+                                            displayColors: false
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            grid: {
+                                                color: '#f3f4f6',
+                                                lineWidth: 1
+                                            },
+                                            ticks: {
+                                                color: '#6b7280',
+                                                font: {
+                                                    size: 12
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            grid: {
+                                                display: false
+                                            },
+                                            ticks: {
+                                                color: '#6b7280',
+                                                font: {
+                                                    size: 12
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            wasteStatisticsChart.data.labels = data.labels;
+                            wasteStatisticsChart.data.datasets[0].data = data.data;
+                            wasteStatisticsChart.update();
                         }
                     }
                 }
-            }
-        });
-    }
 
-    // Phân loại rác thải
-    const wasteTypeCtx = document.getElementById('wasteTypeChart');
-    const labels = @json($wasteData['labels']);
-    const weights  = @json($wasteData['weights']);
+                // Phân loại rác thải
+                const wasteTypeCtx = document.getElementById('wasteTypeChart');
+                const labels = @json($wasteClassification['labels']);
+                const weights = @json($wasteClassification['weights']);
 
-    if (wasteTypeCtx) {
-        new Chart(wasteTypeCtx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: weights,
-                    backgroundColor: [
-                        primaryColor,
-                        successColor,
-                        blueColor,
-                        warningColor
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: {
-                                size: 12
+                if (wasteTypeCtx) {
+                    new Chart(wasteTypeCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: weights,
+                                backgroundColor: [
+                                    primaryColor,
+                                    successColor,
+                                    blueColor,
+                                    warningColor
+                                ],
+                                borderWidth: 0,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        font: {
+                                            size: 12
+                                        },
+                                        color: '#374151',
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    padding: 12,
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    },
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.label}: ${context.raw}%`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Xu hướng tham gia sinh viên
+                const studentTrendCtx = document.getElementById('studentTrendChart');
+                if (studentTrendCtx) {
+                    new Chart(studentTrendCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+                            datasets: [{
+                                label: 'Sinh viên tham gia',
+                                data: [120, 135, 145, 150, 160, 167],
+                                backgroundColor: purpleColor,
+                                borderRadius: 8,
+                                borderSkipped: false,
+                                barThickness: 40
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    padding: 12,
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    },
+                                    cornerRadius: 8,
+                                    displayColors: false
+                                }
                             },
-                            color: '#374151',
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw}%`;
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: '#f3f4f6',
+                                        lineWidth: 1
+                                    },
+                                    ticks: {
+                                        color: '#6b7280',
+                                        font: {
+                                            size: 12
+                                        },
+                                        stepSize: 20
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: '#6b7280',
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
+                    });
                 }
-            }
-        });
-    }
-
-    // Xu hướng tham gia sinh viên
-    const studentTrendCtx = document.getElementById('studentTrendChart');
-    if (studentTrendCtx) {
-        new Chart(studentTrendCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                datasets: [{
-                    label: 'Sinh viên tham gia',
-                    data: [120, 135, 145, 150, 160, 167],
-                    backgroundColor: purpleColor,
-                    borderRadius: 8,
-                    borderSkipped: false,
-                    barThickness: 40
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        cornerRadius: 8,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f3f4f6',
-                            lineWidth: 1
-                        },
-                        ticks: {
-                            color: '#6b7280',
-                            font: {
-                                size: 12
-                            },
-                            stepSize: 20
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#6b7280',
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
-@endpush
+            });
+        </script>
+    @endpush
 @endsection

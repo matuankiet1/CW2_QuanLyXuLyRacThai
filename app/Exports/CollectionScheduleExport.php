@@ -17,35 +17,17 @@ class CollectionScheduleExport implements
     WithStyles,
     WithColumnWidths
 {
-    protected ?string $q;
+    protected $rows;
 
-    public function __construct(?string $q = null)
+    public function __construct($rows)
     {
-        $this->q = $q;
+        $this->rows = $rows;
     }
 
     // Lấy dữ liệu
     public function collection()
     {
-        $query = CollectionSchedule::query()->with('staff');
-        if (!empty($this->q)) {
-            $keyword = $this->q;
-
-            $query->where(function ($q) use ($keyword) {
-                
-                $q->where('status', 'like', "%{$keyword}%")
-                    ->orWhere('scheduled_date', 'like', "%{$keyword}%");
-                // Tìm theo tên nhân viên
-                $q->orWhereHas('staff', function ($sub) use ($keyword) {
-                    $sub->where('name', 'like', "%{$keyword}%");
-                });
-            });
-        }
-        else{
-            $query->orderBy('collection_schedules.schedule_id', 'asc');
-        }
-        
-        return $query->select('collection_schedules.*')->get();
+        return $this->rows;
     }
 
     // Định nghĩa header dòng đầu tiên
@@ -56,8 +38,8 @@ class CollectionScheduleExport implements
             'Tên nhân viên thực hiện',
             'Ngày thu gom',
             'Ngày hoàn thành',
-            'Trạng thái',
             'Ngày tạo',
+            'Trạng thái',
         ];
     }
 
@@ -69,8 +51,8 @@ class CollectionScheduleExport implements
             $collection->staff?->name ?? $collection->staff_id,
             $collection->scheduled_date,
             $collection->completed_at,
-            $collection->status,
             $collection->created_at?->format('Y-m-d H:i:s'),
+            $collection->status,
         ];
     }
 
@@ -128,10 +110,10 @@ class CollectionScheduleExport implements
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
-            $cellValue = $sheet->getCell("E{$row}")->getValue();
+            $cellValue = $sheet->getCell("F{$row}")->getValue();
 
             if ($cellValue === 'Đã hoàn thành') {
-                $sheet->getStyle("E{$row}")->applyFromArray([
+                $sheet->getStyle("F{$row}")->applyFromArray([
                     'fill' => [
                         'fillType' => 'solid',
                         'color' => ['rgb' => 'C6EFCE'] // xanh lá nhạt
@@ -150,12 +132,12 @@ class CollectionScheduleExport implements
     public function columnWidths(): array
     {
         return [
-            'A' => 7,   // #
+            'A' => 7,   // ID
             'B' => 30,  // Tên nhân viên
             'C' => 25,  // Ngày thu gom
             'D' => 25,  // Ngày hoàn thành
-            'E' => 20,  // Trạng thái
-            'F' => 25,  // Ngày tạo
+            'E' => 25,  // Ngày tạo
+            'F' => 20,  // Trạng thái
         ];
     }
 }

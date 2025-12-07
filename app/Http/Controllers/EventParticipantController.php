@@ -47,7 +47,9 @@ class EventParticipantController extends Controller
         }
 
         // Sắp xếp
-        $participants = $query->orderBy('registered_at', 'desc')
+        $participants = EventUser::with('user')
+            ->where('event_id', $event->id)
+            ->orderBy('registered_at', 'desc')
             ->paginate(20);
 
         // Thống kê
@@ -61,52 +63,6 @@ class EventParticipantController extends Controller
 
         return view('admin.events.participants', compact('event', 'participants', 'status', 'search', 'stats'));
     }
-
-
-    public function register(Request $request, $id)
-    {
-        $event = Event::findOrFail($id);
-
-        // Validate dữ liệu từ form
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'student_id' => 'required|string|max:50',   // MSSV
-            'student_class' => 'required|string|max:50', // Lớp
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // Kiểm tra user đã tồn tại theo email chưa
-        $user = User::firstOrCreate(
-            ['email' => $request->email],
-            ['name' => $request->name]
-        );
-
-        // Kiểm tra đã đăng ký sự kiện chưa
-        $alreadyRegistered = EventUser::where('event_id', $event->id)
-            ->where('user_id', $user->id)
-            ->exists();
-
-        if ($alreadyRegistered) {
-            return redirect()->back()->with('error', 'Bạn đã đăng ký sự kiện này rồi.');
-        }
-
-        // Tạo bản ghi EventUser
-        EventUser::create([
-            'event_id' => $event->id,
-            'user_id' => $user->id,
-            'student_id' => $request->student_id,
-            'student_class' => $request->student_class,
-            'status' => EventUser::STATUS_PENDING, // mặc định chờ xác nhận
-            'registered_at' => now(),
-        ]);
-
-        return redirect()->back()->with('success', 'Đăng ký tham gia sự kiện thành công!');
-    }
-
 
     /**
      * Xác nhận sinh viên tham gia

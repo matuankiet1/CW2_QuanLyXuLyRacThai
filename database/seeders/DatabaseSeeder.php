@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // Tạo tài khoản admin mặc định
         $this->call(DefaultAdminSeeder::class);
+        $this->call(UserSeeder::class);
         $this->call(CollectionScheduleSeeder::class);
         $this->call(WasteTypesSeeder::class);
         $this->call(PostSeeder::class);

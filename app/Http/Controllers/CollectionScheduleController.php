@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\CollectionSchedule;
 use App\Models\WasteLog;
 use App\Exports\CollectionScheduleExport;
+use App\Mail\NotificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CollectionScheduleController extends Controller
@@ -18,10 +20,28 @@ class CollectionScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
+        $query = $this->applyFillter($request);
         $isSearch = false;
         $isFilter = false;
 
+        if ($query) {
+            $isFilter = true;
+        } else {
+            $query->orderByDesc('schedule_id');
+        }
+
+        $collectionSchedules = $query
+            ->select('collection_schedules.*')
+            ->paginate(7)
+            // GIỮ LẠI TẤT CẢ THAM SỐ QUERY HIỆN CÓ (trừ page)
+            ->appends($request->except('page'));
+
+        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'isFilter'));
+    }
+
+    public function applyFillter(Request $request)
+    {
+        $query = CollectionSchedule::query()->with(['staff', 'confirmedBy', 'report']);
         // 1. Sắp xếp theo nhân viên
         if ($request->radioFilterStaff === 'asc') {
             $query->leftJoin('users', 'collection_schedules.staff_id', '=', 'users.user_id')
@@ -52,27 +72,7 @@ class CollectionScheduleController extends Controller
             $query->where('status', 'Chưa thực hiện');
         }
 
-        if ($request->hasAny(['radioFilterStaff', 'radioFilterScheduledDate', 'radioFilterCompletedAt', 'radioFilterStatus'])) {
-            $isFilter = true;
-        } else {
-            $query->orderByDesc('schedule_id');
-        }
-
-        $collectionSchedules = $query
-            ->select('collection_schedules.*')
-            ->paginate(7)
-            // GIỮ LẠI TẤT CẢ THAM SỐ QUERY HIỆN CÓ (trừ page)
-            ->appends($request->except('page'));
-
-        return view('admin.collection_schedules.index', compact('collectionSchedules', 'isSearch', 'isFilter'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $query;
     }
 
     /**
@@ -82,22 +82,47 @@ class CollectionScheduleController extends Controller
     {
         try {
             $validated = $request->validate([
-                'staff_id' => 'required|string|max:255',
-                'scheduled_date' => 'required|date|after_or_equal:now'
+                'staff_id' => 'required|string|max:255|exists:users,user_id',
+                'scheduled_date' => [
+                    'required',
+                    'date',
+                    'after_or_equal:today',
+                    function ($attribute, $value, $fail) {
+                        $max = now()->addMonths(3)->startOfDay();
+                        if (strtotime($value) > $max->timestamp) {
+                            $fail('Ngày thu gom không được vượt quá 3 tháng so với ngày hiện tại.');
+                        }
+                    }
+                ]
             ]);
-            $staff_id = User::where('name', $validated['staff_id'])->value('user_id');
-            if (!$staff_id) {
+            $staff = User::where('name', $request->staff_name)
+                ->where('role', 'staff')
+                ->first();
+            if (!$staff) {
                 return back()->with('status', [
                     'type' => 'error',
                     'message' => 'Không tìm thấy nhân viên!'
                 ])->withInput();
             } else {
-                $validated['staff_id'] = $staff_id;
+                $validated['staff_id'] = $staff->user_id;
                 CollectionSchedule::create($validated);
             }
         } catch (ValidationException $e) {
-            return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
+            return back()->withErrors($e->validator)->withInput()->with('show_modal_add', true);
         }
+
+        $user = User::where('name', $request->staff_name)
+            ->where('role', 'staff')
+            ->first();
+
+        if ($user && $user->email) {
+            Mail::to($user->email)->queue(new NotificationMail(
+                'Thông báo về lịch thu gom rác mới',
+                'Bạn có một lịch thu gom rác mới được lên lịch vào ngày ' . $validated['scheduled_date'] . '. Vui lòng kiểm tra và chuẩn bị thực hiện nhiệm vụ đúng hạn.',
+                $user->name
+            ));
+        }
+
         return back()->with('status', [
             'type' => 'success',
             'message' => 'Thêm lịch thu gom thành công!'
@@ -129,29 +154,60 @@ class CollectionScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $staff_name = $request['staff_id'];
-        if ($staff_name) {
-            $staff_id = User::where('name', $staff_name)->value('user_id');
-            if (!$staff_id) {
+        $staff = null;
+        if ($request->staff_name) {
+            $staff = User::where('name', $request->staff_name)
+                ->where('role', 'staff')
+                ->first();
+            if (!$staff) {
                 return back()->with('status', [
                     'type' => 'error',
                     'message' => 'Không tìm thấy nhân viên. Vui lòng thử lại sau!'
                 ])->withInput();
-            } else {
-                $request['staff_id'] = $staff_id;
             }
         }
 
         try {
             $validated = $request->validate([
-                'staff_id' => 'required|exists:users,user_id',
-                'scheduled_date' => 'required|date',
-                'completed_at' => 'nullable|date|after_or_equal:now',
+                'staff_id' => 'required|string|max:255|exists:users,user_id',
+                'scheduled_date' => [
+                    'required',
+                    'date',
+                    function ($attribute, $value, $fail) {
+                        $max = now()->addMonths(3)->startOfDay();
+                        if (strtotime($value) > $max->timestamp) {
+                            $fail('Ngày thu gom không được vượt quá 3 tháng so với ngày hiện tại.');
+                        }
+                    }
+                ],
+                'completed_at' => [
+                    'nullable',
+                    'date',
+                    function ($attribute, $value, $fail) use ($request) {
+                        if (!$value || !$request->scheduled_date)
+                            return;
+
+                        $scheduled = \Carbon\Carbon::parse($request->scheduled_date)->startOfDay();
+                        $completed = \Carbon\Carbon::parse($value)->startOfDay();
+
+                        // Nếu completed_at < scheduled_date
+                        if ($completed->lt($scheduled)) {
+                            return $fail('Ngày hoàn thành phải lớn hơn hoặc bằng ngày thu gom.');
+                        }
+
+                        // Nếu completed_at > scheduled_date + 3 ngày
+                        if ($completed->gt($scheduled->copy()->addDays(3))) {
+                            return $fail('Ngày hoàn thành không được vượt quá 3 ngày so với ngày thu gom.');
+                        }
+                    }
+                ],
                 'status' => ['required', Rule::in(['Chưa thực hiện', 'Đã hoàn thành'])],
             ]);
         } catch (ValidationException $e) {
-            return back()->withErrors($e->validator)->withInput()->with('show_modal', true);
+            return back()->withErrors($e->validator)->withInput()->with('show_modal_update', true)->with('schedule_id', $id);
         }
+
+        $validated['staff_id'] = $staff->user_id;
 
         $collectionSchedule = CollectionSchedule::findOrFail($id);
 
@@ -209,12 +265,20 @@ class CollectionScheduleController extends Controller
         ]);
     }
 
+    public function getWasteLogs($id)
+    {
+        $wasteLogs = WasteLog::where('schedule_id', $id)
+            ->with('wasteType') //
+            ->get();
+        return response()->json($wasteLogs);
+    }
+
     public function search(Request $request)
     {
         $q = $request->input('q');
         $collectionSchedules = CollectionSchedule::with(['staff', 'confirmedBy', 'report'])
             ->whereHas('staff', function ($query) use ($q) {
-            $query->where('name', 'like', '%' . $q . '%');
+                $query->where('name', 'like', '%' . $q . '%');
             })
             ->orWhere('scheduled_date', 'like', '%' . $q . '%')
             ->orderBy('schedule_id', 'desc')
@@ -225,9 +289,20 @@ class CollectionScheduleController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $q = $request->input('q');
-        $fileName = 'Tất cả lịch thu gom.xlsx';
-        return Excel::download(new CollectionScheduleExport($q), $fileName);
+        $query = $this->applyFillter($request);
+
+        // Lấy toàn bộ dữ liệu (không phân trang)
+        $rows = $query->get([
+            'collection_schedules.schedule_id',
+            'collection_schedules.staff_id',
+            'collection_schedules.scheduled_date',
+            'collection_schedules.created_at',
+            'collection_schedules.status',
+        ]);
+
+        $fileName = 'Lịch thu gom rác.xlsx';
+
+        return Excel::download(new CollectionScheduleExport($rows), $fileName);
     }
 
     /**
@@ -288,6 +363,16 @@ class CollectionScheduleController extends Controller
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getStaffs(Request $request)
+    {
+        $staffs = User::where('role', 'staff')
+            ->where('name', 'like', '%' . $request->input('q') . '%');
+        return response()->json([
+            'id' => $staffs->pluck('user_id'),
+            'name' => $staffs->pluck('name'),
+        ]);
     }
 
 }
