@@ -190,6 +190,11 @@ class PostController extends Controller
         try {
             // 1️⃣ Ghi log để debug
             \Log::info('update() đang chạy', $request->all());
+            if ($request->updated_at != $post->updated_at) {
+                return back()
+                    ->with('error', 'Dữ liệu sự kiện đã được cập nhật ở tab khác. Vui lòng tải lại trang trước khi cập nhật.')
+                    ->withInput();
+            }
 
             // 2️⃣ Xác thực dữ liệu đầu vào
             $validated = $request->validate([

@@ -133,6 +133,7 @@
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Cập nhật bài
                     viết</button>
             </div>
+            <input type="hidden" name="updated_at" value="{{ $post->updated_at }}">
         </form>
     </div>
 
